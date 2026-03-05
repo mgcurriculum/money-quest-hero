@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
+import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const WelcomeScreen = () => {
   const { dispatch } = useGame();
@@ -27,7 +28,7 @@ const WelcomeScreen = () => {
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           className="mb-6"
         >
-          <span className="text-6xl">🏆</span>
+          <img src={finquoLogo} alt="FinQuo Versity" className="w-32 h-auto mx-auto" />
         </motion.div>
 
         <motion.p

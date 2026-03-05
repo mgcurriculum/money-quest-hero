@@ -1,7 +1,7 @@
 export interface Scenario {
   situation: string;
-  scene: string; // emoji scene illustration
-  character: string; // character emoji
+  scene: string;
+  character: string;
   options: { text: string; emoji: string }[];
 }
 
@@ -11,9 +11,67 @@ export interface Level {
   theme: string;
   icon: string;
   color: string;
-  bgEmoji: string; // background decoration
+  bgEmoji: string;
   scenarios: Scenario[];
 }
+
+// Dimension weights for FQ scoring (total = 1.0)
+export const dimensionWeights = [0.15, 0.20, 0.20, 0.15, 0.15, 0.15];
+
+export const dimensionLabels = [
+  "Earning Mindset",
+  "Spending Discipline",
+  "Saving Behaviour",
+  "Debt Awareness",
+  "Investment Awareness",
+  "Financial Safety",
+];
+
+export const dimensionIcons = ["💼", "💳", "💰", "🧾", "📈", "🛡️"];
+
+// 12 Financial Personality Archetypes (2 per dimension: high & low)
+export const archetypes: { dimension: number; high: { name: string; emoji: string; trait: string; strength: string; quest: string }; low: { name: string; emoji: string; trait: string; risk: string; quest: string } }[] = [
+  {
+    dimension: 0,
+    high: { name: "Income Explorer", emoji: "💼", trait: "Actively seeks earning opportunities", strength: "Income growth mindset", quest: "Diversify income streams" },
+    low: { name: "Skill Monetizer", emoji: "🎯", trait: "Turns skills or hobbies into money", risk: "Untapped earning potential", quest: "Start a freelance side project" },
+  },
+  {
+    dimension: 1,
+    high: { name: "Smart Spender", emoji: "💳", trait: "Controls impulse purchases", strength: "Budget awareness", quest: "Track every purchase for 30 days" },
+    low: { name: "Lifestyle Drifter", emoji: "🛍️", trait: "Spends based on social influence", risk: "Peer pressure spending", quest: "Follow the 24-hour rule before buying" },
+  },
+  {
+    dimension: 2,
+    high: { name: "Growing Saver", emoji: "💰", trait: "Consistently builds savings", strength: "Emergency fund mindset", quest: "Save ₹500 weekly for 4 weeks" },
+    low: { name: "Future Planner", emoji: "📊", trait: "Plans financial goals ahead", risk: "Inconsistent savings habit", quest: "Set up automatic savings transfer" },
+  },
+  {
+    dimension: 3,
+    high: { name: "Debt Avoider", emoji: "🧾", trait: "Cautious about borrowing", strength: "Responsible repayment behaviour", quest: "Create a debt-free action plan" },
+    low: { name: "Credit Juggler", emoji: "⚠️", trait: "Uses debt casually", risk: "EMI-driven lifestyle", quest: "Review & eliminate one unnecessary subscription" },
+  },
+  {
+    dimension: 4,
+    high: { name: "Future Investor", emoji: "📈", trait: "Interested in wealth creation", strength: "Long-term mindset", quest: "Start a ₹500 monthly SIP" },
+    low: { name: "Market Learner", emoji: "📚", trait: "Early stage investment curiosity", risk: "Analysis paralysis", quest: "Read one investment article daily for a week" },
+  },
+  {
+    dimension: 5,
+    high: { name: "Money Protector", emoji: "🛡️", trait: "High awareness of fraud and financial safety", strength: "Fraud awareness", quest: "Share one safety tip with a friend" },
+    low: { name: "Risk Blind", emoji: "🚨", trait: "Low financial safety awareness", risk: "Vulnerable to scams", quest: "Learn about 3 common financial scams" },
+  },
+];
+
+// FQ Score interpretation bands
+export const fqBands: { min: number; max: number; level: string; meaning: string; emoji: string }[] = [
+  { min: 0, max: 200, level: "Financial Beginner", meaning: "Limited awareness — your journey starts here!", emoji: "🌱" },
+  { min: 200, max: 400, level: "Financial Explorer", meaning: "Basic awareness — keep exploring!", emoji: "🧭" },
+  { min: 400, max: 600, level: "Developing Money Skills", meaning: "Improving habits — you're on the right track!", emoji: "📚" },
+  { min: 600, max: 800, level: "Financially Smart", meaning: "Good control — strong financial instincts!", emoji: "🧠" },
+  { min: 800, max: 900, level: "Wealth Builder", meaning: "Strong discipline — building real wealth!", emoji: "🏗️" },
+  { min: 900, max: 1001, level: "Financial Master", meaning: "Highly optimized behaviour — you're a legend!", emoji: "👑" },
+];
 
 export const levels: Level[] = [
   {
@@ -303,8 +361,9 @@ export const reflectionOptions = [
   "🛡️ Protect money from scams",
 ];
 
+// Legacy exports for compatibility
 export const levelTraits = [
-  { label: "Income Mindset", icon: "💼" },
+  { label: "Earning Mindset", icon: "💼" },
   { label: "Spending Behaviour", icon: "💳" },
   { label: "Saving Behaviour", icon: "💰" },
   { label: "Debt Awareness", icon: "🧾" },
@@ -320,3 +379,52 @@ export const traitProfiles: { [key: number]: string[] } = {
   4: ["Investment Avoider", "Investment Skeptic", "Investment Curious", "Future Investor", "Investment Explorer"],
   5: ["Fraud Vulnerable", "Somewhat Aware", "Getting Careful", "Money Protector", "Security Expert"],
 };
+
+// FQ Scoring utility functions
+export function calculateNormalizedScore(levelAnswers: { [q: number]: number }): number {
+  const vals = Object.values(levelAnswers);
+  if (vals.length === 0) return 0;
+  const userScore = vals.reduce((a, b) => a + b, 0);
+  const minScore = vals.length * 1;
+  const maxScore = vals.length * 5;
+  return ((userScore - minScore) / (maxScore - minScore)) * 100;
+}
+
+export function calculateFQScore(answers: { [level: number]: { [q: number]: number } }): {
+  fqScore: number;
+  normalizedScores: number[];
+  primaryArchetype: { name: string; emoji: string; trait: string; quest: string };
+  secondaryArchetype: { name: string; emoji: string; trait: string; quest: string };
+  band: typeof fqBands[0];
+} {
+  const normalizedScores = Array.from({ length: 6 }, (_, level) => {
+    const levelAnswers = answers[level] || {};
+    return calculateNormalizedScore(levelAnswers);
+  });
+
+  const weightedTotal = normalizedScores.reduce(
+    (sum, score, idx) => sum + score * dimensionWeights[idx],
+    0
+  );
+
+  const fqScore = Math.round(weightedTotal * 10);
+
+  // Determine primary & secondary archetypes
+  const scored = normalizedScores.map((s, i) => ({ score: s, index: i }));
+  scored.sort((a, b) => b.score - a.score);
+
+  const primaryIdx = scored[0].index;
+  const secondaryIdx = scored[1]?.index ?? scored[0].index;
+
+  const threshold = 50;
+  const primaryArchetype = normalizedScores[primaryIdx] >= threshold
+    ? archetypes[primaryIdx].high
+    : archetypes[primaryIdx].low;
+  const secondaryArchetype = normalizedScores[secondaryIdx] >= threshold
+    ? archetypes[secondaryIdx].high
+    : archetypes[secondaryIdx].low;
+
+  const band = fqBands.find(b => fqScore >= b.min && fqScore < b.max) || fqBands[0];
+
+  return { fqScore, normalizedScores, primaryArchetype, secondaryArchetype, band };
+}

@@ -228,7 +228,7 @@ const ReportScreen = () => {
             onClick={() => dispatch({ type: 'RESET' })}
             className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform"
           >
-            Play Again 🔄
+            Take Test Again 🔄
           </button>
         </div>
       </div>

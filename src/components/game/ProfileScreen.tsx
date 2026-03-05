@@ -3,18 +3,19 @@ import { motion } from 'framer-motion';
 import { useGame, PlayerProfile } from '@/context/GameContext';
 
 const statusOptions = [
-  { label: '🎓 School (11/12)', value: 'school' },
-  { label: '🎓 College', value: 'college' },
-  { label: '🎓 Skill Program', value: 'skill' },
-  { label: '💼 Working', value: 'working' },
+  { label: '🎒 In school (Class 11/12)', value: 'school' },
+  { label: '🎓 In college', value: 'college' },
+  { label: '🧑‍💻 Doing a course or skill program', value: 'skill' },
+  { label: '💼 Working part-time or full-time', value: 'working' },
+  { label: '🚀 Running a business / startup', value: 'business' },
 ];
 
 const incomeOptions = [
-  { label: '💰 Pocket Money', value: 'pocket' },
-  { label: '💰 Part-time Income', value: 'parttime' },
-  { label: '👪 Dependent on Parents', value: 'dependent' },
-  { label: '💼 Salary', value: 'salary' },
-  { label: '💼 Business Revenue', value: 'business' },
+  { label: '👨‍👩‍👧 Fully dependent on parents', value: 'dependent' },
+  { label: '💸 Pocket money from family', value: 'pocket' },
+  { label: '🧑‍💻 Freelance / gig work', value: 'freelance' },
+  { label: '💼 Salary from job', value: 'salary' },
+  { label: '🚀 Business / startup income', value: 'business' },
 ];
 
 const ProfileScreen = () => {
@@ -105,7 +106,7 @@ const ProfileScreen = () => {
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-3 block text-center">Current Status</label>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-3 block text-center">What best describes your current stage?</label>
               <div className="grid grid-cols-2 gap-2">
                 {statusOptions.map(opt => (
                   <button
@@ -119,7 +120,7 @@ const ProfileScreen = () => {
               </div>
             </div>
             <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-3 block text-center">Income Type</label>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-3 block text-center">How do you usually receive money?</label>
               <div className="grid grid-cols-2 gap-2">
                 {incomeOptions.map(opt => (
                   <button

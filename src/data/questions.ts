@@ -24,28 +24,6 @@ export interface Level {
 // 11 Financial Reality Check questions (Level 0)
 export const realityQuestions: RealityQuestion[] = [
   {
-    question: "What best describes your current stage?",
-    category: "Player Segmentation",
-    options: [
-      { text: "In school (Class 11/12)", emoji: "🎒" },
-      { text: "In college", emoji: "🎓" },
-      { text: "Doing a course or skill program", emoji: "🧑‍💻" },
-      { text: "Working part-time or full-time", emoji: "💼" },
-      { text: "Running a business / startup", emoji: "🚀" },
-    ],
-  },
-  {
-    question: "How do you usually receive money?",
-    category: "Player Segmentation",
-    options: [
-      { text: "Fully dependent on parents", emoji: "👨‍👩‍👧" },
-      { text: "Pocket money from family", emoji: "💸" },
-      { text: "Freelance / gig work", emoji: "🧑‍💻" },
-      { text: "Salary from job", emoji: "💼" },
-      { text: "Business / startup income", emoji: "🚀" },
-    ],
-  },
-  {
     question: "How much money do you receive or earn every month from all sources?",
     category: "Real Income Level",
     options: [
@@ -120,28 +98,6 @@ export const realityQuestions: RealityQuestion[] = [
       { text: "Sometimes check my balance", emoji: "🤔" },
       { text: "Often review my spending", emoji: "📊" },
       { text: "Track every expense carefully", emoji: "📱" },
-    ],
-  },
-  {
-    question: "How interested are you in improving your financial knowledge?",
-    category: "Financial Learning Mindset",
-    options: [
-      { text: "Not interested", emoji: "❌" },
-      { text: "Slightly curious", emoji: "🤷" },
-      { text: "Somewhat interested", emoji: "🤔" },
-      { text: "Interested in learning more", emoji: "📚" },
-      { text: "Actively learning about money", emoji: "🚀" },
-    ],
-  },
-  {
-    question: "Are you ready to take charge of your money journey?",
-    category: "Final Commitment",
-    options: [
-      { text: "Not ready yet", emoji: "😴" },
-      { text: "Maybe later", emoji: "🤔" },
-      { text: "Thinking about it", emoji: "🙂" },
-      { text: "Yes, I want to improve", emoji: "💪" },
-      { text: "Absolutely! I'm ready to level up", emoji: "🚀" },
     ],
   },
 ];

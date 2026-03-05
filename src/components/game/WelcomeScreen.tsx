@@ -37,7 +37,8 @@ const WelcomeScreen = () => {
           transition={{ delay: 0.3 }}
           className="text-game-muted text-sm font-body tracking-widest uppercase mb-2"
         >
-          FQ Test by FinQuo Versity
+          <span className="gold-text font-display font-bold text-base">FQ Test</span>{' '}
+          <span className="text-game-muted text-xs">by FinQuo Versity</span>
         </motion.p>
 
         <motion.h1
@@ -69,7 +70,7 @@ const WelcomeScreen = () => {
             onClick={() => dispatch({ type: 'SET_STEP', step: 'consent' })}
             className="w-full py-4 px-8 rounded-2xl font-display font-semibold text-lg gold-gradient text-game-bg game-shadow pulse-glow transition-transform hover:scale-105 active:scale-95"
           >
-            Start My Money Quest 🚀
+            Start My FQ Test 🚀
           </button>
         </motion.div>
 

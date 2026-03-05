@@ -18,8 +18,8 @@ const JourneyMap = () => {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-          <p className="text-game-muted text-xs font-body uppercase tracking-widest mb-1">FQ Test by FinQuo Versity</p>
-          <h2 className="text-2xl font-display font-bold text-game-text">Financial Journey Map</h2>
+          <p className="mb-1"><span className="gold-text font-display font-bold text-base">FQ Test</span>{' '}<span className="text-game-muted text-xs font-body">by FinQuo Versity</span></p>
+          <h2 className="text-2xl font-display font-bold text-game-text">Journey Map</h2>
           <div className="flex items-center justify-center gap-2 mt-3">
             <div className="h-2 flex-1 max-w-[200px] bg-game-card rounded-full overflow-hidden">
               <motion.div

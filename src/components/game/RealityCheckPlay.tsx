@@ -66,8 +66,8 @@ const RealityCheckPlay = () => {
             ✕ Exit
           </button>
           <motion.div className="glass-card rounded-full px-4 py-1.5 flex items-center gap-2">
-            <span className="text-xl">📋</span>
-            <span className="text-game-text font-display font-semibold text-xs">Reality Check</span>
+            <span className="gold-text font-display font-bold text-xs">FQ Test</span>
+            <span className="text-game-muted text-[10px] font-body">Reality Check</span>
           </motion.div>
           <div className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1">
             <Zap size={14} className="text-game-gold" />

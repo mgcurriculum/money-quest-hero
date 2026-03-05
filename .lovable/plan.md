@@ -1,46 +1,49 @@
 
 
-## Plan: Add Voice Narration to All Screens
+## Plan: Convert Voice Narration from Direct Reading to Assistant-Style Explanations
 
-Extend the existing `useNarration` hook to all remaining screens. Each screen gets auto-play narration with a mute toggle, and voice feedback on answer selections where applicable.
+The current narration reads screen text verbatim. The change is to replace all narration strings with conversational, assistant-style explanations that guide the user rather than repeat what's on screen.
 
-### Screens to Update
+### Narration Text Changes
 
-**1. ConsentScreen.tsx** — "Before We Begin"
-- Add `useNarration` hook, mute toggle button (top-right)
-- Auto-play: "Before we begin. We respect your privacy. Your responses will only be used to generate your Financial Intelligence Report. Please check both boxes to continue."
-- Stop narration on "Continue" or "Back"
+**WelcomeScreen.tsx**
+- Current: "Welcome to the FQ Test by FinQuo Versity. Discover how smart you are with money..."
+- New: "Hey there! I'm your financial guide. This is a quick and fun quiz that'll help you understand how smart you really are with money. It only takes about 5 minutes. Ready? Just tap Start!"
 
-**2. ProfileScreen.tsx** — "Create Your Money Profile"
-- Add `useNarration` hook, mute toggle button (top-right)
-- Step 0 auto-play: "Create your money profile. Enter your name, age and gender to get started."
-- Step 1 auto-play: "What best describes your current stage? And how do you usually receive money?"
-- Stop narration on navigation
+**ConsentScreen.tsx**
+- Current: "Before we begin. We respect your privacy..."
+- New: "Alright, just a quick heads up! We need your consent before we start. Don't worry, your data stays safe and private. Just check both boxes and we're good to go!"
 
-**3. JourneyMap.tsx** — Journey Map
-- Add `useNarration` hook, mute toggle button (top-right)
-- Auto-play on mount: "Here's your journey map. Tap a level to begin your quest."
-- When all levels complete, narrate: "Amazing! You've completed all levels. Tap View Your Results to see your report."
-- Stop narration on level select or results button
+**ProfileScreen.tsx**
+- Step 0 current: "Create your money profile. Enter your name, age and gender..."
+- Step 0 new: "Let's get to know you a bit! Just fill in your name, and optionally your age and gender. This helps us personalize your results."
+- Step 1 current: "What best describes your current stage?..."
+- Step 1 new: "Great! Now tell me a little about where you are in life and how money comes your way. This helps me tailor the scenarios to you."
 
-**4. LevelPlay.tsx** — Main 5 Levels (Questions)
-- Add `useNarration` hook, mute toggle button in header
-- Auto-play each scenario's `situation` text when question changes
-- Speak feedback text after answer selection (same pattern as RealityCheckPlay)
-- Stop narration on answer select, then speak feedback
+**JourneyMap.tsx**
+- Mount: "Here's your quest board! Each level covers a different money skill. Start from the top and work your way down. Tap any unlocked level to begin!"
+- All complete: "Wow, you crushed it! All levels done. Let's see how you scored. Tap the button below to view your results!"
 
-**5. ReflectionScreen.tsx** — Final Reflection
-- Add `useNarration` hook, mute toggle button (top-right)
-- Step 0 auto-play: "How interested are you in improving your financial knowledge?"
-- Step 1 auto-play: "Final reflection. If you could improve one money skill this year, what would it be?"
-- Stop narration on selection
+**RealityCheckPlay.tsx** (questions)
+- Instead of reading the question text verbatim, narrate: "Here's a question about [category]. Take a moment to read it and pick the answer that feels most like you."
+- Use `question.category` to make it contextual
+
+**LevelPlay.tsx** (scenario questions)
+- Instead of reading `scenario.situation` verbatim, narrate: "Alright, picture this scenario. Read through the situation and choose how you'd handle it."
+- Keep feedback voice as-is (short phrases like "Noted!", "Bold move!")
+
+**ReflectionScreen.tsx**
+- Step 0 current: "How interested are you in improving..."
+- Step 0 new: "We're almost done! I'm curious — how interested are you in actually getting better with money? Be honest!"
+- Step 1 current: "Final reflection..."
+- Step 1 new: "Last question! If you could level up just one money skill this year, which would it be? Pick the one that matters most to you."
 
 ### Files to Change
-- `src/components/game/ConsentScreen.tsx`
-- `src/components/game/ProfileScreen.tsx`
-- `src/components/game/JourneyMap.tsx`
-- `src/components/game/LevelPlay.tsx`
-- `src/components/game/ReflectionScreen.tsx`
-
-All follow the same pattern already established in `WelcomeScreen.tsx` and `RealityCheckPlay.tsx`: import `useNarration`, add mute toggle UI, `useEffect` for auto-play, `stop()` before navigation.
+- `src/components/game/WelcomeScreen.tsx` — Update WELCOME_TEXT
+- `src/components/game/ConsentScreen.tsx` — Update CONSENT_TEXT
+- `src/components/game/ProfileScreen.tsx` — Update PROFILE_TEXT_0 and PROFILE_TEXT_1
+- `src/components/game/JourneyMap.tsx` — Update both narration strings
+- `src/components/game/RealityCheckPlay.tsx` — Change from `question.question` to assistant-style text using category
+- `src/components/game/LevelPlay.tsx` — Change from `scenario.situation` to assistant-style text
+- `src/components/game/ReflectionScreen.tsx` — Update REFLECTION_TEXT_0 and REFLECTION_TEXT_1
 

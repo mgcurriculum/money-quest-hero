@@ -75,7 +75,7 @@ const WelcomeScreen = () => {
           transition={{ delay: 0.4 }}
           className="text-4xl md:text-5xl font-display font-bold text-game-text mb-4 leading-tight"
         >
-          Your Money Journey{' '}
+          Your Financial Journey{' '}
           <span className="gold-text">Starts Here</span>
         </motion.h1>
 

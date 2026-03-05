@@ -18,7 +18,7 @@ const JourneyMap = () => {
       hasNarrated.current = true;
       const text = allCompleted
         ? "Wow, you crushed it! All levels done. Let's see how you scored. Tap the button below to view your results!"
-        : "Here's your quest board! Each level covers a different money skill. Start from the top and work your way down. Tap any unlocked level to begin!";
+        : "Here's your quest board! Each level covers a different financial skill. Start from the top and work your way down. Tap any unlocked level to begin!";
       const timer = setTimeout(() => speak(text), 500);
       return () => clearTimeout(timer);
     }

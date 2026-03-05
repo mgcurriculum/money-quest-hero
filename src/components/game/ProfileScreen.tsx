@@ -68,7 +68,7 @@ const ProfileScreen = () => {
       >
         <div className="text-center mb-8">
           <span className="text-5xl mb-4 block">🧑‍🎮</span>
-          <h2 className="text-3xl font-display font-bold text-game-text mb-2">Create Your Money Profile</h2>
+          <h2 className="text-3xl font-display font-bold text-game-text mb-2">Create Your Financial Profile</h2>
           <div className="flex justify-center gap-2 mt-4">
             {[0, 1].map(i => (
               <div key={i} className={`h-1.5 w-12 rounded-full transition-all ${i <= step ? 'gold-gradient' : 'bg-game-card'}`} />

@@ -27,7 +27,7 @@ const ReportScreen = () => {
     fullMark: 100,
   }));
 
-  const shareText = `My Financial Quotient is ${fqScore}/1000! 🏆\nI am a ${primaryArchetype.emoji} ${primaryArchetype.name}\nWhat's your Money Superpower?\n\nTake the test: ${window.location.origin}`;
+  const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nI am a ${primaryArchetype.emoji} ${primaryArchetype.name}\nWhat's your Money Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
 
   const handleShare = (platform: string) => {
     const encoded = encodeURIComponent(shareText);
@@ -57,7 +57,7 @@ const ReportScreen = () => {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="glass-card rounded-2xl p-5 text-center mb-5"
         >
-          <p className="text-game-muted text-xs font-body mb-2">Financial Quotient Score</p>
+          <p className="text-game-muted text-xs font-body mb-2">FQ Test Score</p>
           <div className="relative w-36 h-36 mx-auto mb-3">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--game-card))" strokeWidth="7" />

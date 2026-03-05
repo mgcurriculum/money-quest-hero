@@ -80,7 +80,7 @@ const WelcomeScreen = () => {
           className="mt-8 flex items-center justify-center gap-6 text-game-muted text-sm"
         >
           <span className="flex items-center gap-1">⏱️ 5 min</span>
-          <span className="flex items-center gap-1">🎮 18 scenarios</span>
+          <span className="flex items-center gap-1">🎮 29 questions</span>
           <span className="flex items-center gap-1">🏅 Free report</span>
         </motion.div>
       </motion.div>

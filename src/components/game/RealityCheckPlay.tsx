@@ -36,10 +36,15 @@ const RealityCheckPlay = () => {
   }, [state.currentQuestion, isMuted, question, speak]);
 
   const handleSelect = (optIndex: number) => {
-    stop(); // Stop narration on answer
+    stop(); // Stop question narration
     const score = optIndex + 1;
     setSelectedOption(optIndex);
     dispatch({ type: 'ANSWER_QUESTION', level: 0, question: state.currentQuestion, score });
+
+    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
+    if (!isMuted) {
+      speak(feedbackText);
+    }
 
     setShowFeedback(true);
     setTimeout(() => {
@@ -50,7 +55,7 @@ const RealityCheckPlay = () => {
       } else {
         dispatch({ type: 'COMPLETE_LEVEL', level: 0 });
       }
-    }, 800);
+    }, 1200);
   };
 
   if (!question) return null;

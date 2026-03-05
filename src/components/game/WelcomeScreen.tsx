@@ -1,12 +1,40 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
+import { useNarration } from '@/hooks/useNarration';
+import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 import finquoLogo from '@/assets/finquo-logo-white.png';
+
+const WELCOME_TEXT = "Welcome to the FQ Test by FinQuo Versity. Discover how smart you are with money through real-life scenarios. It takes only 5 minutes. Tap Start to begin!";
 
 const WelcomeScreen = () => {
   const { dispatch } = useGame();
+  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const hasNarrated = useRef(false);
+
+  useEffect(() => {
+    if (!isMuted && !hasNarrated.current) {
+      hasNarrated.current = true;
+      const timer = setTimeout(() => speak(WELCOME_TEXT), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [isMuted, speak]);
+
+  const handleStart = () => {
+    stop();
+    dispatch({ type: 'SET_STEP', step: 'consent' });
+  };
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+      {/* Mute toggle */}
+      <button
+        onClick={toggleMute}
+        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
+      >
+        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
+      </button>
+
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 text-5xl float-animation opacity-30">💰</div>
@@ -67,7 +95,7 @@ const WelcomeScreen = () => {
           className="space-y-3"
         >
           <button
-            onClick={() => dispatch({ type: 'SET_STEP', step: 'consent' })}
+            onClick={handleStart}
             className="w-full py-4 px-8 rounded-2xl font-display font-semibold text-lg gold-gradient text-game-bg game-shadow pulse-glow transition-transform hover:scale-105 active:scale-95"
           >
             Start My FQ Test 🚀

@@ -1,11 +1,28 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
+import { useNarration } from '@/hooks/useNarration';
+import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { levels } from '@/data/questions';
 
 const JourneyMap = () => {
   const { state, dispatch } = useGame();
+  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const hasNarrated = useRef(false);
+  const prevCompleted = useRef(state.completedLevels.length);
 
   const allCompleted = state.completedLevels.length === 7;
+
+  useEffect(() => {
+    if (!isMuted && !hasNarrated.current) {
+      hasNarrated.current = true;
+      const text = allCompleted
+        ? "Amazing! You've completed all levels. Tap View Your Results to see your report."
+        : "Here's your journey map. Tap a level to begin your quest.";
+      const timer = setTimeout(() => speak(text), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isMuted, speak, allCompleted]);
 
   const getStatus = (idx: number) => {
     if (state.completedLevels.includes(idx)) return 'completed';
@@ -14,7 +31,14 @@ const JourneyMap = () => {
   };
 
   return (
-    <div className="min-h-screen game-gradient px-6 py-8">
+    <div className="min-h-screen game-gradient px-6 py-8 relative">
+      {/* Mute toggle */}
+      <button
+        onClick={toggleMute}
+        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
+      >
+        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
+      </button>
       <div className="max-w-md mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
@@ -44,7 +68,7 @@ const JourneyMap = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.08 }}
                 disabled={status === 'locked'}
-                onClick={() => dispatch({ type: 'START_LEVEL', level: idx })}
+                onClick={() => { stop(); dispatch({ type: 'START_LEVEL', level: idx }); }}
                 className={`w-full glass-card rounded-2xl p-4 flex items-center gap-4 transition-all ${
                   status === 'completed' ? 'border-2 border-game-green/50' :
                   status === 'unlocked' ? 'border-2 border-game-gold/50 hover:scale-[1.02] active:scale-[0.98]' :
@@ -71,7 +95,7 @@ const JourneyMap = () => {
         {allCompleted && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
             <button
-              onClick={() => dispatch({ type: 'SET_STEP', step: 'reflection' })}
+              onClick={() => { stop(); dispatch({ type: 'SET_STEP', step: 'reflection' }); }}
               className="w-full py-4 rounded-2xl font-display font-semibold text-lg gold-gradient text-white game-shadow pulse-glow hover:scale-105 active:scale-95 transition-transform"
             >
               View Your Results 🏆

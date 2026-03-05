@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame, PlayerProfile } from '@/context/GameContext';
+import { useNarration } from '@/hooks/useNarration';
+import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 
 const statusOptions = [
   { label: '🎒 In school (Class 11/12)', value: 'school' },
@@ -18,14 +20,28 @@ const incomeOptions = [
   { label: '🚀 Business / startup income', value: 'business' },
 ];
 
+const PROFILE_TEXT_0 = "Create your money profile. Enter your name, age and gender to get started.";
+const PROFILE_TEXT_1 = "What best describes your current stage? And how do you usually receive money?";
+
 const ProfileScreen = () => {
   const { dispatch } = useGame();
+  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const hasNarrated = useRef<number>(-1);
   const [profile, setProfile] = useState<PlayerProfile>({
     name: '', age: '', gender: '', phone: '',
     country: 'India', state: '', district: '',
     status: '', incomeType: '',
   });
-  const [step, setStep] = useState(0); // 0: personal, 1: status
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    if (!isMuted && hasNarrated.current !== step) {
+      hasNarrated.current = step;
+      const text = step === 0 ? PROFILE_TEXT_0 : PROFILE_TEXT_1;
+      const timer = setTimeout(() => speak(text), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isMuted, speak, step]);
 
   const updateField = (field: keyof PlayerProfile, value: string) => {
     setProfile(p => ({ ...p, [field]: value }));
@@ -35,7 +51,14 @@ const ProfileScreen = () => {
   const canProceedStep1 = profile.status && profile.incomeType;
 
   return (
-    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
+      {/* Mute toggle */}
+      <button
+        onClick={toggleMute}
+        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
+      >
+        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
+      </button>
       <motion.div
         key={step}
         initial={{ opacity: 0, x: 20 }}
@@ -140,7 +163,7 @@ const ProfileScreen = () => {
           {step === 0 && (
             <button
               disabled={!canProceedStep0}
-              onClick={() => setStep(1)}
+              onClick={() => { stop(); setStep(1); }}
               className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceedStep0 ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
             >
               Next →
@@ -150,6 +173,7 @@ const ProfileScreen = () => {
             <button
               disabled={!canProceedStep1}
               onClick={() => {
+                stop();
                 dispatch({ type: 'SET_PROFILE', profile });
                 dispatch({ type: 'SET_STEP', step: 'journey' });
               }}
@@ -159,7 +183,7 @@ const ProfileScreen = () => {
             </button>
           )}
           <button
-            onClick={() => step === 0 ? dispatch({ type: 'SET_STEP', step: 'consent' }) : setStep(0)}
+            onClick={() => { stop(); step === 0 ? dispatch({ type: 'SET_STEP', step: 'consent' }) : setStep(0); }}
             className="w-full py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"
           >
             ← Back

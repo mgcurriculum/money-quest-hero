@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
+import { useNarration } from '@/hooks/useNarration';
+import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { reflectionOptions } from '@/data/questions';
 
 const interestOptions = [
@@ -11,21 +13,44 @@ const interestOptions = [
   { text: "Actively learning about money", emoji: "🚀" },
 ];
 
+const REFLECTION_TEXT_0 = "How interested are you in improving your financial knowledge?";
+const REFLECTION_TEXT_1 = "Final reflection. If you could improve one money skill this year, what would it be?";
+
 const ReflectionScreen = () => {
   const { state, dispatch } = useGame();
-  const [step, setStep] = useState(0); // 0: interest question, 1: reflection
+  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const hasNarrated = useRef<number>(-1);
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    if (!isMuted && hasNarrated.current !== step) {
+      hasNarrated.current = step;
+      const text = step === 0 ? REFLECTION_TEXT_0 : REFLECTION_TEXT_1;
+      const timer = setTimeout(() => speak(text), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isMuted, speak, step]);
 
   const handleInterestSelect = (option: string) => {
+    stop();
     setStep(1);
   };
 
   const handleReflectionSelect = (option: string) => {
+    stop();
     dispatch({ type: 'SET_REFLECTION', answer: option });
     dispatch({ type: 'SET_STEP', step: 'report' });
   };
 
   return (
-    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
+      {/* Mute toggle */}
+      <button
+        onClick={toggleMute}
+        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
+      >
+        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
+      </button>
       <motion.div key={step} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full text-center">
         <p className="gold-text font-display font-bold text-lg mb-2">FQ Test</p>
 

@@ -19,6 +19,7 @@ const ConsentScreen = () => {
       >
         <div className="text-center mb-8">
           <img src={finquoLogo} alt="FinQuo Versity" className="w-28 h-auto mx-auto mb-4" />
+          <p className="gold-text font-display font-bold text-lg mb-2">FQ Test</p>
           <span className="text-5xl mb-4 block">🔒</span>
           <h2 className="text-3xl font-display font-bold text-game-text mb-2">Before We Begin</h2>
           <p className="text-game-muted font-body">We respect your privacy. Your responses will only be used to generate your Financial Intelligence Report.</p>

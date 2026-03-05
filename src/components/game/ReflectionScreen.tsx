@@ -13,6 +13,7 @@ const ReflectionScreen = () => {
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full text-center">
+        <p className="gold-text font-display font-bold text-lg mb-2">FQ Test</p>
         <span className="text-5xl mb-4 block">🪞</span>
         <h2 className="text-3xl font-display font-bold text-game-text mb-2">Final Reflection</h2>
         <p className="text-game-muted font-body mb-8">If you could improve one money skill this year, what would it be?</p>

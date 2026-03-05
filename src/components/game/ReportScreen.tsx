@@ -48,7 +48,7 @@ const ReportScreen = () => {
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }} className="text-5xl mb-2">
             {band.emoji}
           </motion.div>
-          <h1 className="text-2xl font-display font-bold text-game-text mb-1">Your Financial Hero Profile</h1>
+          <h1 className="text-2xl font-display font-bold text-game-text mb-1">Your <span className="gold-text">FQ Test</span> Report</h1>
           <p className="text-game-muted font-body text-sm">{state.profile.name}'s Money Journey Results</p>
         </motion.div>
 
@@ -57,7 +57,7 @@ const ReportScreen = () => {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="glass-card rounded-2xl p-5 text-center mb-5"
         >
-          <p className="text-game-muted text-xs font-body mb-2">FQ Test Score</p>
+          <p className="text-game-muted text-xs font-body mb-2"><span className="gold-text font-semibold">FQ Test</span> Score</p>
           <div className="relative w-36 h-36 mx-auto mb-3">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--game-card))" strokeWidth="7" />
@@ -182,7 +182,7 @@ const ReportScreen = () => {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }}
             className="glass-card rounded-2xl p-4 mb-5 text-center"
           >
-            <p className="text-game-muted text-[10px] font-body uppercase tracking-wider mb-1">Your 2025 Money Quest</p>
+            <p className="text-game-muted text-[10px] font-body uppercase tracking-wider mb-1">Your 2025 <span className="gold-text">FQ Test</span> Goal</p>
             <p className="text-game-text font-display font-semibold text-sm">{state.reflectionAnswer}</p>
           </motion.div>
         )}

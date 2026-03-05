@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
+import { useNarration } from '@/hooks/useNarration';
 import { levels } from '@/data/questions';
-import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight } from 'lucide-react';
+import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight, Volume2, VolumeX, Loader2 } from 'lucide-react';
 
 const feedbackData = [
   { text: "Noted! 📝", icon: <Zap className="text-game-gold" size={28} /> },
@@ -14,16 +15,32 @@ const feedbackData = [
 
 const LevelPlay = () => {
   const { state, dispatch } = useGame();
+  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
   const level = levels[state.currentLevel];
   const scenario = level.scenarios[state.currentQuestion];
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [xpGained, setXpGained] = useState(0);
 
+  // Auto-narrate scenario situation text
+  useEffect(() => {
+    if (!isMuted && scenario) {
+      const timer = setTimeout(() => speak(scenario.situation), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isMuted, speak, state.currentLevel, state.currentQuestion]);
+
   const handleSelect = (optIndex: number) => {
+    stop();
     const score = optIndex + 1;
     setSelectedOption(optIndex);
     setXpGained(score * 20);
+    dispatch({ type: 'ANSWER_QUESTION', level: state.currentLevel, question: state.currentQuestion, score });
+
+    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
+    if (!isMuted) {
+      speak(feedbackText);
+    }
     dispatch({ type: 'ANSWER_QUESTION', level: state.currentLevel, question: state.currentQuestion, score });
 
     setShowFeedback(true);
@@ -72,10 +89,17 @@ const LevelPlay = () => {
         {/* Header bar */}
         <div className="flex items-center justify-between mb-4">
           <button
-            onClick={() => dispatch({ type: 'SET_STEP', step: 'journey' })}
+            onClick={() => { stop(); dispatch({ type: 'SET_STEP', step: 'journey' }); }}
             className="glass-card rounded-full px-3 py-1.5 text-game-muted text-xs font-body hover:text-game-text transition-colors flex items-center gap-1"
           >
             ✕ Exit
+          </button>
+          {/* Mute toggle */}
+          <button
+            onClick={toggleMute}
+            className={`glass-card rounded-full p-2 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
+          >
+            {isLoading ? <Loader2 size={16} className="animate-spin" /> : isMuted ? <VolumeX size={16} /> : <Volume2 size={16} className={isPlaying ? 'animate-pulse' : ''} />}
           </button>
           <motion.div
             className="glass-card rounded-full px-4 py-1.5 flex items-center gap-2"

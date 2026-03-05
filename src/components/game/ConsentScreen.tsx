@@ -1,17 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
+import { useNarration } from '@/hooks/useNarration';
+import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 import finquoLogo from '@/assets/finquo-logo-white.png';
+
+const CONSENT_TEXT = "Before we begin. We respect your privacy. Your responses will only be used to generate your Financial Intelligence Report. Please check both boxes to continue.";
 
 const ConsentScreen = () => {
   const { dispatch } = useGame();
+  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const hasNarrated = useRef(false);
   const [consent1, setConsent1] = useState(false);
   const [consent2, setConsent2] = useState(false);
 
   const canProceed = consent1 && consent2;
 
+  useEffect(() => {
+    if (!isMuted && !hasNarrated.current) {
+      hasNarrated.current = true;
+      const timer = setTimeout(() => speak(CONSENT_TEXT), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isMuted, speak]);
+
   return (
-    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
+      {/* Mute toggle */}
+      <button
+        onClick={toggleMute}
+        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
+      >
+        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
+      </button>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -48,6 +69,7 @@ const ConsentScreen = () => {
         <button
           disabled={!canProceed}
           onClick={() => {
+            stop();
             dispatch({ type: 'SET_CONSENT', value: true });
             dispatch({ type: 'SET_STEP', step: 'profile' });
           }}
@@ -57,7 +79,7 @@ const ConsentScreen = () => {
         </button>
 
         <button
-          onClick={() => dispatch({ type: 'SET_STEP', step: 'welcome' })}
+          onClick={() => { stop(); dispatch({ type: 'SET_STEP', step: 'welcome' }); }}
           className="w-full mt-3 py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"
         >
           ← Back

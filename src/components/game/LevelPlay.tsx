@@ -22,10 +22,10 @@ const LevelPlay = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [xpGained, setXpGained] = useState(0);
 
-  // Auto-narrate scenario situation text
+  // Auto-narrate with assistant-style guidance
   useEffect(() => {
     if (!isMuted && scenario) {
-      const timer = setTimeout(() => speak(scenario.situation), 500);
+      const timer = setTimeout(() => speak("Alright, picture this scenario. Read through the situation and choose how you'd handle it."), 500);
       return () => clearTimeout(timer);
     }
   }, [isMuted, speak, state.currentLevel, state.currentQuestion]);

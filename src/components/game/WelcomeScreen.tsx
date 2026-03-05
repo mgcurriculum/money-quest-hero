@@ -5,7 +5,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 
-const WELCOME_TEXT = "Welcome to the FQ Test by FinQuo Versity. Discover how smart you are with money through real-life scenarios. It takes only 5 minutes. Tap Start to begin!";
+const WELCOME_TEXT = "Hey there! I'm your financial guide. This is a quick and fun quiz that'll help you understand how smart you really are with money. It only takes about 5 minutes. Ready? Just tap Start!";
 
 const WelcomeScreen = () => {
   const { dispatch } = useGame();

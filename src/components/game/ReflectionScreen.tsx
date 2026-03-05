@@ -13,8 +13,8 @@ const interestOptions = [
   { text: "Actively learning about money", emoji: "🚀" },
 ];
 
-const REFLECTION_TEXT_0 = "How interested are you in improving your financial knowledge?";
-const REFLECTION_TEXT_1 = "Final reflection. If you could improve one money skill this year, what would it be?";
+const REFLECTION_TEXT_0 = "We're almost done! I'm curious — how interested are you in actually getting better with money? Be honest!";
+const REFLECTION_TEXT_1 = "Last question! If you could level up just one money skill this year, which would it be? Pick the one that matters most to you.";
 
 const ReflectionScreen = () => {
   const { state, dispatch } = useGame();

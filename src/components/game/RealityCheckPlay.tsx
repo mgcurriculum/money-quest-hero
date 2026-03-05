@@ -27,9 +27,8 @@ const RealityCheckPlay = () => {
   useEffect(() => {
     if (!isMuted && question && state.currentQuestion !== lastNarratedQuestion.current) {
       lastNarratedQuestion.current = state.currentQuestion;
-      // Small delay to let the animation start
       const timer = setTimeout(() => {
-        speak(question.question);
+        speak(`Here's a question about ${question.category}. Take a moment to read it and pick the answer that feels most like you.`);
       }, 500);
       return () => clearTimeout(timer);
     }

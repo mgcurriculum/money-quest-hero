@@ -140,7 +140,7 @@ const ProfileScreen = () => {
             <button
               disabled={!canProceedStep0}
               onClick={() => setStep(1)}
-              className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceedStep0 ? 'gold-gradient text-game-bg game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
+              className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceedStep0 ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
             >
               Next →
             </button>
@@ -152,7 +152,7 @@ const ProfileScreen = () => {
                 dispatch({ type: 'SET_PROFILE', profile });
                 dispatch({ type: 'SET_STEP', step: 'journey' });
               }}
-              className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceedStep1 ? 'gold-gradient text-game-bg game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
+              className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceedStep1 ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
             >
               Begin Quest! 🎮
             </button>

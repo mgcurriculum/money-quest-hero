@@ -13,6 +13,7 @@ import {
   Radar,
   ResponsiveContainer,
 } from 'recharts';
+import finquoLogo from '@/assets/finquo-logo.png';
 
 const ReportScreen = () => {
   const { state, dispatch } = useGame();
@@ -43,7 +44,7 @@ const ReportScreen = () => {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center mb-6">
-          <p className="text-game-muted text-[10px] font-body uppercase tracking-[0.2em] mb-1">FQ Test by FinQuo Versity</p>
+          <img src={finquoLogo} alt="FinQuo Versity" className="w-24 h-auto mx-auto mb-2" />
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }} className="text-5xl mb-2">
             {band.emoji}
           </motion.div>
@@ -71,7 +72,7 @@ const ReportScreen = () => {
               <defs>
                 <linearGradient id="fqGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="hsl(var(--game-gold))" />
-                  <stop offset="100%" stopColor="hsl(var(--game-orange))" />
+                  <stop offset="100%" stopColor="hsl(var(--game-purple))" />
                 </linearGradient>
               </defs>
             </svg>
@@ -207,8 +208,8 @@ const ReportScreen = () => {
           <div className="flex justify-center gap-3">
             {[
               { name: 'whatsapp', emoji: '💬', label: 'WhatsApp', color: 'bg-green-600' },
-              { name: 'twitter', emoji: '🐦', label: 'Twitter', color: 'bg-blue-500' },
-              { name: 'linkedin', emoji: '💼', label: 'LinkedIn', color: 'bg-blue-700' },
+              { name: 'twitter', emoji: '🐦', label: 'Twitter', color: 'bg-game-gold' },
+              { name: 'linkedin', emoji: '💼', label: 'LinkedIn', color: 'bg-game-purple' },
             ].map((p) => (
               <button
                 key={p.name}
@@ -225,7 +226,7 @@ const ReportScreen = () => {
         <div className="pb-8">
           <button
             onClick={() => dispatch({ type: 'RESET' })}
-            className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-game-bg game-shadow hover:scale-105 active:scale-95 transition-transform"
+            className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform"
           >
             Play Again 🔄
           </button>

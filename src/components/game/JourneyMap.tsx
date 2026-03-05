@@ -72,7 +72,7 @@ const JourneyMap = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
             <button
               onClick={() => dispatch({ type: 'SET_STEP', step: 'reflection' })}
-              className="w-full py-4 rounded-2xl font-display font-semibold text-lg gold-gradient text-game-bg game-shadow pulse-glow hover:scale-105 active:scale-95 transition-transform"
+              className="w-full py-4 rounded-2xl font-display font-semibold text-lg gold-gradient text-white game-shadow pulse-glow hover:scale-105 active:scale-95 transition-transform"
             >
               View Your Results 🏆
             </button>

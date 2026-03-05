@@ -20,8 +20,8 @@ const incomeOptions = [
   { label: '🚀 Business / startup income', value: 'business' },
 ];
 
-const PROFILE_TEXT_0 = "Create your money profile. Enter your name, age and gender to get started.";
-const PROFILE_TEXT_1 = "What best describes your current stage? And how do you usually receive money?";
+const PROFILE_TEXT_0 = "Let's get to know you a bit! Just fill in your name, and optionally your age and gender. This helps us personalize your results.";
+const PROFILE_TEXT_1 = "Great! Now tell me a little about where you are in life and how money comes your way. This helps me tailor the scenarios to you.";
 
 const ProfileScreen = () => {
   const { dispatch } = useGame();

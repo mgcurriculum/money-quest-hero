@@ -5,7 +5,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 
-const CONSENT_TEXT = "Before we begin. We respect your privacy. Your responses will only be used to generate your Financial Intelligence Report. Please check both boxes to continue.";
+const CONSENT_TEXT = "Alright, just a quick heads up! We need your consent before we start. Don't worry, your data stays safe and private. Just check both boxes and we're good to go!";
 
 const ConsentScreen = () => {
   const { dispatch } = useGame();

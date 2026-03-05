@@ -1,8 +1,8 @@
-# FQ Test – Money Quest by FinQuo Versity
+# FQ Test – Finance Quest by FinQuo Versity
 
 ## 1. Overview
 
-**FQ Test** (Money Quest) is a gamified Financial Quotient assessment tool built by **FinQuo Versity**. Players navigate through 7 themed levels — starting with a Financial Reality Check followed by 6 real-life financial scenario levels — to discover their financial personality, strengths, and areas for growth. The result is a personalized FQ Test Score (0–1000) along with financial personality archetypes and actionable quests.
+**FQ Test** (Finance Quest) is a gamified Financial Quotient assessment tool built by **FinQuo Versity**. Players navigate through 7 themed levels — starting with a Financial Reality Check followed by 6 real-life financial scenario levels — to discover their financial personality, strengths, and areas for growth. The result is a personalized FQ Test Score (0–1000) along with financial personality archetypes and actionable quests.
 
 ---
 
@@ -18,10 +18,10 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 |------|--------|-------------|
 | 1 | **Welcome** | Introduction to the FQ Test and language selection (English / Malayalam) |
 | 2 | **Consent** | Data privacy consent before proceeding |
-| 3 | **Profile** | Player fills in demographic details |
+| 3 | **Profile** | Player fills in demographic details (Step 1: personal info, Step 2: status & income type selection) |
 | 4 | **Journey Map** | Visual map showing all 7 levels; player picks a level to play |
-| 5 | **Level Play** | Level 0: 11 reality-check questions; Levels 1–6: 3 scenario-based questions each (29 total questions) |
-| 6 | **Reflection** | Post-game self-reflection on financial goals |
+| 5 | **Level Play** | Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions) |
+| 6 | **Reflection** | Financial mindset question + financial goal selection |
 | 7 | **Report** | FQ Test Score, personality archetypes, dimension breakdown, and quests |
 
 ---
@@ -37,8 +37,8 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 | `country` | Country (default: India) |
 | `state` | State |
 | `district` | District |
-| `status` | Current status (e.g., student, employed) |
-| `incomeType` | Type of income |
+| `status` | Current status (e.g., student, employed) — collected via UI selection in Profile Step 2 |
+| `incomeType` | Type of income — collected via UI selection in Profile Step 2 |
 
 ---
 
@@ -49,31 +49,11 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 ### Level 0: 📋 Financial Reality Check
 **Theme:** Know your real financial situation
 **Dimension:** Financial Reality
-**Questions:** 11
+**Questions:** 7
 
-#### Question 1: Current Stage of Life
-> What best describes your current stage?
+> **Note:** "Current Stage of Life" and "Income Source" questions have been moved to the Profile screen (Step 2). "Financial Knowledge Growth" and "Money Journey Commitment" questions have been moved to the Reflection screen.
 
-| # | Option | Score |
-|---|--------|-------|
-| 1 | 🎒 In school (Class 11/12) | 1 |
-| 2 | 🎓 In college | 2 |
-| 3 | 🧑‍💻 Doing a course or skill program | 3 |
-| 4 | 💼 Working part-time or full-time | 4 |
-| 5 | 🚀 Running a business / startup | 5 |
-
-#### Question 2: Income Source
-> How do you usually receive money?
-
-| # | Option | Score |
-|---|--------|-------|
-| 1 | 👨‍👩‍👧 Fully dependent on parents | 1 |
-| 2 | 💸 Pocket money from family | 2 |
-| 3 | 🧑‍💻 Freelance / gig work | 3 |
-| 4 | 💼 Salary from job | 4 |
-| 5 | 🚀 Business / startup income | 5 |
-
-#### Question 3: Monthly Income
+#### Question 1: Monthly Income
 > How much money do you receive or earn every month from all sources?
 
 | # | Option | Score |
@@ -84,7 +64,7 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 | 4 | 💰 ₹25,000 – ₹50,000 | 4 |
 | 5 | 🚀 Above ₹50,000 | 5 |
 
-#### Question 4: Monthly Spending
+#### Question 2: Monthly Spending
 > On average, how much do you spend every month?
 
 | # | Option | Score |
@@ -95,7 +75,7 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 | 4 | 🛍 ₹5,000 – ₹10,000 | 4 |
 | 5 | 🚀 Above ₹10,000 | 5 |
 
-#### Question 5: Current Savings
+#### Question 3: Current Savings
 > How much money do you currently have saved?
 
 | # | Option | Score |
@@ -106,7 +86,7 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 | 4 | 💰 ₹2,000 – ₹10,000 | 4 |
 | 5 | 🏦 More than ₹10,000 | 5 |
 
-#### Question 6: Current Debt
+#### Question 4: Current Debt
 > Do you currently owe money to anyone?
 
 | # | Option | Score |
@@ -117,7 +97,7 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 | 4 | 🔴 ₹5,000 – ₹25,000 | 4 |
 | 5 | ⚠️ More than ₹25,000 | 5 |
 
-#### Question 7: Investment Experience
+#### Question 5: Investment Experience
 > Have you ever invested money?
 
 | # | Option | Score |
@@ -128,7 +108,7 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 | 4 | 📈 Mutual fund SIP | 4 |
 | 5 | 🚀 Stocks / crypto / advanced investments | 5 |
 
-#### Question 8: Insurance Coverage
+#### Question 6: Insurance Coverage
 > Does your family currently have any insurance coverage?
 
 | # | Option | Score |
@@ -139,7 +119,7 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 | 4 | 🛡 Multiple policies covering family | 4 |
 | 5 | 🧠 I help manage or understand these policies | 5 |
 
-#### Question 9: Tracking Expenses
+#### Question 7: Tracking Expenses
 > How often do you track your spending?
 
 | # | Option | Score |
@@ -149,28 +129,6 @@ Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflect
 | 3 | 🤔 Sometimes check my balance | 3 |
 | 4 | 📊 Often review my spending | 4 |
 | 5 | 📱 Track every expense carefully | 5 |
-
-#### Question 10: Financial Knowledge Growth
-> How interested are you in improving your financial knowledge?
-
-| # | Option | Score |
-|---|--------|-------|
-| 1 | ❌ Not interested | 1 |
-| 2 | 🤷 Slightly curious | 2 |
-| 3 | 🤔 Somewhat interested | 3 |
-| 4 | 📚 Interested in learning more | 4 |
-| 5 | 🚀 Actively learning about money | 5 |
-
-#### Question 11: Money Journey Commitment
-> Are you ready to take charge of your money journey?
-
-| # | Option | Score |
-|---|--------|-------|
-| 1 | 😴 Not ready yet | 1 |
-| 2 | 🤔 Maybe later | 2 |
-| 3 | 🙂 Thinking about it | 3 |
-| 4 | 💪 Yes, I want to improve | 4 |
-| 5 | 🚀 Absolutely! I'm ready to level up | 5 |
 
 ---
 
@@ -427,7 +385,7 @@ Where:
 - `minScore` = number of questions × 1
 - `maxScore` = number of questions × 5
 
-For Level 0: minScore = 11, maxScore = 55
+For Level 0: minScore = 7, maxScore = 35
 For Levels 1–6: minScore = 3, maxScore = 15
 
 ### Dimension Weights
@@ -535,9 +493,23 @@ Each dimension has a **5-tier trait label** corresponding to scores 1–5:
 
 ---
 
-## 9. Reflection Options
+## 9. Reflection
 
-After completing all levels, the player selects one financial goal to focus on:
+After completing all levels, the Reflection screen has two steps:
+
+### Step 1: Financial Mindset
+> How interested are you in improving your financial knowledge?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | ❌ Not interested | 1 |
+| 2 | 🤷 Slightly curious | 2 |
+| 3 | 🤔 Somewhat interested | 3 |
+| 4 | 📚 Interested in learning more | 4 |
+| 5 | 🚀 Actively learning about money | 5 |
+
+### Step 2: Financial Goal Selection
+The player selects one financial goal to focus on:
 
 1. 💼 Earn more actively
 2. 💳 Spend smarter
@@ -576,7 +548,7 @@ interface GameState {
   profile: PlayerProfile;
   consentGiven: boolean;
   currentLevel: number;      // 0–6
-  currentQuestion: number;   // 0–10 (Level 0) or 0–2 (Levels 1–6)
+  currentQuestion: number;   // 0–6 (Level 0) or 0–2 (Levels 1–6)
   answers: { [level: number]: { [questionIndex: number]: number } };
   completedLevels: number[];
   reflectionAnswer: string;

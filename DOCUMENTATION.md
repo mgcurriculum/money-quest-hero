@@ -1,28 +1,28 @@
-# Money Quest – FQ Test by FinQuo Versity
+# FQ Test – Money Quest by FinQuo Versity
 
 ## 1. Overview
 
-**Money Quest** is a gamified Financial Quotient (FQ) assessment tool built by **FinQuo Versity**. Players navigate through 6 themed levels of real-life financial scenarios to discover their financial personality, strengths, and areas for growth. The result is a personalized FQ Score (0–1000) along with financial personality archetypes and actionable quests.
+**FQ Test** (Money Quest) is a gamified Financial Quotient assessment tool built by **FinQuo Versity**. Players navigate through 7 themed levels — starting with a Financial Reality Check followed by 6 real-life financial scenario levels — to discover their financial personality, strengths, and areas for growth. The result is a personalized FQ Test Score (0–1000) along with financial personality archetypes and actionable quests.
 
 ---
 
 ## 2. Game Flow
 
-The game follows a 7-step linear progression:
+The **FQ Test** follows a 7-step linear progression:
 
 ```
-Welcome → Consent → Profile → Journey Map → Level Play (×6) → Reflection → Report
+Welcome → Consent → Profile → Journey Map → Level Play (×7) → Reflection → Report
 ```
 
 | Step | Screen | Description |
 |------|--------|-------------|
-| 1 | **Welcome** | Introduction and language selection (English / Malayalam) |
+| 1 | **Welcome** | Introduction to the FQ Test and language selection (English / Malayalam) |
 | 2 | **Consent** | Data privacy consent before proceeding |
 | 3 | **Profile** | Player fills in demographic details |
-| 4 | **Journey Map** | Visual map showing all 6 levels; player picks a level to play |
-| 5 | **Level Play** | 3 scenario-based questions per level (6 levels × 3 = 18 total questions) |
+| 4 | **Journey Map** | Visual map showing all 7 levels; player picks a level to play |
+| 5 | **Level Play** | Level 0: 11 reality-check questions; Levels 1–6: 3 scenario-based questions each (29 total questions) |
 | 6 | **Reflection** | Post-game self-reflection on financial goals |
-| 7 | **Report** | FQ Score, personality archetypes, dimension breakdown, and quests |
+| 7 | **Report** | FQ Test Score, personality archetypes, dimension breakdown, and quests |
 
 ---
 
@@ -42,9 +42,135 @@ Welcome → Consent → Profile → Journey Map → Level Play (×6) → Reflect
 
 ---
 
-## 4. All 6 Levels with Full Questions
+## 4. All 7 Levels with Full Questions
 
-Each level has **3 scenarios** with **5 options** each. Options are scored **1–5** (first option = 1, last option = 5).
+---
+
+### Level 0: 📋 Financial Reality Check
+**Theme:** Know your real financial situation
+**Dimension:** Financial Reality
+**Questions:** 11
+
+#### Question 1: Current Stage of Life
+> What best describes your current stage?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | 🎒 In school (Class 11/12) | 1 |
+| 2 | 🎓 In college | 2 |
+| 3 | 🧑‍💻 Doing a course or skill program | 3 |
+| 4 | 💼 Working part-time or full-time | 4 |
+| 5 | 🚀 Running a business / startup | 5 |
+
+#### Question 2: Income Source
+> How do you usually receive money?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | 👨‍👩‍👧 Fully dependent on parents | 1 |
+| 2 | 💸 Pocket money from family | 2 |
+| 3 | 🧑‍💻 Freelance / gig work | 3 |
+| 4 | 💼 Salary from job | 4 |
+| 5 | 🚀 Business / startup income | 5 |
+
+#### Question 3: Monthly Income
+> How much money do you receive or earn every month from all sources?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | 💰 Up to ₹5,000 | 1 |
+| 2 | 💰 ₹5,000 – ₹10,000 | 2 |
+| 3 | 💰 ₹10,000 – ₹25,000 | 3 |
+| 4 | 💰 ₹25,000 – ₹50,000 | 4 |
+| 5 | 🚀 Above ₹50,000 | 5 |
+
+#### Question 4: Monthly Spending
+> On average, how much do you spend every month?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | 🪙 Less than ₹1,000 | 1 |
+| 2 | 💸 ₹1,000 – ₹2,500 | 2 |
+| 3 | 💳 ₹2,500 – ₹5,000 | 3 |
+| 4 | 🛍 ₹5,000 – ₹10,000 | 4 |
+| 5 | 🚀 Above ₹10,000 | 5 |
+
+#### Question 5: Current Savings
+> How much money do you currently have saved?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | 🪙 No savings yet | 1 |
+| 2 | 💰 Less than ₹500 | 2 |
+| 3 | 💰 ₹500 – ₹2,000 | 3 |
+| 4 | 💰 ₹2,000 – ₹10,000 | 4 |
+| 5 | 🏦 More than ₹10,000 | 5 |
+
+#### Question 6: Current Debt
+> Do you currently owe money to anyone?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | 🟢 No debt at all | 1 |
+| 2 | 🟡 Less than ₹1,000 | 2 |
+| 3 | 🟠 ₹1,000 – ₹5,000 | 3 |
+| 4 | 🔴 ₹5,000 – ₹25,000 | 4 |
+| 5 | ⚠️ More than ₹25,000 | 5 |
+
+#### Question 7: Investment Experience
+> Have you ever invested money?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | 🪙 No investment yet | 1 |
+| 2 | 🪙 Physical savings (gold or cash) | 2 |
+| 3 | 🏦 Bank FD / RD | 3 |
+| 4 | 📈 Mutual fund SIP | 4 |
+| 5 | 🚀 Stocks / crypto / advanced investments | 5 |
+
+#### Question 8: Insurance Coverage
+> Does your family currently have any insurance coverage?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | ❌ No insurance | 1 |
+| 2 | 🏛 Government scheme only | 2 |
+| 3 | 🏥 One private insurance policy | 3 |
+| 4 | 🛡 Multiple policies covering family | 4 |
+| 5 | 🧠 I help manage or understand these policies | 5 |
+
+#### Question 9: Tracking Expenses
+> How often do you track your spending?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | ❌ Never track it | 1 |
+| 2 | ⚠️ Rarely track | 2 |
+| 3 | 🤔 Sometimes check my balance | 3 |
+| 4 | 📊 Often review my spending | 4 |
+| 5 | 📱 Track every expense carefully | 5 |
+
+#### Question 10: Financial Knowledge Growth
+> How interested are you in improving your financial knowledge?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | ❌ Not interested | 1 |
+| 2 | 🤷 Slightly curious | 2 |
+| 3 | 🤔 Somewhat interested | 3 |
+| 4 | 📚 Interested in learning more | 4 |
+| 5 | 🚀 Actively learning about money | 5 |
+
+#### Question 11: Money Journey Commitment
+> Are you ready to take charge of your money journey?
+
+| # | Option | Score |
+|---|--------|-------|
+| 1 | 😴 Not ready yet | 1 |
+| 2 | 🤔 Maybe later | 2 |
+| 3 | 🙂 Thinking about it | 3 |
+| 4 | 💪 Yes, I want to improve | 4 |
+| 5 | 🚀 Absolutely! I'm ready to level up | 5 |
 
 ---
 
@@ -285,7 +411,7 @@ Each level has **3 scenarios** with **5 options** each. Options are scored **1�
 ## 5. Scoring Criteria
 
 ### Per-Question Scoring
-- Each scenario has **5 options** scored **1 to 5**
+- Each question/scenario has **5 options** scored **1 to 5**
 - Option 1 (first) = **1 point** (lowest financial awareness)
 - Option 5 (last) = **5 points** (highest financial awareness)
 
@@ -298,32 +424,36 @@ normalizedScore = ((userScore - minScore) / (maxScore - minScore)) × 100
 
 Where:
 - `userScore` = sum of selected option scores for the level
-- `minScore` = number of questions × 1 (i.e., 3)
-- `maxScore` = number of questions × 5 (i.e., 15)
+- `minScore` = number of questions × 1
+- `maxScore` = number of questions × 5
+
+For Level 0: minScore = 11, maxScore = 55
+For Levels 1–6: minScore = 3, maxScore = 15
 
 ### Dimension Weights
 
 | Dimension | Weight |
 |-----------|--------|
-| 💼 Earning Mindset | 0.15 |
-| 💳 Spending Discipline | 0.20 |
-| 💰 Saving Behaviour | 0.20 |
-| 🧾 Debt Awareness | 0.15 |
-| 📈 Investment Awareness | 0.15 |
+| 📋 Financial Reality | 0.10 |
+| 💼 Earning Mindset | 0.13 |
+| 💳 Spending Discipline | 0.17 |
+| 💰 Saving Behaviour | 0.17 |
+| 🧾 Debt Awareness | 0.14 |
+| 📈 Investment Awareness | 0.14 |
 | 🛡️ Financial Safety | 0.15 |
 | **Total** | **1.00** |
 
-### FQ Score Calculation
+### FQ Test Score Calculation
 
 ```
-FQ Score = (Σ normalizedScore[i] × weight[i]) × 10
+FQ Test Score = (Σ normalizedScore[i] × weight[i]) × 10
 ```
 
 **Range: 0 – 1000**
 
 ---
 
-## 6. FQ Score Bands
+## 6. FQ Test Score Bands
 
 | Score Range | Level | Meaning | Emoji |
 |-------------|-------|---------|-------|
@@ -338,7 +468,14 @@ FQ Score = (Σ normalizedScore[i] × weight[i]) × 10
 
 ## 7. Financial Personality Archetypes
 
-There are **12 archetypes** — 2 per dimension (High ≥ 50% normalized score, Low < 50%).
+There are **14 archetypes** — 2 per dimension (High ≥ 50% normalized score, Low < 50%).
+
+### Financial Reality
+
+| Type | Name | Emoji | Trait | Strength/Risk | Quest |
+|------|------|-------|-------|---------------|-------|
+| High | Reality Checker | 📋 | Strong grasp of real financial situation | **Strength:** Self-awareness | Review your finances monthly |
+| Low | Reality Explorer | 🔍 | Still discovering financial realities | **Risk:** Lack of financial self-awareness | List all your income and expenses this week |
 
 ### Earning Mindset
 
@@ -388,13 +525,13 @@ There are **12 archetypes** — 2 per dimension (High ≥ 50% normalized score, 
 
 Each dimension has a **5-tier trait label** corresponding to scores 1–5:
 
-| Tier | 💼 Earning | 💳 Spending | 💰 Saving | 🧾 Debt | 📈 Investment | 🛡️ Safety |
-|------|-----------|------------|----------|---------|--------------|----------|
-| 1 | Income Ignorer | Impulse Buyer | Non-Saver | Debt Prone | Investment Avoider | Fraud Vulnerable |
-| 2 | Income Thinker | Social Spender | Occasional Saver | Casual Borrower | Investment Skeptic | Somewhat Aware |
-| 3 | Income Trier | Emotional Spender | Growing Saver | Cautious Borrower | Investment Curious | Getting Careful |
-| 4 | Income Explorer | Smart Spender | Consistent Saver | Debt Avoider | Future Investor | Money Protector |
-| 5 | Income Builder | Mindful Spender | Savings Master | Debt Free Champion | Investment Explorer | Security Expert |
+| Tier | 📋 Reality | 💼 Earning | 💳 Spending | 💰 Saving | 🧾 Debt | 📈 Investment | 🛡️ Safety |
+|------|-----------|-----------|------------|----------|---------|--------------|----------|
+| 1 | Reality Unaware | Income Ignorer | Impulse Buyer | Non-Saver | Debt Prone | Investment Avoider | Fraud Vulnerable |
+| 2 | Reality Curious | Income Thinker | Social Spender | Occasional Saver | Casual Borrower | Investment Skeptic | Somewhat Aware |
+| 3 | Reality Aware | Income Trier | Emotional Spender | Growing Saver | Cautious Borrower | Investment Curious | Getting Careful |
+| 4 | Reality Checker | Income Explorer | Smart Spender | Consistent Saver | Debt Avoider | Future Investor | Money Protector |
+| 5 | Reality Master | Income Builder | Mindful Spender | Savings Master | Debt Free Champion | Investment Explorer | Security Expert |
 
 ---
 
@@ -429,7 +566,7 @@ After completing all levels, the player selects one financial goal to focus on:
 | `src/context/GameContext.tsx` | Global game state (step, profile, answers, completed levels) |
 | `src/data/questions.ts` | All questions, scoring logic, archetypes, FQ bands |
 | `src/pages/Index.tsx` | Main game page orchestrating all screens |
-| `src/components/game/*.tsx` | Individual screen components (Welcome, Consent, Profile, JourneyMap, LevelPlay, Reflection, Report) |
+| `src/components/game/*.tsx` | Individual screen components (Welcome, Consent, Profile, JourneyMap, LevelPlay, RealityCheckPlay, Reflection, Report) |
 
 ### State Shape
 
@@ -438,8 +575,8 @@ interface GameState {
   step: 'welcome' | 'consent' | 'profile' | 'journey' | 'level' | 'reflection' | 'report';
   profile: PlayerProfile;
   consentGiven: boolean;
-  currentLevel: number;      // 0–5
-  currentQuestion: number;   // 0–2
+  currentLevel: number;      // 0–6
+  currentQuestion: number;   // 0–10 (Level 0) or 0–2 (Levels 1–6)
   answers: { [level: number]: { [questionIndex: number]: number } };
   completedLevels: number[];
   reflectionAnswer: string;

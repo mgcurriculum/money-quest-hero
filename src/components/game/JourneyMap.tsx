@@ -5,7 +5,7 @@ import { levels } from '@/data/questions';
 const JourneyMap = () => {
   const { state, dispatch } = useGame();
 
-  const allCompleted = state.completedLevels.length === 6;
+  const allCompleted = state.completedLevels.length === 7;
 
   const getStatus = (idx: number) => {
     if (state.completedLevels.includes(idx)) return 'completed';
@@ -25,11 +25,11 @@ const JourneyMap = () => {
               <motion.div
                 className="h-full gold-gradient rounded-full"
                 initial={{ width: 0 }}
-                animate={{ width: `${(state.completedLevels.length / 6) * 100}%` }}
+                animate={{ width: `${(state.completedLevels.length / 7) * 100}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
-            <span className="text-game-gold text-sm font-display font-semibold">{state.completedLevels.length}/6</span>
+            <span className="text-game-gold text-sm font-display font-semibold">{state.completedLevels.length}/7</span>
           </div>
         </motion.div>
 
@@ -55,7 +55,7 @@ const JourneyMap = () => {
                   {status === 'completed' ? '✅' : level.icon}
                 </div>
                 <div className="text-left flex-1">
-                  <p className="text-game-muted text-xs font-body">Level {idx + 1}</p>
+                  <p className="text-game-muted text-xs font-body">Level {idx}</p>
                   <p className="text-game-text font-display font-semibold">{level.title}</p>
                   <p className="text-game-muted text-xs font-body">{level.theme}</p>
                 </div>

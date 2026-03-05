@@ -5,6 +5,12 @@ export interface Scenario {
   options: { text: string; emoji: string }[];
 }
 
+export interface RealityQuestion {
+  question: string;
+  category: string;
+  options: { text: string; emoji: string }[];
+}
+
 export interface Level {
   id: number;
   title: string;
@@ -15,10 +21,136 @@ export interface Level {
   scenarios: Scenario[];
 }
 
-// Dimension weights for FQ scoring (total = 1.0)
-export const dimensionWeights = [0.15, 0.20, 0.20, 0.15, 0.15, 0.15];
+// 11 Financial Reality Check questions (Level 0)
+export const realityQuestions: RealityQuestion[] = [
+  {
+    question: "What best describes your current stage?",
+    category: "Player Segmentation",
+    options: [
+      { text: "In school (Class 11/12)", emoji: "🎒" },
+      { text: "In college", emoji: "🎓" },
+      { text: "Doing a course or skill program", emoji: "🧑‍💻" },
+      { text: "Working part-time or full-time", emoji: "💼" },
+      { text: "Running a business / startup", emoji: "🚀" },
+    ],
+  },
+  {
+    question: "How do you usually receive money?",
+    category: "Player Segmentation",
+    options: [
+      { text: "Fully dependent on parents", emoji: "👨‍👩‍👧" },
+      { text: "Pocket money from family", emoji: "💸" },
+      { text: "Freelance / gig work", emoji: "🧑‍💻" },
+      { text: "Salary from job", emoji: "💼" },
+      { text: "Business / startup income", emoji: "🚀" },
+    ],
+  },
+  {
+    question: "How much money do you receive or earn every month from all sources?",
+    category: "Real Income Level",
+    options: [
+      { text: "Up to ₹5,000", emoji: "💰" },
+      { text: "₹5,000 – ₹10,000", emoji: "💰" },
+      { text: "₹10,000 – ₹25,000", emoji: "💰" },
+      { text: "₹25,000 – ₹50,000", emoji: "💰" },
+      { text: "Above ₹50,000", emoji: "🚀" },
+    ],
+  },
+  {
+    question: "On average, how much do you spend every month?",
+    category: "Spending Reality",
+    options: [
+      { text: "Less than ₹1,000", emoji: "🪙" },
+      { text: "₹1,000 – ₹2,500", emoji: "💸" },
+      { text: "₹2,500 – ₹5,000", emoji: "💳" },
+      { text: "₹5,000 – ₹10,000", emoji: "🛍" },
+      { text: "Above ₹10,000", emoji: "🚀" },
+    ],
+  },
+  {
+    question: "How much money do you currently have saved?",
+    category: "Savings Status",
+    options: [
+      { text: "No savings yet", emoji: "🪙" },
+      { text: "Less than ₹500", emoji: "💰" },
+      { text: "₹500 – ₹2,000", emoji: "💰" },
+      { text: "₹2,000 – ₹10,000", emoji: "💰" },
+      { text: "More than ₹10,000", emoji: "🏦" },
+    ],
+  },
+  {
+    question: "Do you currently owe money to anyone?",
+    category: "Debt Situation",
+    options: [
+      { text: "No debt at all", emoji: "🟢" },
+      { text: "Less than ₹1,000", emoji: "🟡" },
+      { text: "₹1,000 – ₹5,000", emoji: "🟠" },
+      { text: "₹5,000 – ₹25,000", emoji: "🔴" },
+      { text: "More than ₹25,000", emoji: "⚠️" },
+    ],
+  },
+  {
+    question: "Have you ever invested money?",
+    category: "Investment Participation",
+    options: [
+      { text: "No investment yet", emoji: "🪙" },
+      { text: "Physical savings (gold or cash)", emoji: "🪙" },
+      { text: "Bank FD / RD", emoji: "🏦" },
+      { text: "Mutual fund SIP", emoji: "📈" },
+      { text: "Stocks / crypto / advanced investments", emoji: "🚀" },
+    ],
+  },
+  {
+    question: "Does your family currently have any insurance coverage?",
+    category: "Insurance Protection",
+    options: [
+      { text: "No insurance", emoji: "❌" },
+      { text: "Government scheme only", emoji: "🏛" },
+      { text: "One private insurance policy", emoji: "🏥" },
+      { text: "Multiple policies covering family", emoji: "🛡" },
+      { text: "I help manage or understand these policies", emoji: "🧠" },
+    ],
+  },
+  {
+    question: "How often do you track your spending?",
+    category: "Financial Habit Check",
+    options: [
+      { text: "Never track it", emoji: "❌" },
+      { text: "Rarely track", emoji: "⚠️" },
+      { text: "Sometimes check my balance", emoji: "🤔" },
+      { text: "Often review my spending", emoji: "📊" },
+      { text: "Track every expense carefully", emoji: "📱" },
+    ],
+  },
+  {
+    question: "How interested are you in improving your financial knowledge?",
+    category: "Financial Learning Mindset",
+    options: [
+      { text: "Not interested", emoji: "❌" },
+      { text: "Slightly curious", emoji: "🤷" },
+      { text: "Somewhat interested", emoji: "🤔" },
+      { text: "Interested in learning more", emoji: "📚" },
+      { text: "Actively learning about money", emoji: "🚀" },
+    ],
+  },
+  {
+    question: "Are you ready to take charge of your money journey?",
+    category: "Final Commitment",
+    options: [
+      { text: "Not ready yet", emoji: "😴" },
+      { text: "Maybe later", emoji: "🤔" },
+      { text: "Thinking about it", emoji: "🙂" },
+      { text: "Yes, I want to improve", emoji: "💪" },
+      { text: "Absolutely! I'm ready to level up", emoji: "🚀" },
+    ],
+  },
+];
+
+// Dimension weights for FQ scoring (total = 1.0) — 7 dimensions
+export const dimensionWeights = [0.10, 0.13, 0.17, 0.17, 0.14, 0.14, 0.15];
 
 export const dimensionLabels = [
+  "Financial Reality",
   "Earning Mindset",
   "Spending Discipline",
   "Saving Behaviour",
@@ -27,37 +159,42 @@ export const dimensionLabels = [
   "Financial Safety",
 ];
 
-export const dimensionIcons = ["💼", "💳", "💰", "🧾", "📈", "🛡️"];
+export const dimensionIcons = ["📋", "💼", "💳", "💰", "🧾", "📈", "🛡️"];
 
 // 12 Financial Personality Archetypes (2 per dimension: high & low)
 export const archetypes: { dimension: number; high: { name: string; emoji: string; trait: string; strength: string; quest: string }; low: { name: string; emoji: string; trait: string; risk: string; quest: string } }[] = [
   {
     dimension: 0,
+    high: { name: "Reality Checker", emoji: "📋", trait: "Strong grasp of real financial situation", strength: "Self-awareness", quest: "Review your finances monthly" },
+    low: { name: "Reality Explorer", emoji: "🔍", trait: "Still discovering financial realities", risk: "Lack of financial self-awareness", quest: "List all your income and expenses this week" },
+  },
+  {
+    dimension: 1,
     high: { name: "Income Explorer", emoji: "💼", trait: "Actively seeks earning opportunities", strength: "Income growth mindset", quest: "Diversify income streams" },
     low: { name: "Skill Monetizer", emoji: "🎯", trait: "Turns skills or hobbies into money", risk: "Untapped earning potential", quest: "Start a freelance side project" },
   },
   {
-    dimension: 1,
+    dimension: 2,
     high: { name: "Smart Spender", emoji: "💳", trait: "Controls impulse purchases", strength: "Budget awareness", quest: "Track every purchase for 30 days" },
     low: { name: "Lifestyle Drifter", emoji: "🛍️", trait: "Spends based on social influence", risk: "Peer pressure spending", quest: "Follow the 24-hour rule before buying" },
   },
   {
-    dimension: 2,
+    dimension: 3,
     high: { name: "Growing Saver", emoji: "💰", trait: "Consistently builds savings", strength: "Emergency fund mindset", quest: "Save ₹500 weekly for 4 weeks" },
     low: { name: "Future Planner", emoji: "📊", trait: "Plans financial goals ahead", risk: "Inconsistent savings habit", quest: "Set up automatic savings transfer" },
   },
   {
-    dimension: 3,
+    dimension: 4,
     high: { name: "Debt Avoider", emoji: "🧾", trait: "Cautious about borrowing", strength: "Responsible repayment behaviour", quest: "Create a debt-free action plan" },
     low: { name: "Credit Juggler", emoji: "⚠️", trait: "Uses debt casually", risk: "EMI-driven lifestyle", quest: "Review & eliminate one unnecessary subscription" },
   },
   {
-    dimension: 4,
+    dimension: 5,
     high: { name: "Future Investor", emoji: "📈", trait: "Interested in wealth creation", strength: "Long-term mindset", quest: "Start a ₹500 monthly SIP" },
     low: { name: "Market Learner", emoji: "📚", trait: "Early stage investment curiosity", risk: "Analysis paralysis", quest: "Read one investment article daily for a week" },
   },
   {
-    dimension: 5,
+    dimension: 6,
     high: { name: "Money Protector", emoji: "🛡️", trait: "High awareness of fraud and financial safety", strength: "Fraud awareness", quest: "Share one safety tip with a friend" },
     low: { name: "Risk Blind", emoji: "🚨", trait: "Low financial safety awareness", risk: "Vulnerable to scams", quest: "Learn about 3 common financial scams" },
   },
@@ -76,6 +213,15 @@ export const fqBands: { min: number; max: number; level: string; meaning: string
 export const levels: Level[] = [
   {
     id: 0,
+    title: "Financial Reality Check",
+    theme: "Know your real financial situation",
+    icon: "📋",
+    color: "game-blue",
+    bgEmoji: "🔍",
+    scenarios: [], // Level 0 uses realityQuestions instead
+  },
+  {
+    id: 1,
     title: "The Earning Quest",
     theme: "Discover your earning mindset",
     icon: "💼",
@@ -121,7 +267,7 @@ export const levels: Level[] = [
     ],
   },
   {
-    id: 1,
+    id: 2,
     title: "Spending Challenge",
     theme: "Battle the impulse monster!",
     icon: "💳",
@@ -167,7 +313,7 @@ export const levels: Level[] = [
     ],
   },
   {
-    id: 2,
+    id: 3,
     title: "Saving Mission",
     theme: "Build your treasure chest!",
     icon: "💰",
@@ -213,7 +359,7 @@ export const levels: Level[] = [
     ],
   },
   {
-    id: 3,
+    id: 4,
     title: "Debt Trap",
     theme: "Escape the debt dungeon!",
     icon: "🧾",
@@ -259,7 +405,7 @@ export const levels: Level[] = [
     ],
   },
   {
-    id: 4,
+    id: 5,
     title: "Investment World",
     theme: "Grow your wealth garden!",
     icon: "📈",
@@ -305,7 +451,7 @@ export const levels: Level[] = [
     ],
   },
   {
-    id: 5,
+    id: 6,
     title: "Protection Shield",
     theme: "Defend against digital villains!",
     icon: "🛡️",
@@ -363,6 +509,7 @@ export const reflectionOptions = [
 
 // Legacy exports for compatibility
 export const levelTraits = [
+  { label: "Financial Reality", icon: "📋" },
   { label: "Earning Mindset", icon: "💼" },
   { label: "Spending Behaviour", icon: "💳" },
   { label: "Saving Behaviour", icon: "💰" },
@@ -372,12 +519,13 @@ export const levelTraits = [
 ];
 
 export const traitProfiles: { [key: number]: string[] } = {
-  0: ["Income Ignorer", "Income Thinker", "Income Trier", "Income Explorer", "Income Builder"],
-  1: ["Impulse Buyer", "Social Spender", "Emotional Spender", "Smart Spender", "Mindful Spender"],
-  2: ["Non-Saver", "Occasional Saver", "Growing Saver", "Consistent Saver", "Savings Master"],
-  3: ["Debt Prone", "Casual Borrower", "Cautious Borrower", "Debt Avoider", "Debt Free Champion"],
-  4: ["Investment Avoider", "Investment Skeptic", "Investment Curious", "Future Investor", "Investment Explorer"],
-  5: ["Fraud Vulnerable", "Somewhat Aware", "Getting Careful", "Money Protector", "Security Expert"],
+  0: ["Reality Unaware", "Reality Curious", "Reality Aware", "Reality Checker", "Reality Master"],
+  1: ["Income Ignorer", "Income Thinker", "Income Trier", "Income Explorer", "Income Builder"],
+  2: ["Impulse Buyer", "Social Spender", "Emotional Spender", "Smart Spender", "Mindful Spender"],
+  3: ["Non-Saver", "Occasional Saver", "Growing Saver", "Consistent Saver", "Savings Master"],
+  4: ["Debt Prone", "Casual Borrower", "Cautious Borrower", "Debt Avoider", "Debt Free Champion"],
+  5: ["Investment Avoider", "Investment Skeptic", "Investment Curious", "Future Investor", "Investment Explorer"],
+  6: ["Fraud Vulnerable", "Somewhat Aware", "Getting Careful", "Money Protector", "Security Expert"],
 };
 
 // FQ Scoring utility functions
@@ -397,7 +545,7 @@ export function calculateFQScore(answers: { [level: number]: { [q: number]: numb
   secondaryArchetype: { name: string; emoji: string; trait: string; quest: string };
   band: typeof fqBands[0];
 } {
-  const normalizedScores = Array.from({ length: 6 }, (_, level) => {
+  const normalizedScores = Array.from({ length: 7 }, (_, level) => {
     const levelAnswers = answers[level] || {};
     return calculateNormalizedScore(levelAnswers);
   });

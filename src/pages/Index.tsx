@@ -5,6 +5,7 @@ import ConsentScreen from '@/components/game/ConsentScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
 import JourneyMap from '@/components/game/JourneyMap';
 import LevelPlay from '@/components/game/LevelPlay';
+import RealityCheckPlay from '@/components/game/RealityCheckPlay';
 import ReflectionScreen from '@/components/game/ReflectionScreen';
 import ReportScreen from '@/components/game/ReportScreen';
 
@@ -16,7 +17,7 @@ const GameFlow = () => {
     case 'consent': return <ConsentScreen />;
     case 'profile': return <ProfileScreen />;
     case 'journey': return <JourneyMap />;
-    case 'level': return <LevelPlay />;
+    case 'level': return state.currentLevel === 0 ? <RealityCheckPlay /> : <LevelPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;
     default: return <WelcomeScreen />;

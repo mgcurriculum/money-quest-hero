@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
-import finquoLogo from '@/assets/finquo-logo.png';
+import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const ConsentScreen = () => {
   const { dispatch } = useGame();

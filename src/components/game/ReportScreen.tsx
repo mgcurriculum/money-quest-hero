@@ -13,7 +13,7 @@ import {
   Radar,
   ResponsiveContainer,
 } from 'recharts';
-import finquoLogo from '@/assets/finquo-logo.png';
+import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const ReportScreen = () => {
   const { state, dispatch } = useGame();

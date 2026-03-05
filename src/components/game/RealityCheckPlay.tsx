@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { realityQuestions } from '@/data/questions';
-import { Zap, Star, ChevronRight } from 'lucide-react';
+import { Zap, Star, ChevronRight, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { useNarration } from '@/hooks/useNarration';
 
 const feedbackData = [
   { text: "Noted! 📝" },
@@ -17,10 +18,25 @@ const RealityCheckPlay = () => {
   const question = realityQuestions[state.currentQuestion];
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const lastNarratedQuestion = useRef<number>(-1);
 
   const totalQuestions = realityQuestions.length;
 
+  // Auto-play narration when question changes
+  useEffect(() => {
+    if (!isMuted && question && state.currentQuestion !== lastNarratedQuestion.current) {
+      lastNarratedQuestion.current = state.currentQuestion;
+      // Small delay to let the animation start
+      const timer = setTimeout(() => {
+        speak(question.question);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [state.currentQuestion, isMuted, question, speak]);
+
   const handleSelect = (optIndex: number) => {
+    stop(); // Stop narration on answer
     const score = optIndex + 1;
     setSelectedOption(optIndex);
     dispatch({ type: 'ANSWER_QUESTION', level: 0, question: state.currentQuestion, score });
@@ -69,11 +85,28 @@ const RealityCheckPlay = () => {
             <span className="gold-text font-display font-bold text-xs">FQ Test</span>
             <span className="text-game-muted text-[10px] font-body">Reality Check</span>
           </motion.div>
-          <div className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1">
-            <Zap size={14} className="text-game-gold" />
-            <span className="text-game-gold text-xs font-display font-bold">
-              {state.currentQuestion + 1}/{totalQuestions}
-            </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleMute}
+              className={`glass-card rounded-full p-1.5 transition-colors ${
+                isMuted ? 'text-game-muted' : 'text-game-gold'
+              }`}
+              title={isMuted ? 'Unmute narration' : 'Mute narration'}
+            >
+              {isLoading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : isMuted ? (
+                <VolumeX size={14} />
+              ) : (
+                <Volume2 size={14} className={isPlaying ? 'animate-pulse' : ''} />
+              )}
+            </button>
+            <div className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1">
+              <Zap size={14} className="text-game-gold" />
+              <span className="text-game-gold text-xs font-display font-bold">
+                {state.currentQuestion + 1}/{totalQuestions}
+              </span>
+            </div>
           </div>
         </div>
 

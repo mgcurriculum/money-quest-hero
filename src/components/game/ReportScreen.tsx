@@ -27,7 +27,7 @@ const ReportScreen = () => {
     fullMark: 100,
   }));
 
-  const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nI am a ${primaryArchetype.emoji} ${primaryArchetype.name}\nWhat's your Money Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
+  const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nI am a ${primaryArchetype.emoji} ${primaryArchetype.name}\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
 
   const handleShare = (platform: string) => {
     const encoded = encodeURIComponent(shareText);
@@ -49,7 +49,7 @@ const ReportScreen = () => {
             {band.emoji}
           </motion.div>
           <h1 className="text-2xl font-display font-bold text-game-text mb-1">Your <span className="gold-text">FQ Test</span> Report</h1>
-          <p className="text-game-muted font-body text-sm">{state.profile.name}'s Money Journey Results</p>
+          <p className="text-game-muted font-body text-sm">{state.profile.name}'s Financial Journey Results</p>
         </motion.div>
 
         {/* FQ Score Ring */}

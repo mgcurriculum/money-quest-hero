@@ -13,8 +13,8 @@ const interestOptions = [
   { text: "Actively learning about money", emoji: "🚀" },
 ];
 
-const REFLECTION_TEXT_0 = "We're almost done! I'm curious — how interested are you in actually getting better with money? Be honest!";
-const REFLECTION_TEXT_1 = "Last question! If you could level up just one money skill this year, which would it be? Pick the one that matters most to you.";
+const REFLECTION_TEXT_0 = "We're almost done! I'm curious — how interested are you in actually getting better with finances? Be honest!";
+const REFLECTION_TEXT_1 = "Last question! If you could level up just one financial skill this year, which would it be? Pick the one that matters most to you.";
 
 const ReflectionScreen = () => {
   const { state, dispatch } = useGame();
@@ -80,7 +80,7 @@ const ReflectionScreen = () => {
           <>
             <span className="text-5xl mb-4 block">🪞</span>
             <h2 className="text-3xl font-display font-bold text-game-text mb-2">Final Reflection</h2>
-            <p className="text-game-muted font-body mb-8">If you could improve one money skill this year, what would it be?</p>
+            <p className="text-game-muted font-body mb-8">If you could improve one financial skill this year, what would it be?</p>
             <div className="space-y-2">
               {reflectionOptions.map((opt, idx) => (
                 <motion.button

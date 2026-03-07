@@ -7,6 +7,12 @@ import {
   calculateFQScore,
 } from '@/data/questions';
 import {
+  extractQuestionsAndAnswers,
+  getFinancialTips,
+  generateReportHTML,
+  openPrintableReport,
+} from '@/utils/generateReportPDF';
+import {
   RadarChart,
   PolarGrid,
   PolarAngleAxis,

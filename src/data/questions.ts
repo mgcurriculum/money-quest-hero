@@ -21,7 +21,7 @@ export interface Level {
   scenarios: Scenario[];
 }
 
-// 11 Financial Reality Check questions (Level 0)
+// 4 Financial Reality Check questions (Level 0) — fallback
 export const realityQuestions: RealityQuestion[] = [
   {
     question: "How much money do you receive or earn every month from all sources?",
@@ -57,39 +57,6 @@ export const realityQuestions: RealityQuestion[] = [
     ],
   },
   {
-    question: "Do you currently owe money to anyone?",
-    category: "Debt Situation",
-    options: [
-      { text: "No debt at all", emoji: "🟢" },
-      { text: "Less than ₹1,000", emoji: "🟡" },
-      { text: "₹1,000 – ₹5,000", emoji: "🟠" },
-      { text: "₹5,000 – ₹25,000", emoji: "🔴" },
-      { text: "More than ₹25,000", emoji: "⚠️" },
-    ],
-  },
-  {
-    question: "Have you ever invested money?",
-    category: "Investment Participation",
-    options: [
-      { text: "No investment yet", emoji: "🪙" },
-      { text: "Physical savings (gold or cash)", emoji: "🪙" },
-      { text: "Bank FD / RD", emoji: "🏦" },
-      { text: "Mutual fund SIP", emoji: "📈" },
-      { text: "Stocks / crypto / advanced investments", emoji: "🚀" },
-    ],
-  },
-  {
-    question: "Does your family currently have any insurance coverage?",
-    category: "Insurance Protection",
-    options: [
-      { text: "No insurance", emoji: "❌" },
-      { text: "Government scheme only", emoji: "🏛" },
-      { text: "One private insurance policy", emoji: "🏥" },
-      { text: "Multiple policies covering family", emoji: "🛡" },
-      { text: "I help manage or understand these policies", emoji: "🧠" },
-    ],
-  },
-  {
     question: "How often do you track your spending?",
     category: "Financial Habit Check",
     options: [
@@ -117,7 +84,7 @@ export const dimensionLabels = [
 
 export const dimensionIcons = ["📋", "💼", "💳", "💰", "🧾", "📈", "🛡️"];
 
-// 12 Financial Personality Archetypes (2 per dimension: high & low)
+// 14 Financial Personality Archetypes (2 per dimension: high & low)
 export const archetypes: { dimension: number; high: { name: string; emoji: string; trait: string; strength: string; quest: string }; low: { name: string; emoji: string; trait: string; risk: string; quest: string } }[] = [
   {
     dimension: 0,
@@ -185,38 +152,26 @@ export const levels: Level[] = [
     bgEmoji: "🚀",
     scenarios: [
       {
-        situation: "🎬 Scene: It's a lazy Sunday afternoon. Your friends are binge-watching Netflix. Suddenly, your phone buzzes — someone on Instagram is looking for a freelance designer. Clock is ticking! ⏰",
+        situation: "🎬 It's a lazy Sunday afternoon. Your phone buzzes — someone online is looking for help with a paid gig that matches your skills. Clock is ticking! ⏰",
         scene: "🌅",
         character: "🧑‍💻",
         options: [
           { text: "Nah, pass the popcorn 🍿", emoji: "😴" },
           { text: "Hmm, interesting... *scrolls past*", emoji: "🤔" },
-          { text: "Maybe I'll DM them... tomorrow", emoji: "📱" },
-          { text: "I'm on it! Sending my portfolio now", emoji: "⚡" },
-          { text: "Already have 3 freelance gigs running 💪", emoji: "🔥" },
+          { text: "Maybe I'll respond... tomorrow", emoji: "📱" },
+          { text: "I'm on it! Sending my details now", emoji: "⚡" },
+          { text: "Already have multiple gigs running 💪", emoji: "🔥" },
         ],
       },
       {
-        situation: "🎓 Plot twist! A senior drops a hot tip: 'This startup pays ₹5K/month for interns AND teaches you real skills.' Your move, player?",
-        scene: "🏢",
-        character: "🎯",
-        options: [
-          { text: "₹5K? That's pocket change, skip!", emoji: "💤" },
-          { text: "Sounds cool but... effort 😮‍💨", emoji: "🐌" },
-          { text: "I'll apply if the form is short", emoji: "📝" },
-          { text: "Resume updated, application sent! 📨", emoji: "🎯" },
-          { text: "I'm already interning + upskilling!", emoji: "🏆" },
-        ],
-      },
-      {
-        situation: "🎨 Quest unlocked! You realize your hobby — drawing, coding, gaming — could actually make money online. The internet is your marketplace! 🌐",
+        situation: "🎨 Quest unlocked! You realize your hobby — drawing, coding, cooking — could actually make money. The internet is your marketplace! 🌐",
         scene: "💡",
         character: "🎮",
         options: [
           { text: "Hobbies are for fun, not work", emoji: "🎈" },
           { text: "Too complicated to monetize", emoji: "😕" },
-          { text: "Posted once, got 2 likes... gave up", emoji: "📉" },
-          { text: "Setting up my Fiverr profile tonight!", emoji: "🛠️" },
+          { text: "Tried once, didn't work out", emoji: "📉" },
+          { text: "Setting up my profile tonight!", emoji: "🛠️" },
           { text: "Already earning from my passion! 💸", emoji: "🌟" },
         ],
       },
@@ -231,7 +186,7 @@ export const levels: Level[] = [
     bgEmoji: "🛒",
     scenarios: [
       {
-        situation: "🛍️ DANGER ZONE! You're at the mall and spot THE perfect bag. But wait... you already own 3 similar ones at home. The Impulse Monster whispers: 'Treat yourself!' 👹",
+        situation: "🛍️ DANGER ZONE! You spot something you love on sale. But wait... you already own something similar. The Impulse Monster whispers: 'Treat yourself!' 👹",
         scene: "🏬",
         character: "👜",
         options: [
@@ -243,7 +198,7 @@ export const levels: Level[] = [
         ],
       },
       {
-        situation: "⚡ FLASH SALE ALERT! Those sneakers you kinda wanted are 40% OFF for the next 2 hours! Your wallet is watching nervously... 👀",
+        situation: "⚡ FLASH SALE ALERT! Something you kinda wanted is 40% OFF for the next 2 hours! Your wallet is watching nervously... 👀",
         scene: "⏰",
         character: "👟",
         options: [
@@ -252,18 +207,6 @@ export const levels: Level[] = [
           { text: "Added to cart... thinking...", emoji: "🛒" },
           { text: "Let me check my budget first 📊", emoji: "📋" },
           { text: "Unplanned = Unwanted. Next! ✋", emoji: "💪" },
-        ],
-      },
-      {
-        situation: "📅 Month end boss fight! You check your balance and it's... dangerously low. The 'Where Did My Money Go?' mystery begins 🔍",
-        scene: "💰",
-        character: "🕵️",
-        options: [
-          { text: "Money just... vanishes? 🤷", emoji: "👻" },
-          { text: "Too many hangouts with the squad", emoji: "🍕" },
-          { text: "Some surprise expenses hit me", emoji: "💥" },
-          { text: "Slightly miscalculated, I'll adjust", emoji: "📐" },
-          { text: "This rarely happens — I track it all!", emoji: "📊" },
         ],
       },
     ],
@@ -277,39 +220,27 @@ export const levels: Level[] = [
     bgEmoji: "🏦",
     scenarios: [
       {
-        situation: "🎁 LOOT DROP! You just received ₹3,000 unexpectedly — birthday money, cashback, or that friend who finally paid back! What's your power move? ⚡",
+        situation: "🎁 LOOT DROP! You just received some unexpected money — a gift, cashback, or repayment! What's your power move? ⚡",
         scene: "✨",
         character: "💎",
         options: [
           { text: "Shopping spree incoming! 🛒", emoji: "🎉" },
-          { text: "Spend most, hide ₹500 maybe", emoji: "🤫" },
+          { text: "Spend most, save a little maybe", emoji: "🤫" },
           { text: "Save some... spend some... balance?", emoji: "⚖️" },
-          { text: "₹2,000 saved first, rest is play money", emoji: "🎯" },
+          { text: "Save most of it first, rest is play money", emoji: "🎯" },
           { text: "Straight to savings. Budget the rest!", emoji: "🏆" },
         ],
       },
       {
-        situation: "🎮 SIDE QUEST: You've been eyeing a ₹15,000 gadget for weeks. It's calling your name! How do you plan this epic purchase?",
+        situation: "🎮 SIDE QUEST: You've been eyeing something expensive for weeks. It's calling your name! How do you plan this purchase?",
         scene: "📱",
         character: "🎮",
         options: [
-          { text: "Mom/Dad, pleeeease? 🥺", emoji: "🙏" },
+          { text: "Ask someone else to buy it for me", emoji: "🙏" },
           { text: "Use whatever I have right now", emoji: "💸" },
           { text: "Save randomly and hope for the best", emoji: "🤞" },
-          { text: "₹3K/month × 5 months = MINE!", emoji: "📅" },
+          { text: "Create a monthly savings plan for it", emoji: "📅" },
           { text: "Savings plan with deadline + tracker!", emoji: "🗂️" },
-        ],
-      },
-      {
-        situation: "📊 STATS CHECK! You peek at your savings after a few months. What does your treasure chest look like?",
-        scene: "🔮",
-        character: "📈",
-        options: [
-          { text: "What savings? 😅", emoji: "🕳️" },
-          { text: "Had some, but they vanished", emoji: "🪄" },
-          { text: "Small wins here and there", emoji: "🌱" },
-          { text: "Growing steadily! Feels amazing", emoji: "📈" },
-          { text: "I track every rupee! Master saver!", emoji: "👑" },
         ],
       },
     ],
@@ -323,7 +254,7 @@ export const levels: Level[] = [
     bgEmoji: "⚠️",
     scenarios: [
       {
-        situation: "🕸️ TRAP DETECTED! Your friend says: 'Just use Buy Now Pay Later — everyone does it!' The siren song of easy money plays... 🎵",
+        situation: "🕸️ TRAP DETECTED! Someone says: 'Just use Buy Now Pay Later — everyone does it!' The siren song of easy money plays... 🎵",
         scene: "🚨",
         character: "🕸️",
         options: [
@@ -331,23 +262,11 @@ export const levels: Level[] = [
           { text: "If everyone does it, must be fine", emoji: "🐑" },
           { text: "Only if the EMI is tiny...", emoji: "🤏" },
           { text: "Nah, I'll save up for it", emoji: "🏋️" },
-          { text: "Hard pass! I don't borrow!", emoji: "🛑" },
+          { text: "Hard pass! I don't borrow for wants!", emoji: "🛑" },
         ],
       },
       {
-        situation: "🤝 HONOR TEST! You borrowed ₹2,000 from a friend last week. Your repayment style reveals your character!",
-        scene: "⏳",
-        character: "🤝",
-        options: [
-          { text: "They'll forget... right? 😬", emoji: "🙈" },
-          { text: "I'll pay when they remind me", emoji: "📞" },
-          { text: "Oh yeah! Almost forgot — transferring", emoji: "🔔" },
-          { text: "Paid back within 2 days! ⚡", emoji: "✅" },
-          { text: "I track all debts — already repaid!", emoji: "📒" },
-        ],
-      },
-      {
-        situation: "📱 BOSS BATTLE! Flashy ads promise: 'Get ₹50,000 instantly! No documents! Download now!' The Debt Monster attacks! 🐉",
+        situation: "📱 BOSS BATTLE! Flashy ads promise: 'Get money instantly! No documents! Download now!' The Debt Monster attacks! 🐉",
         scene: "⚔️",
         character: "🐉",
         options: [
@@ -369,39 +288,27 @@ export const levels: Level[] = [
     bgEmoji: "🌱",
     scenarios: [
       {
-        situation: "🏛️ THE COUNCIL! Your friend group is debating: 'Should we invest in mutual funds?' The room looks at you. What's your vibe?",
+        situation: "🏛️ THE COUNCIL! People around you are debating: 'Should we invest our money?' Everyone looks at you. What's your vibe?",
         scene: "🗣️",
         character: "🧠",
         options: [
-          { text: "Investing? I'm 20, not 50! 😂", emoji: "🙅" },
+          { text: "Investing? Not for me! 😂", emoji: "🙅" },
           { text: "Sounds risky, I'll keep my cash", emoji: "😨" },
           { text: "Curious but I need to learn more", emoji: "📚" },
-          { text: "Already researching! SIP calculator open", emoji: "🔍" },
-          { text: "I started my first SIP last month! 🚀", emoji: "💹" },
+          { text: "Already researching options!", emoji: "🔍" },
+          { text: "I've already started investing! 🚀", emoji: "💹" },
         ],
       },
       {
-        situation: "🎰 POWER-UP! Someone gifts you ₹10,000! This is your chance to make it grow or blow. Choose wisely, adventurer!",
+        situation: "🎰 POWER-UP! You receive a windfall of money! This is your chance to make it grow or blow. Choose wisely, adventurer!",
         scene: "🌟",
         character: "💎",
         options: [
-          { text: "Shopping spree! Treat yo'self!", emoji: "🛍️" },
-          { text: "Keep it under my mattress 🛏️", emoji: "💤" },
-          { text: "Park it in savings account", emoji: "🏦" },
-          { text: "Invest 30% in index funds!", emoji: "📊" },
-          { text: "70% invested + diversified! 📈", emoji: "🧠" },
-        ],
-      },
-      {
-        situation: "⚔️ DEBATE TIME! A friend declares: 'Stock market is just gambling for rich people!' Your counter-move?",
-        scene: "💬",
-        character: "🎭",
-        options: [
-          { text: "100% agree! It's all luck", emoji: "🎲" },
-          { text: "Mostly agree — seems dangerous", emoji: "⚠️" },
-          { text: "Honestly? I don't know enough", emoji: "🤷" },
-          { text: "There's a difference — research matters", emoji: "📖" },
-          { text: "I invest based on knowledge & patience!", emoji: "🧘" },
+          { text: "Shopping spree! Treat myself!", emoji: "🛍️" },
+          { text: "Keep it safe at home", emoji: "💤" },
+          { text: "Park it in a savings account", emoji: "🏦" },
+          { text: "Invest a portion wisely", emoji: "📊" },
+          { text: "Diversify across multiple investments! 📈", emoji: "🧠" },
         ],
       },
     ],
@@ -415,11 +322,11 @@ export const levels: Level[] = [
     bgEmoji: "🔒",
     scenarios: [
       {
-        situation: "📞 INCOMING THREAT! 'Hello, this is your bank. We need your OTP to verify your account or it will be BLOCKED!' They sound urgent! 😱",
+        situation: "📞 INCOMING THREAT! 'We need your OTP/PIN to verify your account or it will be BLOCKED!' They sound urgent! 😱",
         scene: "🚨",
         character: "🦹",
         options: [
-          { text: "OMG! Here's my OTP: ****", emoji: "😱" },
+          { text: "OMG! Here's my details!", emoji: "😱" },
           { text: "They sound legit... okay fine", emoji: "😟" },
           { text: "Hmm that's weird... but maybe...", emoji: "😰" },
           { text: "Nice try! Hanging up + calling bank", emoji: "📞" },
@@ -427,19 +334,7 @@ export const levels: Level[] = [
         ],
       },
       {
-        situation: "🏪 QUICK PAY! You're scanning a QR code to pay at a street food stall. But is that QR code legit or a villain's trap? 🦹‍♂️",
-        scene: "📱",
-        character: "🔍",
-        options: [
-          { text: "Scan and pay, no time to check!", emoji: "⚡" },
-          { text: "The shop looks fine, just pay", emoji: "🤷" },
-          { text: "At least I check the amount", emoji: "👀" },
-          { text: "Verify name + amount before confirming", emoji: "✅" },
-          { text: "I triple-check everything! Always!", emoji: "🔐" },
-        ],
-      },
-      {
-        situation: "😨 PLOT TWIST! Your friend just lost ₹25,000 in an online scam! They're devastated. What's YOUR takeaway from this event?",
+        situation: "😨 PLOT TWIST! Someone you know just lost a large sum in an online scam! They're devastated. What's YOUR takeaway?",
         scene: "🎭",
         character: "🧠",
         options: [

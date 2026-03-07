@@ -67,8 +67,6 @@ const ReportScreen = () => {
           player_income_type: state.profile.incomeType,
           answers: state.answers as any,
           fq_score: fqScore,
-          primary_archetype: `${primaryArchetype.emoji} ${primaryArchetype.name}`,
-          secondary_archetype: `${secondaryArchetype.emoji} ${secondaryArchetype.name}`,
           band_level: band.level,
           reflection_answer: state.reflectionAnswer,
         });

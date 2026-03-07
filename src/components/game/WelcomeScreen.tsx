@@ -66,7 +66,7 @@ const WelcomeScreen = () => {
         </motion.div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-8 flex items-center justify-center gap-6 text-game-muted text-sm">
-          <span className="flex items-center gap-1">⏱️ 5 min</span>
+          <span className="flex items-center gap-1"><span className="flex items-center gap-1">⏱️ 3 min</span></span>
           <span className="flex items-center gap-1">🎮 16 questions</span>
           <span className="flex items-center gap-1">🏅 Free report</span>
         </motion.div>

@@ -18,6 +18,7 @@ const LevelPlay = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const level = levels[state.currentLevel];
+  const totalScenarios = level.scenarios.length;
   const scenario = level.scenarios[state.currentQuestion];
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -47,7 +48,7 @@ const LevelPlay = () => {
       setShowFeedback(false);
       setSelectedOption(null);
       setXpGained(0);
-      if (state.currentQuestion < 2) {
+      if (state.currentQuestion < totalScenarios - 1) {
         dispatch({ type: 'NEXT_QUESTION' });
       } else {
         dispatch({ type: 'COMPLETE_LEVEL', level: state.currentLevel });
@@ -55,7 +56,11 @@ const LevelPlay = () => {
     }, 1200);
   };
 
-  const questionLabels = ["Quest 1 of 3", "Quest 2 of 3", "Final Quest!"];
+  const questionLabels = Array.from({ length: totalScenarios }, (_, i) =>
+    i === totalScenarios - 1 ? "Final Quest!" : `Quest ${i + 1} of ${totalScenarios}`
+  );
+
+  if (!scenario) return null;
 
   return (
     <div className="min-h-screen game-gradient px-4 py-6 relative overflow-hidden">
@@ -93,7 +98,7 @@ const LevelPlay = () => {
               <span className="text-game-muted text-xs font-body">Progress</span>
             </div>
             <div className="flex gap-1">
-              {[0, 1, 2].map(i => (
+              {Array.from({ length: totalScenarios }, (_, i) => (
                 <motion.div
                   key={i}
                   className={`w-3 h-3 rounded-full border-2 ${
@@ -108,7 +113,7 @@ const LevelPlay = () => {
             </div>
           </div>
           <div className="flex gap-1">
-            {[0, 1, 2].map(i => (
+            {Array.from({ length: totalScenarios }, (_, i) => (
               <div key={i} className="h-2 flex-1 rounded-full overflow-hidden bg-game-bg/50">
                 <motion.div
                   className="h-full rounded-full gold-gradient"

@@ -12,7 +12,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Download, Upload } from 'lucide-react';
+import { exportQuestionsToCsv, parseCsvToQuestions, downloadCsv } from '@/utils/questionsCsv';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Question = Tables<'questions'>;
@@ -53,6 +54,7 @@ const Questions = () => {
   const [formActive, setFormActive] = useState(true);
   const [formOrder, setFormOrder] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => { fetchQuestions(); }, []);
 
@@ -150,6 +152,61 @@ const Questions = () => {
     });
   };
 
+  const handleExport = () => {
+    const filtered = getFilteredQuestions(activeTab);
+    if (filtered.length === 0) {
+      toast({ title: 'No questions to export', description: `No questions found for age group ${activeTab}.`, variant: 'destructive' });
+      return;
+    }
+    const csv = exportQuestionsToCsv(filtered.map(q => ({
+      ...q,
+      options: (q.options as any) || [],
+    })));
+    downloadCsv(csv, `questions-${activeTab}.csv`);
+    toast({ title: 'Exported', description: `${filtered.length} questions exported for ${activeTab}.` });
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      setImporting(true);
+      try {
+        const text = await file.text();
+        const parsed = parseCsvToQuestions(text);
+        if (parsed.length === 0) {
+          toast({ title: 'Import failed', description: 'No valid questions found in CSV.', variant: 'destructive' });
+          setImporting(false);
+          return;
+        }
+        const rows = parsed.map(q => ({
+          question_text: q.question_text,
+          category: q.category,
+          level: q.level,
+          age_groups: q.age_groups.length > 0 ? q.age_groups : [activeTab],
+          options: q.options as any,
+          is_active: q.is_active,
+          sort_order: q.sort_order,
+          updated_at: new Date().toISOString(),
+        }));
+        const { error } = await supabase.from('questions').insert(rows);
+        if (error) {
+          toast({ title: 'Import error', description: error.message, variant: 'destructive' });
+        } else {
+          toast({ title: 'Imported', description: `${rows.length} questions imported successfully.` });
+          fetchQuestions();
+        }
+      } catch {
+        toast({ title: 'Import failed', description: 'Could not read CSV file.', variant: 'destructive' });
+      }
+      setImporting(false);
+    };
+    input.click();
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
@@ -217,8 +274,16 @@ const Questions = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-display font-bold text-foreground">Questions</h1>
-
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-2xl font-display font-bold text-foreground">Questions</h1>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport}><Download className="h-4 w-4 mr-2" />Export CSV</Button>
+          <Button variant="outline" size="sm" onClick={handleImport} disabled={importing}>
+            {importing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+            Import CSV
+          </Button>
+        </div>
+      </div>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           {AGE_GROUPS.map(ag => (

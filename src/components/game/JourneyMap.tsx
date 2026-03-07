@@ -2,27 +2,26 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
-import { Volume2, VolumeX, Loader2 } from 'lucide-react';
+import MuteButton from './MuteButton';
 import { levels } from '@/data/questions';
 
 const JourneyMap = () => {
   const { state, dispatch } = useGame();
-  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef(false);
-  const prevCompleted = useRef(state.completedLevels.length);
 
   const allCompleted = state.completedLevels.length === 7;
 
   useEffect(() => {
-    if (!isMuted && !hasNarrated.current) {
+    if (!state.isMuted && !hasNarrated.current) {
       hasNarrated.current = true;
       const text = allCompleted
-        ? "Wow, you crushed it! All levels done. Let's see how you scored. Tap the button below to view your results!"
-        : "Here's your quest board! Each level covers a different financial skill. Start from the top and work your way down. Tap any unlocked level to begin!";
+        ? "Wow, you crushed it! All levels done. Let's see how you scored."
+        : "Here's your quest board! Tap any unlocked level to begin!";
       const timer = setTimeout(() => speak(text), 500);
       return () => clearTimeout(timer);
     }
-  }, [isMuted, speak, allCompleted]);
+  }, [state.isMuted, speak, allCompleted]);
 
   const getStatus = (idx: number) => {
     if (state.completedLevels.includes(idx)) return 'completed';
@@ -32,32 +31,13 @@ const JourneyMap = () => {
 
   return (
     <div className="min-h-screen game-gradient px-6 py-8 relative">
-      {/* Mute toggle */}
-      <button
-        onClick={toggleMute}
-        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
-      >
-        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
-      </button>
+      <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
       <div className="max-w-md mx-auto">
-        {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
           <p className="mb-1"><span className="gold-text font-display font-bold text-base">FQ Test</span>{' '}<span className="text-game-muted text-xs font-body">by FinQuo Versity</span></p>
           <h2 className="text-2xl font-display font-bold text-game-text">Journey Map</h2>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <div className="h-2 flex-1 max-w-[200px] bg-game-card rounded-full overflow-hidden">
-              <motion.div
-                className="h-full gold-gradient rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${(state.completedLevels.length / 7) * 100}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-            <span className="text-game-gold text-sm font-display font-semibold">{state.completedLevels.length}/7</span>
-          </div>
         </motion.div>
 
-        {/* Level cards */}
         <div className="space-y-3">
           {levels.map((level, idx) => {
             const status = getStatus(idx);
@@ -91,7 +71,6 @@ const JourneyMap = () => {
           })}
         </div>
 
-        {/* Continue to reflection */}
         {allCompleted && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
             <button

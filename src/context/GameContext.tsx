@@ -17,15 +17,16 @@ export interface LevelAnswers {
 }
 
 export interface GameState {
-  step: 'welcome' | 'consent' | 'profile' | 'journey' | 'level' | 'reflection' | 'report';
+  step: 'welcome' | 'consent' | 'profile' | 'level' | 'reflection' | 'report';
   profile: PlayerProfile;
   consentGiven: boolean;
-  currentLevel: number; // 0-5
-  currentQuestion: number; // 0-2
+  currentLevel: number; // 0-6
+  currentQuestion: number; // 0-6 for level 0, 0-2 for levels 1-6
   answers: { [level: number]: LevelAnswers };
   completedLevels: number[];
   reflectionAnswer: string;
   language: 'en' | 'ml';
+  isMuted: boolean;
 }
 
 type Action =
@@ -38,6 +39,7 @@ type Action =
   | { type: 'COMPLETE_LEVEL'; level: number }
   | { type: 'SET_REFLECTION'; answer: string }
   | { type: 'SET_LANGUAGE'; lang: 'en' | 'ml' }
+  | { type: 'SET_MUTE'; value: boolean }
   | { type: 'RESET' };
 
 const initialState: GameState = {
@@ -50,6 +52,7 @@ const initialState: GameState = {
   completedLevels: [],
   reflectionAnswer: '',
   language: 'en',
+  isMuted: false,
 };
 
 function reducer(state: GameState, action: Action): GameState {
@@ -63,13 +66,27 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...state, answers: { ...state.answers, [action.level]: levelAnswers } };
     }
     case 'NEXT_QUESTION': return { ...state, currentQuestion: state.currentQuestion + 1 };
-    case 'COMPLETE_LEVEL': return {
-      ...state,
-      completedLevels: [...new Set([...state.completedLevels, action.level])],
-      step: 'journey',
-    };
+    case 'COMPLETE_LEVEL': {
+      const newCompleted = [...new Set([...state.completedLevels, action.level])];
+      // Auto-advance: if level < 6, start next level; if level === 6, go to reflection
+      if (action.level < 6) {
+        return {
+          ...state,
+          completedLevels: newCompleted,
+          currentLevel: action.level + 1,
+          currentQuestion: 0,
+          step: 'level',
+        };
+      }
+      return {
+        ...state,
+        completedLevels: newCompleted,
+        step: 'reflection',
+      };
+    }
     case 'SET_REFLECTION': return { ...state, reflectionAnswer: action.answer };
     case 'SET_LANGUAGE': return { ...state, language: action.lang };
+    case 'SET_MUTE': return { ...state, isMuted: action.value };
     case 'RESET': return initialState;
     default: return state;
   }

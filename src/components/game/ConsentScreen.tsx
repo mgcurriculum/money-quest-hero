@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
-import { Volume2, VolumeX, Loader2 } from 'lucide-react';
+import MuteButton from './MuteButton';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const CONSENT_TEXT = "Alright, just a quick heads up! We need your consent before we start. Don't worry, your data stays safe and private. Just check both boxes and we're good to go!";
 
 const ConsentScreen = () => {
-  const { dispatch } = useGame();
-  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const { state, dispatch } = useGame();
+  const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef(false);
   const [consent1, setConsent1] = useState(false);
   const [consent2, setConsent2] = useState(false);
@@ -17,27 +17,17 @@ const ConsentScreen = () => {
   const canProceed = consent1 && consent2;
 
   useEffect(() => {
-    if (!isMuted && !hasNarrated.current) {
+    if (!state.isMuted && !hasNarrated.current) {
       hasNarrated.current = true;
       const timer = setTimeout(() => speak(CONSENT_TEXT), 500);
       return () => clearTimeout(timer);
     }
-  }, [isMuted, speak]);
+  }, [state.isMuted, speak]);
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
-      {/* Mute toggle */}
-      <button
-        onClick={toggleMute}
-        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
-      >
-        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
-      </button>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full"
-      >
+      <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full">
         <div className="text-center mb-8">
           <img src={finquoLogo} alt="FinQuo Versity" className="w-28 h-auto mx-auto mb-4" />
           <p className="gold-text font-display font-bold text-lg mb-2">FQ Test</p>
@@ -68,11 +58,7 @@ const ConsentScreen = () => {
 
         <button
           disabled={!canProceed}
-          onClick={() => {
-            stop();
-            dispatch({ type: 'SET_CONSENT', value: true });
-            dispatch({ type: 'SET_STEP', step: 'profile' });
-          }}
+          onClick={() => { stop(); dispatch({ type: 'SET_CONSENT', value: true }); dispatch({ type: 'SET_STEP', step: 'profile' }); }}
           className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceed ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
         >
           Continue →

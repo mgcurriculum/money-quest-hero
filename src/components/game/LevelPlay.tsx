@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
 import { levels } from '@/data/questions';
-import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight } from 'lucide-react';
+import MuteButton from './MuteButton';
 
 const feedbackData = [
   { text: "Noted! 📝", icon: <Zap className="text-game-gold" size={28} /> },
@@ -15,20 +16,19 @@ const feedbackData = [
 
 const LevelPlay = () => {
   const { state, dispatch } = useGame();
-  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const level = levels[state.currentLevel];
   const scenario = level.scenarios[state.currentQuestion];
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [xpGained, setXpGained] = useState(0);
 
-  // Auto-narrate with assistant-style guidance
   useEffect(() => {
-    if (!isMuted && scenario) {
+    if (!state.isMuted && scenario) {
       const timer = setTimeout(() => speak("Alright, picture this scenario. Read through the situation and choose how you'd handle it."), 500);
       return () => clearTimeout(timer);
     }
-  }, [isMuted, speak, state.currentLevel, state.currentQuestion]);
+  }, [state.isMuted, speak, state.currentLevel, state.currentQuestion]);
 
   const handleSelect = (optIndex: number) => {
     stop();
@@ -38,10 +38,9 @@ const LevelPlay = () => {
     dispatch({ type: 'ANSWER_QUESTION', level: state.currentLevel, question: state.currentQuestion, score });
 
     const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
-    if (!isMuted) {
+    if (!state.isMuted) {
       speak(feedbackText);
     }
-    dispatch({ type: 'ANSWER_QUESTION', level: state.currentLevel, question: state.currentQuestion, score });
 
     setShowFeedback(true);
     setTimeout(() => {
@@ -60,25 +59,14 @@ const LevelPlay = () => {
 
   return (
     <div className="min-h-screen game-gradient px-4 py-6 relative overflow-hidden">
-      {/* Floating background decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {[...Array(6)].map((_, i) => (
           <motion.span
             key={i}
             className="absolute text-3xl opacity-10 select-none"
-            style={{
-              top: `${15 + i * 15}%`,
-              left: `${10 + (i % 3) * 35}%`,
-            }}
-            animate={{
-              y: [0, -15, 0],
-              rotate: [0, 10, -10, 0],
-            }}
-            transition={{
-              duration: 3 + i * 0.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            style={{ top: `${15 + i * 15}%`, left: `${10 + (i % 3) * 35}%` }}
+            animate={{ y: [0, -15, 0], rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }}
           >
             {level.bgEmoji}
           </motion.span>
@@ -86,38 +74,18 @@ const LevelPlay = () => {
       </div>
 
       <div className="max-w-md mx-auto relative z-10">
-        {/* Header bar */}
         <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => { stop(); dispatch({ type: 'SET_STEP', step: 'journey' }); }}
-            className="glass-card rounded-full px-3 py-1.5 text-game-muted text-xs font-body hover:text-game-text transition-colors flex items-center gap-1"
-          >
-            ✕ Exit
-          </button>
-          {/* Mute toggle */}
-          <button
-            onClick={toggleMute}
-            className={`glass-card rounded-full p-2 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
-          >
-            {isLoading ? <Loader2 size={16} className="animate-spin" /> : isMuted ? <VolumeX size={16} /> : <Volume2 size={16} className={isPlaying ? 'animate-pulse' : ''} />}
-          </button>
-          <motion.div
-            className="glass-card rounded-full px-4 py-1.5 flex items-center gap-2"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-          >
+          <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="p-2" />
+          <motion.div className="glass-card rounded-full px-4 py-1.5 flex items-center gap-2" initial={{ scale: 0.9 }} animate={{ scale: 1 }}>
             <span className="text-xl">{level.icon}</span>
             <span className="text-game-text font-display font-semibold text-xs">{level.title}</span>
           </motion.div>
           <div className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1">
             <Zap size={14} className="text-game-gold" />
-            <span className="text-game-gold text-xs font-display font-bold">
-              {questionLabels[state.currentQuestion]}
-            </span>
+            <span className="text-game-gold text-xs font-display font-bold">{questionLabels[state.currentQuestion]}</span>
           </div>
         </div>
 
-        {/* XP / Progress bar */}
         <div className="glass-card rounded-2xl p-3 mb-5">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
@@ -129,11 +97,9 @@ const LevelPlay = () => {
                 <motion.div
                   key={i}
                   className={`w-3 h-3 rounded-full border-2 ${
-                    i < state.currentQuestion
-                      ? 'bg-game-green border-game-green'
-                      : i === state.currentQuestion
-                      ? 'border-game-gold bg-game-gold/30'
-                      : 'border-game-muted/30 bg-transparent'
+                    i < state.currentQuestion ? 'bg-game-green border-game-green'
+                    : i === state.currentQuestion ? 'border-game-gold bg-game-gold/30'
+                    : 'border-game-muted/30 bg-transparent'
                   }`}
                   animate={i === state.currentQuestion ? { scale: [1, 1.2, 1] } : {}}
                   transition={{ duration: 1, repeat: Infinity }}
@@ -163,9 +129,7 @@ const LevelPlay = () => {
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.4 }}
           >
-            {/* Scene card */}
             <div className="glass-card rounded-2xl p-5 mb-5 relative overflow-hidden">
-              {/* Scene header with character */}
               <div className="flex items-center gap-3 mb-4">
                 <motion.div
                   className="w-12 h-12 rounded-xl bg-game-bg/50 flex items-center justify-center text-2xl"
@@ -177,30 +141,17 @@ const LevelPlay = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5 mb-1">
                     <Sparkles size={12} className="text-game-gold" />
-                    <span className="text-game-gold font-display text-xs font-semibold uppercase tracking-wider">
-                      Scenario
-                    </span>
+                    <span className="text-game-gold font-display text-xs font-semibold uppercase tracking-wider">Scenario</span>
                   </div>
-                  <div className="text-game-muted text-xs font-body">
-                    {level.theme}
-                  </div>
+                  <div className="text-game-muted text-xs font-body">{level.theme}</div>
                 </div>
-                <motion.span
-                  className="text-3xl"
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
+                <motion.span className="text-3xl" animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2, repeat: Infinity }}>
                   {scenario.scene}
                 </motion.span>
               </div>
-
-              {/* Scenario text */}
-              <p className="text-game-text font-body leading-relaxed text-sm">
-                {scenario.situation}
-              </p>
+              <p className="text-game-text font-body leading-relaxed text-sm">{scenario.situation}</p>
             </div>
 
-            {/* Options as game cards */}
             <div className="space-y-2.5">
               {scenario.options.map((opt, idx) => (
                 <motion.button
@@ -216,34 +167,20 @@ const LevelPlay = () => {
                       : 'text-game-text hover:border-game-gold/30 hover:scale-[1.02] active:scale-[0.98]'
                   }`}
                 >
-                  {/* Selection glow effect */}
                   {selectedOption === idx && (
-                    <motion.div
-                      className="absolute inset-0 bg-game-gold/10 rounded-xl"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                    />
+                    <motion.div className="absolute inset-0 bg-game-gold/10 rounded-xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
                   )}
-
                   <div className="flex items-center gap-3 relative z-10">
-                    <motion.span
-                      className="text-xl flex-shrink-0"
-                      whileHover={{ scale: 1.3, rotate: 15 }}
-                      transition={{ type: "spring" }}
-                    >
+                    <motion.span className="text-xl flex-shrink-0" whileHover={{ scale: 1.3, rotate: 15 }} transition={{ type: "spring" }}>
                       {opt.emoji}
                     </motion.span>
                     <span className="flex-1">{opt.text}</span>
-                    <ChevronRight
-                      size={16}
-                      className="text-game-muted/40 group-hover:text-game-gold transition-colors flex-shrink-0"
-                    />
+                    <ChevronRight size={16} className="text-game-muted/40 group-hover:text-game-gold transition-colors flex-shrink-0" />
                   </div>
                 </motion.button>
               ))}
             </div>
 
-            {/* Feedback popup */}
             <AnimatePresence>
               {showFeedback && selectedOption !== null && (
                 <motion.div
@@ -253,25 +190,13 @@ const LevelPlay = () => {
                   className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
                 >
                   <div className="glass-card rounded-2xl px-8 py-6 text-center game-shadow">
-                    <motion.div
-                      animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
-                      transition={{ duration: 0.6 }}
-                    >
+                    <motion.div animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }} transition={{ duration: 0.6 }}>
                       {feedbackData[selectedOption].icon}
                     </motion.div>
-                    <p className="text-game-gold font-display font-bold text-xl mt-2">
-                      {feedbackData[selectedOption].text}
-                    </p>
-                    <motion.div
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="flex items-center justify-center gap-1 mt-2"
-                    >
+                    <p className="text-game-gold font-display font-bold text-xl mt-2">{feedbackData[selectedOption].text}</p>
+                    <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex items-center justify-center gap-1 mt-2">
                       <Zap size={14} className="text-game-green" />
-                      <span className="text-game-green font-display font-bold text-sm">
-                        +{xpGained} XP
-                      </span>
+                      <span className="text-game-green font-display font-bold text-sm">+{xpGained} XP</span>
                     </motion.div>
                   </div>
                 </motion.div>

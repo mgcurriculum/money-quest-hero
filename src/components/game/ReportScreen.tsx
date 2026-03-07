@@ -127,8 +127,6 @@ const ReportScreen = () => {
           })),
           tips,
           suggestions,
-          primaryArchetype: { name: primaryArchetype.name, emoji: primaryArchetype.emoji, trait: primaryArchetype.trait },
-          secondaryArchetype: { name: secondaryArchetype.name, emoji: secondaryArchetype.emoji, trait: secondaryArchetype.trait },
         },
       });
       setEmailSent(true);

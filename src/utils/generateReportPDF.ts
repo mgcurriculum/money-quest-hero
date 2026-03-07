@@ -100,7 +100,7 @@ export function generateReportHTML(params: {
   reflectionAnswer?: string;
 }): string {
   const {
-    playerName, fqScore, bandLevel, bandEmoji, bandMeaning,
+    logoUrl, playerName, fqScore, bandLevel, bandEmoji, bandMeaning,
     normalizedScores, questionsAndAnswers, tips, suggestions,
     reflectionAnswer,
   } = params;

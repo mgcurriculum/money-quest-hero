@@ -5,6 +5,7 @@ import {
   dimensionLabels,
   dimensionIcons,
   calculateFQScore,
+  levels,
 } from '@/data/questions';
 import {
   extractQuestionsAndAnswers,

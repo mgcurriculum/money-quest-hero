@@ -1,5 +1,5 @@
 import type { Tables } from '@/integrations/supabase/types';
-import { dimensionLabels, dimensionIcons, dimensionWeights } from '@/data/questions';
+import { dimensionLabels, dimensionIcons, dimensionWeights, realityQuestions, levels } from '@/data/questions';
 
 type Session = Tables<'game_sessions'>;
 

@@ -1,19 +1,33 @@
 
 
-## Plan: Remove "Your 2025 FQ Test Goal" Label
-
-Remove the "Your 2025 FQ Test Goal" heading text from three locations while keeping the reflection answer content visible.
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
 ### Changes
 
-**1. `src/components/game/ReportScreen.tsx` (line 232)**
-- Remove the label line `Your 2025 FQ Test Goal`, keep showing `state.reflectionAnswer`
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-**2. `src/utils/generateReportPDF.ts` (line 207)**
-- Remove the `Your 2025 FQ Test Goal` label from the PDF HTML
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-**3. `supabase/functions/send-report-email/index.ts` (line 115)**
-- Remove the `Your 2025 FQ Test Goal` label from the email HTML
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-In all three places, the reflection answer text itself will still be displayed — only the "Your 2025 FQ Test Goal" heading is removed.
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
+
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
+
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

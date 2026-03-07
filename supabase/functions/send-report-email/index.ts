@@ -112,7 +112,7 @@ serve(async (req) => {
 
     ${reflectionAnswer ? `
     <div style="text-align:center;background:#f8f6ff;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #e8e0f0;">
-      <p style="margin:0 0 4px;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">Your 2025 FQ Test Goal</p>
+      
       <p style="margin:0;font-size:14px;font-weight:700;color:#2D1B69;">${reflectionAnswer}</p>
     </div>` : ''}
 

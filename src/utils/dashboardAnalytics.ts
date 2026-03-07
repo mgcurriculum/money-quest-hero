@@ -1,5 +1,5 @@
 import type { Tables } from '@/integrations/supabase/types';
-import { dimensionLabels, dimensionIcons, dimensionWeights } from '@/data/questions';
+import { dimensionLabels, dimensionIcons, dimensionWeights, realityQuestions, levels } from '@/data/questions';
 
 type Session = Tables<'game_sessions'>;
 
@@ -68,6 +68,76 @@ export interface QuestionStat {
   scoreDistribution: number[]; // index 0-4 for scores 1-5
 }
 
+// Reconstruct detailed answers from legacy raw format
+function reconstructFromRaw(session: Session): DetailedAnswer[] {
+  const raw = (session.answers as any);
+  if (!raw || typeof raw !== 'object') return [];
+  
+  // If it has a .raw sub-key, use that; otherwise treat the whole thing as raw
+  const rawData = raw.raw || raw;
+  const results: DetailedAnswer[] = [];
+  let globalIndex = 0;
+
+  for (let levelIdx = 0; levelIdx < 7; levelIdx++) {
+    const levelAnswers = rawData[levelIdx] || rawData[String(levelIdx)];
+    if (!levelAnswers || typeof levelAnswers !== 'object') continue;
+
+    const levelDef = levels[levelIdx];
+    const levelTitle = levelDef?.title || dimensionLabels[levelIdx];
+
+    // Get questions for this level
+    let questionsForLevel: { text: string; emoji: string }[][] = [];
+    if (levelIdx === 0) {
+      questionsForLevel = realityQuestions.map(rq => rq.options);
+    } else if (levelDef?.scenarios) {
+      questionsForLevel = levelDef.scenarios.map(sc => sc.options);
+    }
+
+    const qIndices = Object.keys(levelAnswers).map(Number).sort((a, b) => a - b);
+    for (const qIdx of qIndices) {
+      const score = levelAnswers[qIdx] || levelAnswers[String(qIdx)];
+      if (typeof score !== 'number') continue;
+
+      let questionText = '';
+      let selectedOption = '';
+      let selectedEmoji = '';
+      let category = '';
+
+      if (levelIdx === 0 && realityQuestions[qIdx]) {
+        const rq = realityQuestions[qIdx];
+        questionText = rq.question;
+        category = rq.category;
+        const opt = rq.options[score - 1];
+        selectedOption = opt?.text || `Score ${score}`;
+        selectedEmoji = opt?.emoji || '';
+      } else if (levelDef?.scenarios?.[qIdx]) {
+        const sc = levelDef.scenarios[qIdx];
+        questionText = sc.situation;
+        category = levelTitle;
+        const opt = sc.options[score - 1];
+        selectedOption = opt?.text || `Score ${score}`;
+        selectedEmoji = opt?.emoji || '';
+      } else {
+        questionText = `Level ${levelIdx} Q${qIdx + 1}`;
+        category = levelTitle;
+        selectedOption = `Score ${score}`;
+      }
+
+      results.push({
+        index: globalIndex++,
+        level: levelIdx,
+        levelTitle,
+        category,
+        question: questionText,
+        selectedOption,
+        selectedEmoji,
+        score,
+      });
+    }
+  }
+  return results;
+}
+
 export function computeQuestionStats(sessions: Session[]): QuestionStat[] {
   const questionMap = new Map<string, {
     question: string;
@@ -79,7 +149,11 @@ export function computeQuestionStats(sessions: Session[]): QuestionStat[] {
   }>();
 
   sessions.forEach(s => {
-    const detailed = getDetailedAnswers(s);
+    let detailed = getDetailedAnswers(s);
+    // Fallback: reconstruct from raw for legacy sessions
+    if (detailed.length === 0) {
+      detailed = reconstructFromRaw(s);
+    }
     detailed.forEach(d => {
       const key = `${d.level}-${d.question.substring(0, 60)}`;
       if (!questionMap.has(key)) {

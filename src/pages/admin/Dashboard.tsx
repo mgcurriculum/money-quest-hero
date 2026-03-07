@@ -18,10 +18,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [ageFilter, setAgeFilter] = useState('all');
   const [bandFilter, setBandFilter] = useState('all');
-  const [genderFilter, setGenderFilter] = useState('all');
-  const [stateFilter, setStateFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [incomeFilter, setIncomeFilter] = useState('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
@@ -39,21 +35,11 @@ const Dashboard = () => {
     return sessions.filter(s => {
       if (ageFilter !== 'all' && s.player_age !== ageFilter) return false;
       if (bandFilter !== 'all' && s.band_level !== bandFilter) return false;
-      if (genderFilter !== 'all' && s.player_gender !== genderFilter) return false;
-      if (stateFilter !== 'all' && s.player_state !== stateFilter) return false;
-      if (statusFilter !== 'all' && s.player_status !== statusFilter) return false;
-      if (incomeFilter !== 'all' && s.player_income_type !== incomeFilter) return false;
       if (dateFrom && new Date(s.created_at) < new Date(dateFrom)) return false;
       if (dateTo && new Date(s.created_at) > new Date(dateTo + 'T23:59:59')) return false;
       return true;
     });
-  }, [sessions, ageFilter, bandFilter, genderFilter, stateFilter, statusFilter, incomeFilter, dateFrom, dateTo]);
-
-  // Unique values for filters
-  const uniqueStates = useMemo(() => [...new Set(sessions.map(s => s.player_state).filter(Boolean))].sort(), [sessions]);
-  const uniqueGenders = useMemo(() => [...new Set(sessions.map(s => s.player_gender).filter(Boolean))], [sessions]);
-  const uniqueStatuses = useMemo(() => [...new Set(sessions.map(s => s.player_status).filter(Boolean))], [sessions]);
-  const uniqueIncomes = useMemo(() => [...new Set(sessions.map(s => s.player_income_type).filter(Boolean))], [sessions]);
+  }, [sessions, ageFilter, bandFilter, dateFrom, dateTo]);
 
   const exportCSV = () => {
     const headers = ['Name', 'Age', 'Gender', 'Phone', 'State', 'District', 'Status', 'Income Type', 'FQ Score', 'Band', 'Primary Archetype', 'Secondary Archetype', 'Reflection', 'Date'];
@@ -84,12 +70,12 @@ const Dashboard = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-display font-bold text-foreground">Dashboard</h1>
-        <Button onClick={exportCSV} variant="outline">
+        <Button onClick={exportCSV} variant="outline" size="sm">
           <Download className="h-4 w-4 mr-2" /> Export CSV
         </Button>
       </div>
 
-      {/* Global Filters */}
+      {/* Filters */}
       <div className="flex flex-wrap gap-3 items-end">
         <div>
           <label className="text-xs text-muted-foreground">Age Group</label>
@@ -116,46 +102,6 @@ const Dashboard = () => {
               <SelectItem value="Financially Smart">Financially Smart</SelectItem>
               <SelectItem value="Wealth Builder">Wealth Builder</SelectItem>
               <SelectItem value="Financial Master">Financial Master</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground">Gender</label>
-          <Select value={genderFilter} onValueChange={setGenderFilter}>
-            <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              {uniqueGenders.map(g => <SelectItem key={g} value={g!}>{g}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground">State</label>
-          <Select value={stateFilter} onValueChange={setStateFilter}>
-            <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All States</SelectItem>
-              {uniqueStates.map(s => <SelectItem key={s} value={s!}>{s}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground">Status</label>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[130px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              {uniqueStatuses.map(s => <SelectItem key={s} value={s!}>{s}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground">Income</label>
-          <Select value={incomeFilter} onValueChange={setIncomeFilter}>
-            <SelectTrigger className="w-[130px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              {uniqueIncomes.map(s => <SelectItem key={s} value={s!}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>

@@ -4,8 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Tables } from '@/integrations/supabase/types';
-import { computeQuestionStats, computeDimensionByAgeGroup, type QuestionStat } from '@/utils/dashboardAnalytics';
-import { dimensionLabels, dimensionIcons } from '@/data/questions';
+import { computeQuestionStats } from '@/utils/dashboardAnalytics';
 
 type Session = Tables<'game_sessions'>;
 
@@ -15,16 +14,8 @@ const scoreColor = (score: number) => {
   return 'text-red-600';
 };
 
-const heatColor = (score: number) => {
-  if (score === 0) return 'bg-muted text-muted-foreground';
-  if (score < 40) return 'bg-red-100 text-red-800';
-  if (score < 70) return 'bg-yellow-100 text-yellow-800';
-  return 'bg-green-100 text-green-800';
-};
-
 const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
   const questionStats = useMemo(() => computeQuestionStats(sessions), [sessions]);
-  const heatmapData = useMemo(() => computeDimensionByAgeGroup(sessions), [sessions]);
   const [selectedQuestion, setSelectedQuestion] = useState<string>('');
 
   const selectedStat = useMemo(() => {
@@ -40,8 +31,6 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
       count,
     }));
   }, [selectedStat]);
-
-  const ageGroups = ['18-25', '26-39', '40-59', '60+'];
 
   return (
     <div className="space-y-6">
@@ -114,43 +103,10 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
               {questionStats.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                    No detailed answer data available yet. New sessions will include question-level data.
+                    No question data available yet.
                   </TableCell>
                 </TableRow>
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Heatmap: Dimensions × Age Groups */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Dimension Scores by Age Group</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Dimension</TableHead>
-                {ageGroups.map(ag => (
-                  <TableHead key={ag} className="text-center">{ag}</TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {heatmapData.map((row, i) => (
-                <TableRow key={i}>
-                  <TableCell className="text-sm font-medium">{row.icon} {row.dimension}</TableCell>
-                  {ageGroups.map(ag => (
-                    <TableCell key={ag} className="text-center p-1">
-                      <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${heatColor(row.ageGroups[ag])}`}>
-                        {row.ageGroups[ag] > 0 ? `${row.ageGroups[ag]}%` : '—'}
-                      </span>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
             </TableBody>
           </Table>
         </CardContent>

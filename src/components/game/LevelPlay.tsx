@@ -5,6 +5,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { levels } from '@/data/questions';
 import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight } from 'lucide-react';
 import MuteButton from './MuteButton';
+import QuizProgressBar from './QuizProgressBar';
 
 const feedbackData = [
   { text: "Noted! 📝", icon: <Zap className="text-game-gold" size={28} /> },

@@ -88,7 +88,7 @@ export function getFinancialTips(normalizedScores: number[]): { tips: string[]; 
 }
 
 export function generateReportHTML(params: {
-  playerName: string;
+  logoUrl?: string;
   fqScore: number;
   bandLevel: string;
   bandEmoji: string;

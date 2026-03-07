@@ -5,6 +5,7 @@ import { realityQuestions } from '@/data/questions';
 import { Zap, Star, ChevronRight } from 'lucide-react';
 import { useNarration } from '@/hooks/useNarration';
 import MuteButton from './MuteButton';
+import QuizProgressBar from './QuizProgressBar';
 
 const feedbackData = [
   { text: "Noted! 📝" },

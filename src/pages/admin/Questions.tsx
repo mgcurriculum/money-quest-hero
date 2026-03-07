@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
@@ -37,8 +38,8 @@ const emptyOption = (): OptionItem => ({ text: '', emoji: '' });
 const Questions = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState(AGE_GROUPS[0]);
   const [filterLevel, setFilterLevel] = useState('all');
-  const [filterAgeGroup, setFilterAgeGroup] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Question | null>(null);
   const { toast } = useToast();
@@ -47,7 +48,7 @@ const Questions = () => {
   const [formText, setFormText] = useState('');
   const [formCategory, setFormCategory] = useState('');
   const [formLevel, setFormLevel] = useState(0);
-  const [formAgeGroups, setFormAgeGroups] = useState<string[]>([...AGE_GROUPS]);
+  const [formAgeGroups, setFormAgeGroups] = useState<string[]>([]);
   const [formOptions, setFormOptions] = useState<OptionItem[]>(Array(5).fill(null).map(emptyOption));
   const [formActive, setFormActive] = useState(true);
   const [formOrder, setFormOrder] = useState(0);
@@ -67,7 +68,7 @@ const Questions = () => {
     setFormText('');
     setFormCategory('');
     setFormLevel(0);
-    setFormAgeGroups(filterAgeGroup !== 'all' ? [filterAgeGroup] : [...AGE_GROUPS]);
+    setFormAgeGroups([activeTab]);
     setFormOptions(Array(5).fill(null).map(emptyOption));
     setFormActive(true);
     setFormOrder(0);
@@ -141,92 +142,98 @@ const Questions = () => {
     setFormOptions(prev => prev.map((o, i) => i === idx ? { ...o, [field]: value } : o));
   };
 
-  const filteredQuestions = questions.filter(q => {
-    if (filterLevel !== 'all' && q.level !== Number(filterLevel)) return false;
-    if (filterAgeGroup !== 'all' && !(q.age_groups || []).includes(filterAgeGroup)) return false;
-    return true;
-  });
+  const getFilteredQuestions = (ageGroup: string) => {
+    return questions.filter(q => {
+      if (!(q.age_groups || []).includes(ageGroup)) return false;
+      if (filterLevel !== 'all' && q.level !== Number(filterLevel)) return false;
+      return true;
+    });
+  };
 
   if (loading) {
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 
-  return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-foreground">Questions</h1>
-        <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" /> Add Question</Button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex gap-3 items-end flex-wrap">
-        <div>
-          <label className="text-xs text-muted-foreground">Filter by Age Group</label>
-          <Select value={filterAgeGroup} onValueChange={setFilterAgeGroup}>
-            <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Age Groups</SelectItem>
-              {AGE_GROUPS.map(ag => (
-                <SelectItem key={ag} value={ag}>{ag}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+  const renderQuestionList = (ageGroup: string) => {
+    const filtered = getFilteredQuestions(ageGroup);
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <label className="text-xs text-muted-foreground">Filter by Level</label>
+            <Select value={filterLevel} onValueChange={setFilterLevel}>
+              <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                {CATEGORIES.map(c => (
+                  <SelectItem key={c.level} value={String(c.level)}>{c.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" /> Add Question</Button>
         </div>
-        <div>
-          <label className="text-xs text-muted-foreground">Filter by Level</label>
-          <Select value={filterLevel} onValueChange={setFilterLevel}>
-            <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Levels</SelectItem>
-              {CATEGORIES.map(c => (
-                <SelectItem key={c.level} value={String(c.level)}>{c.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
 
-      {/* Questions by level */}
-      {CATEGORIES.filter(c => filterLevel === 'all' || c.level === Number(filterLevel)).map(cat => {
-        const levelQs = filteredQuestions.filter(q => q.level === cat.level);
-        if (levelQs.length === 0 && filterLevel !== 'all') return null;
-        return (
-          <Card key={cat.level}>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>{cat.label}</span>
-                <Badge variant="secondary">{levelQs.length} question{levelQs.length !== 1 ? 's' : ''}{filterAgeGroup !== 'all' ? ` for ${filterAgeGroup}` : ''}</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {levelQs.map((q, idx) => (
-                <div key={q.id} className="flex items-start gap-3 p-3 rounded-md border bg-card">
-                  <span className="text-sm text-muted-foreground font-mono w-6">{idx + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${q.is_active ? 'text-foreground' : 'text-muted-foreground line-through'}`}>
-                      {q.question_text}
-                    </p>
-                    <div className="flex gap-1 mt-1 flex-wrap">
-                      {(q.age_groups || []).map(ag => (
-                        <Badge key={ag} variant="outline" className="text-xs">{ag}</Badge>
-                      ))}
-                      {q.category && <Badge variant="secondary" className="text-xs">{q.category}</Badge>}
+        {CATEGORIES.filter(c => filterLevel === 'all' || c.level === Number(filterLevel)).map(cat => {
+          const levelQs = filtered.filter(q => q.level === cat.level);
+          if (levelQs.length === 0 && filterLevel !== 'all') return null;
+          return (
+            <Card key={cat.level}>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>{cat.label}</span>
+                  <Badge variant="secondary">{levelQs.length} question{levelQs.length !== 1 ? 's' : ''}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {levelQs.map((q, idx) => (
+                  <div key={q.id} className="flex items-start gap-3 p-3 rounded-md border bg-card">
+                    <span className="text-sm text-muted-foreground font-mono w-6">{idx + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm ${q.is_active ? 'text-foreground' : 'text-muted-foreground line-through'}`}>
+                        {q.question_text}
+                      </p>
+                      {q.category && (
+                        <Badge variant="secondary" className="text-xs mt-1">{q.category}</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Switch checked={q.is_active} onCheckedChange={() => toggleActive(q)} />
+                      <Button size="icon" variant="ghost" onClick={() => openEdit(q)}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => handleDelete(q.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Switch checked={q.is_active} onCheckedChange={() => toggleActive(q)} />
-                    <Button size="icon" variant="ghost" onClick={() => openEdit(q)}><Pencil className="h-4 w-4" /></Button>
-                    <Button size="icon" variant="ghost" onClick={() => handleDelete(q.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                  </div>
-                </div>
-              ))}
-              {levelQs.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">No questions in this level</p>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+                ))}
+                {levelQs.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">No questions in this level</p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-display font-bold text-foreground">Questions</h1>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          {AGE_GROUPS.map(ag => (
+            <TabsTrigger key={ag} value={ag}>
+              {ag} <Badge variant="outline" className="ml-2 text-xs">{questions.filter(q => (q.age_groups || []).includes(ag)).length}</Badge>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {AGE_GROUPS.map(ag => (
+          <TabsContent key={ag} value={ag}>
+            {renderQuestionList(ag)}
+          </TabsContent>
+        ))}
+      </Tabs>
 
       {/* Edit/Create Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

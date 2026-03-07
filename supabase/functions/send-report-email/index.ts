@@ -85,8 +85,6 @@ serve(async (req) => {
       <div style="font-size:11px;color:#888;margin-top:4px;">${bandMeaning}</div>
     </div>
 
-    ${archetypeSection}
-
     <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #e8e0f0;">
       <h2 style="font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:center;margin:0 0 12px;">Dimension Breakdown</h2>
       <table style="width:100%;border-collapse:collapse;">

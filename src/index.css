@@ -147,3 +147,32 @@
 .float-animation {
   animation: float 3s ease-in-out infinite;
 }
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .game-gradient {
+    background: white !important;
+  }
+  .glass-card {
+    background: #f8f6ff !important;
+    border: 1px solid #e0dce8 !important;
+    box-shadow: none !important;
+  }
+  .text-game-text {
+    color: #1a103f !important;
+  }
+  .text-game-muted {
+    color: #666 !important;
+  }
+  .gold-text {
+    color: #4ea8de !important;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+}

@@ -48,6 +48,7 @@ export type Database = {
           player_age: string | null
           player_country: string | null
           player_district: string | null
+          player_email: string | null
           player_gender: string | null
           player_income_type: string | null
           player_name: string
@@ -67,6 +68,7 @@ export type Database = {
           player_age?: string | null
           player_country?: string | null
           player_district?: string | null
+          player_email?: string | null
           player_gender?: string | null
           player_income_type?: string | null
           player_name: string
@@ -86,6 +88,7 @@ export type Database = {
           player_age?: string | null
           player_country?: string | null
           player_district?: string | null
+          player_email?: string | null
           player_gender?: string | null
           player_income_type?: string | null
           player_name?: string

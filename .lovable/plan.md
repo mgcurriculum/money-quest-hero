@@ -1,33 +1,37 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Plan: Clean Up Report Screen + Add PDF Download & Email
 
-### Changes
+### Changes to `src/components/game/ReportScreen.tsx`
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+**Remove these sections:**
+1. **Primary/Secondary Archetype cards** (lines 127-141) — the two-column grid with "Primary" and "Secondary" labels
+2. **Improvement Quest section** (lines 192-197) — the "🎯 Your Improvement Quest" / "Mission" / "🏅 Complete this" block
+3. **Dimension score bar sub-labels** showing archetype names like "🧾 Avoid unnecessary debt" (line 171 — remove the `profile.emoji + profile.name` line from each dimension bar)
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+**Add two new action buttons before "Take Test Again":**
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+1. **📥 Download PDF** — Uses browser's `window.print()` with a print-friendly CSS approach, or generates a client-side PDF using the existing DOM. Since adding a heavy library like html2canvas+jspdf would be complex, we'll use `window.print()` with `@media print` styles for a clean printable report.
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+2. **📧 Send to Email** — Shows a modal/dialog collecting the user's email address, then calls a new backend function to save the email + session data. We'll create a simple edge function that stores the email request and uses Lovable AI to generate and send a summary email.
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+Actually, for PDF: `window.print()` is simplest and works well on mobile. For email: we need to collect the email, store it, and send the report.
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+### Email collection approach
+- Add a dialog with email input field
+- Save email to a new `report_emails` table (or just add `player_email` column to `game_sessions`)
+- For sending: create an edge function that formats the report data and sends via Lovable's transactional email capability
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+### Database change
+Add `player_email` column to `game_sessions` table (nullable text) — simpler than a new table.
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+### New edge function: `send-report-email`
+- Receives: player name, fq score, band level, dimension scores, email
+- Sends a formatted HTML email with the report summary
+
+### Files to modify
+- `src/components/game/ReportScreen.tsx` — remove 3 sections, add PDF download + email dialog
+- `src/context/GameContext.tsx` — add `email` to PlayerProfile (optional)
+- Database migration — add `player_email` to `game_sessions`
+- New edge function `supabase/functions/send-report-email/index.ts`
 

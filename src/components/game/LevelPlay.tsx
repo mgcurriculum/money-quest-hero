@@ -92,40 +92,7 @@ const LevelPlay = () => {
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl p-3 mb-5">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5">
-              <Star size={14} className="text-game-gold" />
-              <span className="text-game-muted text-xs font-body">Progress</span>
-            </div>
-            <div className="flex gap-1">
-              {Array.from({ length: totalScenarios }, (_, i) => (
-                <motion.div
-                  key={i}
-                  className={`w-3 h-3 rounded-full border-2 ${
-                    i < state.currentQuestion ? 'bg-game-green border-game-green'
-                    : i === state.currentQuestion ? 'border-game-gold bg-game-gold/30'
-                    : 'border-game-muted/30 bg-transparent'
-                  }`}
-                  animate={i === state.currentQuestion ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 1, repeat: Infinity }}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="flex gap-1">
-            {Array.from({ length: totalScenarios }, (_, i) => (
-              <div key={i} className="h-2 flex-1 rounded-full overflow-hidden bg-game-bg/50">
-                <motion.div
-                  className="h-full rounded-full gold-gradient"
-                  initial={{ width: 0 }}
-                  animate={{ width: i <= state.currentQuestion ? '100%' : '0%' }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        <QuizProgressBar />
 
         <AnimatePresence mode="wait">
           <motion.div

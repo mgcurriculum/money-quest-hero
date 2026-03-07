@@ -1,78 +1,33 @@
 
 
-## Plan: Generate Branded PDF Report with Q&A, Tips, and Suggestions
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
-### Overview
+### Changes
 
-Build a proper PDF report that gets generated client-side using `jspdf` + `jspdf-autotable`. The same PDF content will be used for both Download and Email (attached as HTML in the email body). The PDF will match brand colors (Deep Purple #2D1B69, Sky Blue #4FC3F7), use the same layout structure, and include:
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-1. Header with logo + player name
-2. FQ Score with band level
-3. Dimension score breakdown (7 bars as a table)
-4. Questions & Answers section (what they chose for each question)
-5. Personalized financial tips based on weak dimensions
-6. Suggestions for improvement based on archetypes
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
----
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-### Part 1: Create PDF Generator Utility
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
 
-**New file: `src/utils/generateReportPDF.ts`**
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
 
-A utility function that takes the full game state + calculated scores and builds an HTML string for the PDF. Uses `window.open` with a styled HTML document and triggers `window.print()` for PDF download (no extra dependency needed — keeps it simple and styled).
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
 
-Actually, better approach: Generate a branded HTML report in a new window with `window.print()`. This preserves fonts, colors, gradients, and layout without needing a PDF library.
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
 
-The HTML will include:
-- **Page 1**: Logo, player name, FQ Score ring (static), band level/meaning
-- **Page 2**: Dimension breakdown table with score bars (CSS-rendered)
-- **Page 3**: Questions & Answers — for each level, list the question text and the option the player selected (highlighted)
-- **Page 4**: Financial Tips — generated based on which dimensions scored below 50%, pulling from archetypes data (the `.quest` and `.risk` fields)
-- **Page 5**: Suggestions — general financial awareness tips + the player's reflection goal
-
-### Part 2: Build Q&A Data Extraction
-
-In `ReportScreen.tsx`, extract the actual questions and selected answers from `state.answers` mapped against the question bank (`realityQuestions` for level 0, `levels[n].scenarios` for levels 1-6). Each entry will show:
-- Level name + icon
-- Question text
-- Selected option text + emoji
-- Score (1-5)
-
-### Part 3: Financial Tips Engine
-
-Create a `getFinancialTips` function in the PDF generator that:
-- For each dimension scoring < 50%: pulls the archetype's `.low.risk` and `.low.quest` as actionable tips
-- For each dimension scoring >= 50%: pulls `.high.strength` as a positive reinforcement
-- Adds 3-5 general financial awareness suggestions at the end (hardcoded wisdom)
-
-### Part 4: Update ReportScreen
-
-- Replace `handleDownloadPDF` (currently just `window.print()`) with the new function that opens a branded print-ready HTML page
-- Update `handleSendEmail` to pass the full Q&A data + tips to the edge function
-- The edge function already sends HTML email — extend it with Q&A rows and tips sections
-
-### Part 5: Update Edge Function
-
-**Modified: `supabase/functions/send-report-email/index.ts`**
-
-Add new body parameters: `questionsAndAnswers` (array of {level, question, selectedOption, score}), `tips` (array of strings), `suggestions` (array of strings). Render them as additional HTML sections in the email body with the same brand styling.
-
----
-
-### Files to Create/Modify
-
-| File | Action |
-|------|--------|
-| `src/utils/generateReportPDF.ts` | Create — HTML report generator + tips engine |
-| `src/components/game/ReportScreen.tsx` | Modify — wire up PDF generator, pass Q&A data to email |
-| `supabase/functions/send-report-email/index.ts` | Modify — add Q&A + tips sections to email HTML |
-
-### Brand Styling in PDF/Email
-
-- Background: `#2D1B69` (deep purple) header, `#ffffff` body
-- Accent: `#4FC3F7` (sky blue) for scores, highlights
-- Secondary: `#7C4DFF` (purple accent) for gradients
-- Font: System sans-serif (web-safe for email/print compatibility)
-- Cards: `#f8f6ff` light purple background
-- Score bars: CSS gradient from `#4FC3F7` to `#7C4DFF`
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

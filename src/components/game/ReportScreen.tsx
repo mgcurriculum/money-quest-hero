@@ -80,8 +80,25 @@ const ReportScreen = () => {
     saveSession();
   }, []);
 
+  const questionsAndAnswers = extractQuestionsAndAnswers(state.answers);
+  const { tips, suggestions } = getFinancialTips(normalizedScores);
+
   const handleDownloadPDF = () => {
-    window.print();
+    const html = generateReportHTML({
+      playerName: state.profile.name,
+      fqScore,
+      bandLevel: band.level,
+      bandEmoji: band.emoji,
+      bandMeaning: band.meaning,
+      normalizedScores,
+      questionsAndAnswers,
+      tips,
+      suggestions,
+      reflectionAnswer: state.reflectionAnswer,
+      primaryArchetype,
+      secondaryArchetype,
+    });
+    openPrintableReport(html);
   };
 
   const handleSendEmail = async () => {

@@ -38,6 +38,7 @@ const Questions = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterLevel, setFilterLevel] = useState('all');
+  const [filterAgeGroup, setFilterAgeGroup] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Question | null>(null);
   const { toast } = useToast();
@@ -66,7 +67,7 @@ const Questions = () => {
     setFormText('');
     setFormCategory('');
     setFormLevel(0);
-    setFormAgeGroups([...AGE_GROUPS]);
+    setFormAgeGroups(filterAgeGroup !== 'all' ? [filterAgeGroup] : [...AGE_GROUPS]);
     setFormOptions(Array(5).fill(null).map(emptyOption));
     setFormActive(true);
     setFormOrder(0);
@@ -140,7 +141,11 @@ const Questions = () => {
     setFormOptions(prev => prev.map((o, i) => i === idx ? { ...o, [field]: value } : o));
   };
 
-  const filteredQuestions = filterLevel === 'all' ? questions : questions.filter(q => q.level === Number(filterLevel));
+  const filteredQuestions = questions.filter(q => {
+    if (filterLevel !== 'all' && q.level !== Number(filterLevel)) return false;
+    if (filterAgeGroup !== 'all' && !(q.age_groups || []).includes(filterAgeGroup)) return false;
+    return true;
+  });
 
   if (loading) {
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -153,8 +158,20 @@ const Questions = () => {
         <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" /> Add Question</Button>
       </div>
 
-      {/* Filter */}
-      <div className="flex gap-3 items-end">
+      {/* Filters */}
+      <div className="flex gap-3 items-end flex-wrap">
+        <div>
+          <label className="text-xs text-muted-foreground">Filter by Age Group</label>
+          <Select value={filterAgeGroup} onValueChange={setFilterAgeGroup}>
+            <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Age Groups</SelectItem>
+              {AGE_GROUPS.map(ag => (
+                <SelectItem key={ag} value={ag}>{ag}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div>
           <label className="text-xs text-muted-foreground">Filter by Level</label>
           <Select value={filterLevel} onValueChange={setFilterLevel}>
@@ -178,7 +195,7 @@ const Questions = () => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>{cat.label}</span>
-                <Badge variant="secondary">{levelQs.length} questions</Badge>
+                <Badge variant="secondary">{levelQs.length} question{levelQs.length !== 1 ? 's' : ''}{filterAgeGroup !== 'all' ? ` for ${filterAgeGroup}` : ''}</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">

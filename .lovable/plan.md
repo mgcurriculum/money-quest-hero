@@ -1,29 +1,33 @@
 
 
-## Plan: Age Group Filter for Question Management
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
-### What Changes
+### Changes
 
-Update `src/pages/admin/Questions.tsx` to add an **Age Group filter** alongside the existing Level filter. The admin selects an age group first, then sees only questions tagged for that group — and can edit/add questions scoped to that group.
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-### Changes to `src/pages/admin/Questions.tsx`
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-1. **Add `filterAgeGroup` state** (default `'all'`) with a Select dropdown next to the Level filter
-2. **Filter the question list** by both level AND age group — show only questions whose `age_groups` array includes the selected group
-3. **When creating a new question**, pre-select the currently filtered age group instead of all groups
-4. **Show per-group counts** in each level card header (e.g., "5 questions for 18-25")
-5. **Add a visual indicator** on each question row showing which age groups it belongs to (already exists as badges — keep as-is)
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-### UI Layout
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
 
-```text
-[Filter by Age Group: All | 18-25 | 26-39 | 40-59 | 60+]  [Filter by Level: All | Level 0 | ...]  [+ Add Question]
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
 
-Level 0 — Reality Check (3 questions for 18-25)
-  1. Question text...  [18-25] [26-39]  [toggle] [edit] [delete]
-  2. ...
-```
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
 
-### Files
-- `src/pages/admin/Questions.tsx` — add age group filter state, filter logic, and pre-selection on create
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

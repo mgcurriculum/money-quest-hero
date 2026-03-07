@@ -140,7 +140,11 @@ const Questions = () => {
     setFormOptions(prev => prev.map((o, i) => i === idx ? { ...o, [field]: value } : o));
   };
 
-  const filteredQuestions = filterLevel === 'all' ? questions : questions.filter(q => q.level === Number(filterLevel));
+  const filteredQuestions = questions.filter(q => {
+    if (filterLevel !== 'all' && q.level !== Number(filterLevel)) return false;
+    if (filterAgeGroup !== 'all' && !(q.age_groups || []).includes(filterAgeGroup)) return false;
+    return true;
+  });
 
   if (loading) {
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;

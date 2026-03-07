@@ -98,6 +98,42 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_options: {
+        Row: {
+          age_groups: string[]
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          sort_order: number
+          type: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          age_groups?: string[]
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          sort_order?: number
+          type: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          age_groups?: string[]
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          sort_order?: number
+          type?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       questions: {
         Row: {
           age_groups: string[]

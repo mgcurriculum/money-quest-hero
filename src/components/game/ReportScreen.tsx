@@ -137,7 +137,7 @@ const ReportScreen = () => {
     }
   };
 
-  const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nI am a ${primaryArchetype.emoji} ${primaryArchetype.name}\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
+  const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
 
   const handleShare = (platform: string) => {
     const encoded = encodeURIComponent(shareText);

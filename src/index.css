@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -51,7 +51,7 @@
     --game-red: 0 75% 55%;
     --game-orange: 263 70% 45%;
 
-    --font-display: 'Fredoka', sans-serif;
+    --font-display: 'Rethink Sans', sans-serif;
     --font-body: 'Inter', sans-serif;
 
     --sidebar-background: 0 0% 98%;

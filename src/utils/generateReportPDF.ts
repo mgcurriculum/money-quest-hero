@@ -204,7 +204,7 @@ export function generateReportHTML(params: {
     ${reflectionAnswer ? `
     <!-- Reflection -->
     <div style="text-align:center;background:#f8f6ff;border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid #e8e0f0;">
-      <p style="margin:0 0 4px;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;">Your 2025 FQ Test Goal</p>
+      
       <p style="margin:0;font-size:15px;font-weight:700;color:#2D1B69;">${reflectionAnswer}</p>
     </div>` : ''}
 

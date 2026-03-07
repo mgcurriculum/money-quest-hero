@@ -4,9 +4,13 @@ import { useGame } from '@/context/GameContext';
 import {
   dimensionLabels,
   dimensionIcons,
-  calculateFQScore,
+  calculateNormalizedScore,
+  archetypes,
+  fqBands as defaultBands,
+  dimensionWeights as defaultWeights,
   levels,
 } from '@/data/questions';
+import { useScoringConfig } from '@/hooks/useScoringConfig';
 import {
   extractQuestionsAndAnswers,
   getFinancialTips,
@@ -39,9 +43,29 @@ const ReportScreen = () => {
   const [email, setEmail] = useState('');
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const { weights, bands, loading: configLoading } = useScoringConfig();
 
-  const { fqScore, normalizedScores, band, primaryArchetype, secondaryArchetype } =
-    calculateFQScore(state.answers);
+  // Calculate FQ score with dynamic weights/bands
+  const normalizedScores = Array.from({ length: 7 }, (_, level) => {
+    const levelAnswers = state.answers[level] || {};
+    return calculateNormalizedScore(levelAnswers);
+  });
+
+  const weightedTotal = normalizedScores.reduce(
+    (sum, score, idx) => sum + score * weights[idx], 0
+  );
+  const fqScore = Math.round(weightedTotal * 10);
+
+  const scored = normalizedScores.map((s, i) => ({ score: s, index: i }));
+  scored.sort((a, b) => b.score - a.score);
+  const primaryIdx = scored[0].index;
+  const secondaryIdx = scored[1]?.index ?? scored[0].index;
+  const threshold = 50;
+  const primaryArchetype = normalizedScores[primaryIdx] >= threshold
+    ? archetypes[primaryIdx].high : archetypes[primaryIdx].low;
+  const secondaryArchetype = normalizedScores[secondaryIdx] >= threshold
+    ? archetypes[secondaryIdx].high : archetypes[secondaryIdx].low;
+  const band = bands.find(b => fqScore >= b.min && fqScore < b.max) || bands[0];
 
   const radarData = dimensionLabels.map((label, i) => ({
     dimension: `${dimensionIcons[i]} ${label}`,

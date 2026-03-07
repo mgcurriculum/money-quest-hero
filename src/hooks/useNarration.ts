@@ -63,7 +63,9 @@ export function useNarration(externalMuted?: boolean) {
       );
 
       if (!response.ok) {
-        throw new Error(`TTS failed: ${response.status}`);
+        // Silently skip narration on API errors (e.g. quota exceeded)
+        setIsLoading(false);
+        return;
       }
 
       const blob = await response.blob();

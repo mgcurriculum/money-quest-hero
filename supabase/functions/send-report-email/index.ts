@@ -14,7 +14,7 @@ serve(async (req) => {
     const {
       email, playerName, fqScore, bandLevel, bandEmoji, bandMeaning,
       dimensionScores, reflectionAnswer, questionsAndAnswers,
-      tips, suggestions, primaryArchetype, secondaryArchetype,
+      tips, suggestions,
     } = await req.json();
 
     if (!email || !email.includes('@')) {

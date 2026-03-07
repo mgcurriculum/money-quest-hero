@@ -2,23 +2,23 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
-import { Volume2, VolumeX, Loader2 } from 'lucide-react';
+import MuteButton from './MuteButton';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const WELCOME_TEXT = "Hey there! I'm your financial guide. This is a quick quiz that'll help you understand how smart you really are with money. It only takes about 5 minutes. Ready? Just tap Start!";
 
 const WelcomeScreen = () => {
-  const { dispatch } = useGame();
-  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const { state, dispatch } = useGame();
+  const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef(false);
 
   useEffect(() => {
-    if (!isMuted && !hasNarrated.current) {
+    if (!state.isMuted && !hasNarrated.current) {
       hasNarrated.current = true;
       const timer = setTimeout(() => speak(WELCOME_TEXT), 600);
       return () => clearTimeout(timer);
     }
-  }, [isMuted, speak]);
+  }, [state.isMuted, speak]);
 
   const handleStart = () => {
     stop();
@@ -27,15 +27,8 @@ const WelcomeScreen = () => {
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
-      {/* Mute toggle */}
-      <button
-        onClick={toggleMute}
-        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
-      >
-        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
-      </button>
+      <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
 
-      {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 text-5xl float-animation opacity-30">💰</div>
         <div className="absolute top-40 right-8 text-4xl float-animation opacity-20" style={{ animationDelay: '1s' }}>📈</div>
@@ -49,67 +42,32 @@ const WelcomeScreen = () => {
         transition={{ duration: 0.6 }}
         className="text-center max-w-md relative z-10"
       >
-        {/* Brand */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          className="mb-6"
-        >
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }} className="mb-6">
           <img src={finquoLogo} alt="FinQuo Versity" className="w-32 h-auto mx-auto" />
         </motion.div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-game-muted text-sm font-body tracking-widest uppercase mb-2"
-        >
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-game-muted text-sm font-body tracking-widest uppercase mb-2">
           <span className="gold-text font-display font-bold text-base">FQ Test</span>{' '}
           <span className="text-game-muted text-xs">by FinQuo Versity</span>
         </motion.p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-4xl md:text-5xl font-display font-bold text-game-text mb-4 leading-tight"
-        >
-          Your Financial Journey{' '}
-          <span className="gold-text">Starts Here</span>
+        <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="text-4xl md:text-5xl font-display font-bold text-game-text mb-4 leading-tight">
+          Your Financial Journey{' '}<span className="gold-text">Starts Here</span>
         </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-game-muted text-lg font-body mb-8 leading-relaxed"
-        >
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-game-muted text-lg font-body mb-8 leading-relaxed">
           Discover how smart you are with money through real-life scenarios. Takes only 5 minutes!
         </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="space-y-3"
-        >
-          <button
-            onClick={handleStart}
-            className="w-full py-4 px-8 rounded-2xl font-display font-semibold text-lg gold-gradient text-game-bg game-shadow pulse-glow transition-transform hover:scale-105 active:scale-95"
-          >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="space-y-3">
+          <button onClick={handleStart} className="w-full py-4 px-8 rounded-2xl font-display font-semibold text-lg gold-gradient text-game-bg game-shadow pulse-glow transition-transform hover:scale-105 active:scale-95">
             Start My FQ Test 🚀
           </button>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="mt-8 flex items-center justify-center gap-6 text-game-muted text-sm"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-8 flex items-center justify-center gap-6 text-game-muted text-sm">
           <span className="flex items-center gap-1">⏱️ 5 min</span>
-          <span className="flex items-center gap-1">🎮 29 questions</span>
+          <span className="flex items-center gap-1">🎮 25 questions</span>
           <span className="flex items-center gap-1">🏅 Free report</span>
         </motion.div>
       </motion.div>

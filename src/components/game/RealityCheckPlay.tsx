@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { realityQuestions } from '@/data/questions';
-import { Zap, Star, ChevronRight, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Zap, Star, ChevronRight } from 'lucide-react';
 import { useNarration } from '@/hooks/useNarration';
+import MuteButton from './MuteButton';
 
 const feedbackData = [
   { text: "Noted! 📝" },
@@ -18,30 +19,29 @@ const RealityCheckPlay = () => {
   const question = realityQuestions[state.currentQuestion];
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
-  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const lastNarratedQuestion = useRef<number>(-1);
 
   const totalQuestions = realityQuestions.length;
 
-  // Auto-play narration when question changes
   useEffect(() => {
-    if (!isMuted && question && state.currentQuestion !== lastNarratedQuestion.current) {
+    if (!state.isMuted && question && state.currentQuestion !== lastNarratedQuestion.current) {
       lastNarratedQuestion.current = state.currentQuestion;
       const timer = setTimeout(() => {
         speak(`Here's a question about ${question.category}. Take a moment to read it and pick the answer that feels most like you.`);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [state.currentQuestion, isMuted, question, speak]);
+  }, [state.currentQuestion, state.isMuted, question, speak]);
 
   const handleSelect = (optIndex: number) => {
-    stop(); // Stop question narration
+    stop();
     const score = optIndex + 1;
     setSelectedOption(optIndex);
     dispatch({ type: 'ANSWER_QUESTION', level: 0, question: state.currentQuestion, score });
 
     const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
-    if (!isMuted) {
+    if (!state.isMuted) {
       speak(feedbackText);
     }
 
@@ -61,7 +61,6 @@ const RealityCheckPlay = () => {
 
   return (
     <div className="min-h-screen game-gradient px-4 py-6 relative overflow-hidden">
-      {/* Floating background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {[...Array(4)].map((_, i) => (
           <motion.span
@@ -77,34 +76,13 @@ const RealityCheckPlay = () => {
       </div>
 
       <div className="max-w-md mx-auto relative z-10">
-        {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => dispatch({ type: 'SET_STEP', step: 'journey' })}
-            className="glass-card rounded-full px-3 py-1.5 text-game-muted text-xs font-body hover:text-game-text transition-colors"
-          >
-            ✕ Exit
-          </button>
           <motion.div className="glass-card rounded-full px-4 py-1.5 flex items-center gap-2">
             <span className="gold-text font-display font-bold text-xs">FQ Test</span>
             <span className="text-game-muted text-[10px] font-body">Reality Check</span>
           </motion.div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={toggleMute}
-              className={`glass-card rounded-full p-1.5 transition-colors ${
-                isMuted ? 'text-game-muted' : 'text-game-gold'
-              }`}
-              title={isMuted ? 'Unmute narration' : 'Mute narration'}
-            >
-              {isLoading ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : isMuted ? (
-                <VolumeX size={14} />
-              ) : (
-                <Volume2 size={14} className={isPlaying ? 'animate-pulse' : ''} />
-              )}
-            </button>
+            <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="p-1.5" />
             <div className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1">
               <Zap size={14} className="text-game-gold" />
               <span className="text-game-gold text-xs font-display font-bold">
@@ -114,7 +92,6 @@ const RealityCheckPlay = () => {
           </div>
         </div>
 
-        {/* Progress bar */}
         <div className="glass-card rounded-2xl p-3 mb-5">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
@@ -140,7 +117,6 @@ const RealityCheckPlay = () => {
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.4 }}
           >
-            {/* Question card */}
             <div className="glass-card rounded-2xl p-5 mb-5">
               <p className="text-game-gold text-xs font-display font-semibold uppercase tracking-wider mb-2">
                 {question.category}
@@ -150,7 +126,6 @@ const RealityCheckPlay = () => {
               </p>
             </div>
 
-            {/* Options */}
             <div className="space-y-2.5">
               {question.options.map((opt, idx) => (
                 <motion.button
@@ -167,31 +142,19 @@ const RealityCheckPlay = () => {
                   }`}
                 >
                   {selectedOption === idx && (
-                    <motion.div
-                      className="absolute inset-0 bg-game-gold/10 rounded-xl"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                    />
+                    <motion.div className="absolute inset-0 bg-game-gold/10 rounded-xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
                   )}
                   <div className="flex items-center gap-3 relative z-10">
-                    <motion.span
-                      className="text-xl flex-shrink-0"
-                      whileHover={{ scale: 1.3, rotate: 15 }}
-                      transition={{ type: "spring" }}
-                    >
+                    <motion.span className="text-xl flex-shrink-0" whileHover={{ scale: 1.3, rotate: 15 }} transition={{ type: "spring" }}>
                       {opt.emoji}
                     </motion.span>
                     <span className="flex-1">{opt.text}</span>
-                    <ChevronRight
-                      size={16}
-                      className="text-game-muted/40 group-hover:text-game-gold transition-colors flex-shrink-0"
-                    />
+                    <ChevronRight size={16} className="text-game-muted/40 group-hover:text-game-gold transition-colors flex-shrink-0" />
                   </div>
                 </motion.button>
               ))}
             </div>
 
-            {/* Feedback popup */}
             <AnimatePresence>
               {showFeedback && selectedOption !== null && (
                 <motion.div

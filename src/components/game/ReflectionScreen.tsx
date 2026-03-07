@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
-import { Volume2, VolumeX, Loader2 } from 'lucide-react';
+import MuteButton from './MuteButton';
 import { reflectionOptions } from '@/data/questions';
 
 const interestOptions = [
@@ -18,20 +18,20 @@ const REFLECTION_TEXT_1 = "Last question! If you could level up just one financi
 
 const ReflectionScreen = () => {
   const { state, dispatch } = useGame();
-  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef<number>(-1);
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    if (!isMuted && hasNarrated.current !== step) {
+    if (!state.isMuted && hasNarrated.current !== step) {
       hasNarrated.current = step;
       const text = step === 0 ? REFLECTION_TEXT_0 : REFLECTION_TEXT_1;
       const timer = setTimeout(() => speak(text), 500);
       return () => clearTimeout(timer);
     }
-  }, [isMuted, speak, step]);
+  }, [state.isMuted, speak, step]);
 
-  const handleInterestSelect = (option: string) => {
+  const handleInterestSelect = (_option: string) => {
     stop();
     setStep(1);
   };
@@ -44,13 +44,7 @@ const ReflectionScreen = () => {
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
-      {/* Mute toggle */}
-      <button
-        onClick={toggleMute}
-        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
-      >
-        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
-      </button>
+      <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
       <motion.div key={step} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full text-center">
         <p className="gold-text font-display font-bold text-lg mb-2">FQ Test</p>
 

@@ -3,12 +3,14 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-export function useNarration() {
-  const [isMuted, setIsMuted] = useState(false);
+export function useNarration(externalMuted?: boolean) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Use external muted state if provided
+  const isMuted = externalMuted ?? false;
 
   const stop = useCallback(() => {
     if (audioRef.current) {
@@ -25,7 +27,15 @@ export function useNarration() {
     setIsLoading(false);
   }, []);
 
+  // Stop playback when muted externally
+  useEffect(() => {
+    if (isMuted) {
+      stop();
+    }
+  }, [isMuted, stop]);
+
   const speak = useCallback(async (text: string) => {
+    if (isMuted) return;
     stop();
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
@@ -83,22 +93,12 @@ export function useNarration() {
       setIsLoading(false);
       setIsPlaying(false);
     }
-  }, [stop]);
-
-  const toggleMute = useCallback(() => {
-    setIsMuted(prev => {
-      if (!prev) {
-        // Muting — stop current playback
-        stop();
-      }
-      return !prev;
-    });
-  }, [stop]);
+  }, [stop, isMuted]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => stop();
   }, [stop]);
 
-  return { isMuted, isPlaying, isLoading, speak, stop, toggleMute };
+  return { isMuted, isPlaying, isLoading, speak, stop };
 }

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame, PlayerProfile } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
-import { Volume2, VolumeX, Loader2 } from 'lucide-react';
+import MuteButton from './MuteButton';
 
 const statusOptions = [
   { label: '🎒 In school (Class 11/12)', value: 'school' },
@@ -21,11 +21,12 @@ const incomeOptions = [
 ];
 
 const PROFILE_TEXT_0 = "Let's get to know you a bit! Just fill in your name, and optionally your age and gender. This helps us personalize your results.";
-const PROFILE_TEXT_1 = "Great! Now tell me a little about where you are in life and how money comes your way. This helps me tailor the scenarios to you.";
+const PROFILE_TEXT_1 = "Great! Now tell me — what best describes your current stage in life?";
+const PROFILE_TEXT_2 = "Almost there! How does money usually come your way?";
 
 const ProfileScreen = () => {
-  const { dispatch } = useGame();
-  const { isMuted, isPlaying, isLoading, speak, stop, toggleMute } = useNarration();
+  const { state, dispatch } = useGame();
+  const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef<number>(-1);
   const [profile, setProfile] = useState<PlayerProfile>({
     name: '', age: '', gender: '', phone: '',
@@ -35,30 +36,23 @@ const ProfileScreen = () => {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    if (!isMuted && hasNarrated.current !== step) {
+    if (!state.isMuted && hasNarrated.current !== step) {
       hasNarrated.current = step;
-      const text = step === 0 ? PROFILE_TEXT_0 : PROFILE_TEXT_1;
-      const timer = setTimeout(() => speak(text), 500);
+      const texts = [PROFILE_TEXT_0, PROFILE_TEXT_1, PROFILE_TEXT_2];
+      const timer = setTimeout(() => speak(texts[step]), 500);
       return () => clearTimeout(timer);
     }
-  }, [isMuted, speak, step]);
+  }, [state.isMuted, speak, step]);
 
   const updateField = (field: keyof PlayerProfile, value: string) => {
     setProfile(p => ({ ...p, [field]: value }));
   };
 
   const canProceedStep0 = profile.name.trim().length > 0;
-  const canProceedStep1 = profile.status && profile.incomeType;
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
-      {/* Mute toggle */}
-      <button
-        onClick={toggleMute}
-        className={`absolute top-4 right-4 z-20 glass-card rounded-full p-2.5 transition-colors ${isMuted ? 'text-game-muted' : 'text-game-gold'}`}
-      >
-        {isLoading ? <Loader2 size={18} className="animate-spin" /> : isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className={isPlaying ? 'animate-pulse' : ''} />}
-      </button>
+      <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
       <motion.div
         key={step}
         initial={{ opacity: 0, x: 20 }}
@@ -67,11 +61,13 @@ const ProfileScreen = () => {
         className="max-w-md w-full"
       >
         <div className="text-center mb-8">
-          <span className="text-5xl mb-4 block">🧑‍🎮</span>
-          <h2 className="text-3xl font-display font-bold text-game-text mb-2">Create Your Financial Profile</h2>
+          <span className="text-5xl mb-4 block">{step === 0 ? '🧑‍🎮' : step === 1 ? '🎯' : '💰'}</span>
+          <h2 className="text-3xl font-display font-bold text-game-text mb-2">
+            {step === 0 ? 'Create Your Profile' : step === 1 ? 'Your Current Stage' : 'Your Income Source'}
+          </h2>
           <div className="flex justify-center gap-2 mt-4">
-            {[0, 1].map(i => (
-              <div key={i} className={`h-1.5 w-12 rounded-full transition-all ${i <= step ? 'gold-gradient' : 'bg-game-card'}`} />
+            {[0, 1, 2].map(i => (
+              <div key={i} className={`h-1.5 w-10 rounded-full transition-all ${i <= step ? 'gold-gradient' : 'bg-game-card'}`} />
             ))}
           </div>
         </div>
@@ -127,34 +123,40 @@ const ProfileScreen = () => {
         )}
 
         {step === 1 && (
-          <div className="space-y-5">
-            <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-3 block text-center">What best describes your current stage?</label>
-              <div className="grid grid-cols-2 gap-2">
-                {statusOptions.map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => updateField('status', opt.value)}
-                    className={`glass-card rounded-xl px-4 py-3 text-sm font-body text-left transition-all ${profile.status === opt.value ? 'border-2 border-game-gold text-game-gold' : 'text-game-text hover:border-game-muted'}`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+          <div>
+            <p className="text-game-muted text-sm font-body text-center mb-4">What best describes your current stage?</p>
+            <div className="space-y-2.5">
+              {statusOptions.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => { updateField('status', opt.value); stop(); setStep(2); }}
+                  className={`w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all ${profile.status === opt.value ? 'border-2 border-game-gold text-game-gold' : 'text-game-text hover:border-game-gold/30 hover:scale-[1.01] active:scale-[0.99]'}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
-            <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-3 block text-center">How do you usually receive money?</label>
-              <div className="grid grid-cols-2 gap-2">
-                {incomeOptions.map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => updateField('incomeType', opt.value)}
-                    className={`glass-card rounded-xl px-4 py-3 text-sm font-body text-left transition-all ${profile.incomeType === opt.value ? 'border-2 border-game-gold text-game-gold' : 'text-game-text hover:border-game-muted'}`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div>
+            <p className="text-game-muted text-sm font-body text-center mb-4">How do you usually receive money?</p>
+            <div className="space-y-2.5">
+              {incomeOptions.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    const updatedProfile = { ...profile, incomeType: opt.value };
+                    stop();
+                    dispatch({ type: 'SET_PROFILE', profile: updatedProfile });
+                    dispatch({ type: 'START_LEVEL', level: 0 });
+                  }}
+                  className={`w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all ${profile.incomeType === opt.value ? 'border-2 border-game-gold text-game-gold' : 'text-game-text hover:border-game-gold/30 hover:scale-[1.01] active:scale-[0.99]'}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -169,21 +171,8 @@ const ProfileScreen = () => {
               Next →
             </button>
           )}
-          {step === 1 && (
-            <button
-              disabled={!canProceedStep1}
-              onClick={() => {
-                stop();
-                dispatch({ type: 'SET_PROFILE', profile });
-                dispatch({ type: 'SET_STEP', step: 'journey' });
-              }}
-              className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceedStep1 ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
-            >
-              Begin Quest! 🎮
-            </button>
-          )}
           <button
-            onClick={() => { stop(); step === 0 ? dispatch({ type: 'SET_STEP', step: 'consent' }) : setStep(0); }}
+            onClick={() => { stop(); step === 0 ? dispatch({ type: 'SET_STEP', step: 'consent' }) : setStep(step - 1); }}
             className="w-full py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"
           >
             ← Back

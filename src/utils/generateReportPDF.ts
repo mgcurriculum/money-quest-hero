@@ -88,6 +88,7 @@ export function getFinancialTips(normalizedScores: number[]): { tips: string[]; 
 }
 
 export function generateReportHTML(params: {
+  logoUrl?: string;
   playerName: string;
   fqScore: number;
   bandLevel: string;
@@ -100,7 +101,7 @@ export function generateReportHTML(params: {
   reflectionAnswer?: string;
 }): string {
   const {
-    playerName, fqScore, bandLevel, bandEmoji, bandMeaning,
+    logoUrl, playerName, fqScore, bandLevel, bandEmoji, bandMeaning,
     normalizedScores, questionsAndAnswers, tips, suggestions,
     reflectionAnswer,
   } = params;
@@ -163,7 +164,7 @@ export function generateReportHTML(params: {
 
     <!-- Header -->
     <div style="text-align:center;padding:28px 24px;background:linear-gradient(135deg,#2D1B69,#1a103f);border-radius:16px;color:#fff;margin-bottom:20px;">
-      <div style="font-size:14px;font-weight:600;letter-spacing:2px;opacity:0.8;margin-bottom:4px;">FINQUO VERSITY</div>
+      ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:100px;height:auto;margin:0 auto 12px;display:block;" />` : ''}
       <h1 style="margin:0 0 4px;font-size:24px;">FQ Test Report</h1>
       <p style="margin:0;opacity:0.7;font-size:13px;">${playerName}'s Financial Journey Results</p>
     </div>

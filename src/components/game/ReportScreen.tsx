@@ -83,6 +83,7 @@ const ReportScreen = () => {
 
   const handleDownloadPDF = () => {
     const html = generateReportHTML({
+      logoUrl: window.location.origin + finquoLogo,
       playerName: state.profile.name,
       fqScore,
       bandLevel: band.level,

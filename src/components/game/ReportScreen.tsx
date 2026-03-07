@@ -1,11 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import {
   dimensionLabels,
   dimensionIcons,
   calculateFQScore,
-  archetypes,
 } from '@/data/questions';
 import {
   RadarChart,
@@ -16,10 +15,23 @@ import {
 } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
 import finquoLogo from '@/assets/finquo-logo-white.png';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const ReportScreen = () => {
   const { state, dispatch } = useGame();
   const hasSaved = useRef(false);
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   const { fqScore, normalizedScores, primaryArchetype, secondaryArchetype, band } =
     calculateFQScore(state.answers);
@@ -62,6 +74,42 @@ const ReportScreen = () => {
     saveSession();
   }, []);
 
+  const handleDownloadPDF = () => {
+    window.print();
+  };
+
+  const handleSendEmail = async () => {
+    if (!email || !email.includes('@')) return;
+    setEmailSending(true);
+    try {
+      // Save email to the session
+      await supabase.from('game_sessions').update({ player_email: email } as any).eq('player_name', state.profile.name).eq('fq_score', fqScore);
+
+      // Call edge function to send email
+      await supabase.functions.invoke('send-report-email', {
+        body: {
+          email,
+          playerName: state.profile.name,
+          fqScore,
+          bandLevel: band.level,
+          bandEmoji: band.emoji,
+          bandMeaning: band.meaning,
+          dimensionScores: dimensionLabels.map((label, i) => ({
+            label,
+            icon: dimensionIcons[i],
+            score: Math.round(normalizedScores[i]),
+          })),
+          reflectionAnswer: state.reflectionAnswer,
+        },
+      });
+      setEmailSent(true);
+    } catch (err) {
+      console.error('Failed to send email:', err);
+    } finally {
+      setEmailSending(false);
+    }
+  };
+
   const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nI am a ${primaryArchetype.emoji} ${primaryArchetype.name}\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
 
   const handleShare = (platform: string) => {
@@ -80,7 +128,7 @@ const ReportScreen = () => {
   };
 
   return (
-    <div className="min-h-screen game-gradient px-4 py-6">
+    <div className="min-h-screen game-gradient px-4 py-6 print:bg-white print:text-black">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center mb-6">
@@ -124,24 +172,8 @@ const ReportScreen = () => {
           <p className="text-game-muted font-body text-xs mt-1">{band.meaning}</p>
         </motion.div>
 
-        {/* Personality Archetypes */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="grid grid-cols-2 gap-3 mb-5">
-          <div className="glass-card rounded-2xl p-4 text-center border border-game-gold/30">
-            <p className="text-game-muted text-[10px] font-body uppercase tracking-wider mb-1">Primary</p>
-            <span className="text-3xl block mb-1">{primaryArchetype.emoji}</span>
-            <p className="text-game-text font-display font-bold text-sm">{primaryArchetype.name}</p>
-            <p className="text-game-muted font-body text-[10px] mt-1">{primaryArchetype.trait}</p>
-          </div>
-          <div className="glass-card rounded-2xl p-4 text-center border border-game-text/10">
-            <p className="text-game-muted text-[10px] font-body uppercase tracking-wider mb-1">Secondary</p>
-            <span className="text-3xl block mb-1">{secondaryArchetype.emoji}</span>
-            <p className="text-game-text font-display font-bold text-sm">{secondaryArchetype.name}</p>
-            <p className="text-game-muted font-body text-[10px] mt-1">{secondaryArchetype.trait}</p>
-          </div>
-        </motion.div>
-
         {/* Radar Chart */}
-        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.8 }} className="glass-card rounded-2xl p-4 mb-5">
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }} className="glass-card rounded-2xl p-4 mb-5">
           <p className="text-game-muted text-xs font-body uppercase tracking-wider text-center mb-2">Dimension Breakdown</p>
           <div className="w-full h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -158,23 +190,18 @@ const ReportScreen = () => {
         <div className="space-y-2.5 mb-5">
           {dimensionLabels.map((label, idx) => {
             const score = Math.round(normalizedScores[idx]);
-            const archetype = archetypes[idx];
-            const profile = score >= 50 ? archetype.high : archetype.low;
 
             return (
-              <motion.div key={idx} initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 + idx * 0.08 }} className="glass-card rounded-xl p-3">
+              <motion.div key={idx} initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 + idx * 0.08 }} className="glass-card rounded-xl p-3">
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{dimensionIcons[idx]}</span>
-                    <div>
-                      <p className="text-game-text font-display font-semibold text-xs">{label}</p>
-                      <p className="text-game-gold text-[10px] font-body">{profile.emoji} {profile.name}</p>
-                    </div>
+                    <p className="text-game-text font-display font-semibold text-xs">{label}</p>
                   </div>
                   <span className="text-game-muted font-body text-xs font-semibold">{score}%</span>
                 </div>
                 <div className="h-2 bg-game-card rounded-full overflow-hidden">
-                  <motion.div className="h-full gold-gradient rounded-full" initial={{ width: 0 }} animate={{ width: `${score}%` }} transition={{ delay: 1.1 + idx * 0.08, duration: 0.6 }} />
+                  <motion.div className="h-full gold-gradient rounded-full" initial={{ width: 0 }} animate={{ width: `${score}%` }} transition={{ delay: 0.8 + idx * 0.08, duration: 0.6 }} />
                 </div>
               </motion.div>
             );
@@ -183,21 +210,14 @@ const ReportScreen = () => {
 
         {/* Reflection */}
         {state.reflectionAnswer && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }} className="glass-card rounded-2xl p-4 mb-5 text-center">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }} className="glass-card rounded-2xl p-4 mb-5 text-center">
             <p className="text-game-muted text-[10px] font-body uppercase tracking-wider mb-1">Your 2025 <span className="gold-text">FQ Test</span> Goal</p>
             <p className="text-game-text font-display font-semibold text-sm">{state.reflectionAnswer}</p>
           </motion.div>
         )}
 
-        {/* Improvement Quest */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.7 }} className="glass-card rounded-2xl p-4 mb-5 border-2 border-game-gold/30">
-          <p className="text-game-gold font-display font-semibold mb-2 text-sm">🎯 Your Improvement Quest</p>
-          <p className="text-game-text font-body text-xs mb-1"><strong>Mission:</strong> {primaryArchetype.quest}</p>
-          <p className="text-game-muted font-body text-[10px]">🏅 Complete this to level up your FQ!</p>
-        </motion.div>
-
         {/* Social Sharing */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.9 }} className="glass-card rounded-2xl p-4 mb-5 text-center">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="glass-card rounded-2xl p-4 mb-5 text-center print:hidden">
           <p className="text-game-text font-display font-semibold text-sm mb-3">📢 Share Your Superpower</p>
           <div className="flex justify-center gap-3">
             {[
@@ -216,8 +236,24 @@ const ReportScreen = () => {
           </div>
         </motion.div>
 
+        {/* Download PDF & Send Email */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="grid grid-cols-2 gap-3 mb-5 print:hidden">
+          <button
+            onClick={handleDownloadPDF}
+            className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2"
+          >
+            📥 Download PDF
+          </button>
+          <button
+            onClick={() => setEmailOpen(true)}
+            className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2"
+          >
+            📧 Send to Email
+          </button>
+        </motion.div>
+
         {/* Play Again */}
-        <div className="pb-8">
+        <div className="pb-8 print:hidden">
           <button
             onClick={() => dispatch({ type: 'RESET' })}
             className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform"
@@ -226,6 +262,45 @@ const ReportScreen = () => {
           </button>
         </div>
       </div>
+
+      {/* Email Dialog */}
+      <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
+        <DialogContent className="bg-game-surface border-game-card text-game-text max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-game-text">📧 Send Report to Email</DialogTitle>
+            <DialogDescription className="text-game-muted font-body text-xs">
+              Enter your email address and we'll send your FQ Test report.
+            </DialogDescription>
+          </DialogHeader>
+          {emailSent ? (
+            <div className="text-center py-4">
+              <span className="text-4xl block mb-2">✅</span>
+              <p className="text-game-text font-display font-semibold">Report Sent!</p>
+              <p className="text-game-muted font-body text-xs mt-1">Check your inbox for your FQ Test report.</p>
+              <Button onClick={() => { setEmailOpen(false); setEmailSent(false); setEmail(''); }} className="mt-4 gold-gradient text-white font-display">
+                Close
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <Input
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-game-card border-game-muted/30 text-game-text placeholder:text-game-muted/50 font-body"
+              />
+              <Button
+                onClick={handleSendEmail}
+                disabled={emailSending || !email.includes('@')}
+                className="w-full gold-gradient text-white font-display font-semibold hover:scale-105 active:scale-95 transition-transform"
+              >
+                {emailSending ? 'Sending...' : 'Send Report 📨'}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -186,16 +186,18 @@ const ReportScreen = () => {
           </div>
         </motion.div>
 
-        {/* Overall Evaluation */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="glass-card rounded-2xl p-5 mb-5">
-          <div className="flex items-end justify-between mb-3">
-            <p className="text-game-text font-display font-semibold text-sm">Overall Evaluation</p>
-            <span className="text-3xl font-display font-bold gold-text">{Math.round(fqScore / 10)}%</span>
-          </div>
-          <div className="h-3 bg-game-card rounded-full overflow-hidden">
-            <motion.div className="h-full gold-gradient rounded-full" initial={{ width: 0 }} animate={{ width: `${Math.round(fqScore / 10)}%` }} transition={{ delay: 0.8, duration: 1.2, ease: 'easeOut' }} />
-          </div>
-        </motion.div>
+        {/* Dimension Score Bars */}
+        {dimensionLabels.map((label, i) => (
+          <motion.div key={label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.1 }} className="glass-card rounded-2xl p-4 mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-game-text font-display text-sm">{dimensionIcons[i]} {label}</span>
+              <span className="text-game-gold font-display font-bold">{Math.round(normalizedScores[i])}%</span>
+            </div>
+            <div className="h-2.5 bg-game-card rounded-full overflow-hidden">
+              <motion.div className="h-full gold-gradient rounded-full" initial={{ width: 0 }} animate={{ width: `${Math.round(normalizedScores[i])}%` }} transition={{ delay: 0.6 + i * 0.1, duration: 1, ease: 'easeOut' }} />
+            </div>
+          </motion.div>
+        ))}
 
         {/* Reflection */}
         {state.reflectionAnswer && (

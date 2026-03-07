@@ -186,27 +186,16 @@ const ReportScreen = () => {
           </div>
         </motion.div>
 
-        {/* Dimension Score Bars */}
-        <div className="space-y-2.5 mb-5">
-          {dimensionLabels.map((label, idx) => {
-            const score = Math.round(normalizedScores[idx]);
-
-            return (
-              <motion.div key={idx} initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 + idx * 0.08 }} className="glass-card rounded-xl p-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{dimensionIcons[idx]}</span>
-                    <p className="text-game-text font-display font-semibold text-xs">{label}</p>
-                  </div>
-                  <span className="text-game-muted font-body text-xs font-semibold">{score}%</span>
-                </div>
-                <div className="h-2 bg-game-card rounded-full overflow-hidden">
-                  <motion.div className="h-full gold-gradient rounded-full" initial={{ width: 0 }} animate={{ width: `${score}%` }} transition={{ delay: 0.8 + idx * 0.08, duration: 0.6 }} />
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+        {/* Overall Evaluation */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="glass-card rounded-2xl p-5 mb-5">
+          <div className="flex items-end justify-between mb-3">
+            <p className="text-game-text font-display font-semibold text-sm">Overall Evaluation</p>
+            <span className="text-3xl font-display font-bold gold-text">{Math.round(fqScore / 10)}%</span>
+          </div>
+          <div className="h-3 bg-game-card rounded-full overflow-hidden">
+            <motion.div className="h-full gold-gradient rounded-full" initial={{ width: 0 }} animate={{ width: `${Math.round(fqScore / 10)}%` }} transition={{ delay: 0.8, duration: 1.2, ease: 'easeOut' }} />
+          </div>
+        </motion.div>
 
         {/* Reflection */}
         {state.reflectionAnswer && (

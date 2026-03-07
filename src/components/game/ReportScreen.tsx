@@ -40,7 +40,7 @@ const ReportScreen = () => {
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
-  const { fqScore, normalizedScores, band } =
+  const { fqScore, normalizedScores, band, primaryArchetype, secondaryArchetype } =
     calculateFQScore(state.answers);
 
   const radarData = dimensionLabels.map((label, i) => ({

@@ -201,12 +201,6 @@ export function generateReportHTML(params: {
       ${suggestionsHTML}
     </div>
 
-    ${reflectionAnswer ? `
-    <!-- Reflection -->
-    <div style="text-align:center;background:#f8f6ff;border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid #e8e0f0;">
-      
-      <p style="margin:0;font-size:15px;font-weight:700;color:#2D1B69;">${reflectionAnswer}</p>
-    </div>` : ''}
 
     <!-- Footer -->
     <div style="text-align:center;padding:16px;margin-top:12px;">

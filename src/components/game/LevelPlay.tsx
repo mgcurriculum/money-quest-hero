@@ -96,7 +96,7 @@ const LevelPlay = () => {
               <span className="text-game-muted text-xs font-body">Progress</span>
             </div>
             <div className="flex gap-1">
-              {[0, 1, 2].map(i => (
+              {Array.from({ length: totalScenarios }, (_, i) => (
                 <motion.div
                   key={i}
                   className={`w-3 h-3 rounded-full border-2 ${

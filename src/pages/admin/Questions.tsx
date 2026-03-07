@@ -274,8 +274,16 @@ const Questions = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-display font-bold text-foreground">Questions</h1>
-
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-2xl font-display font-bold text-foreground">Questions</h1>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport}><Download className="h-4 w-4 mr-2" />Export CSV</Button>
+          <Button variant="outline" size="sm" onClick={handleImport} disabled={importing}>
+            {importing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+            Import CSV
+          </Button>
+        </div>
+      </div>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           {AGE_GROUPS.map(ag => (

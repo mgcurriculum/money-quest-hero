@@ -111,7 +111,7 @@ const LevelPlay = () => {
             </div>
           </div>
           <div className="flex gap-1">
-            {[0, 1, 2].map(i => (
+            {Array.from({ length: totalScenarios }, (_, i) => (
               <div key={i} className="h-2 flex-1 rounded-full overflow-hidden bg-game-bg/50">
                 <motion.div
                   className="h-full rounded-full gold-gradient"

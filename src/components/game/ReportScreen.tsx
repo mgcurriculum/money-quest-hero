@@ -93,8 +93,6 @@ const ReportScreen = () => {
       tips,
       suggestions,
       reflectionAnswer: state.reflectionAnswer,
-      primaryArchetype,
-      secondaryArchetype,
     });
     openPrintableReport(html);
   };

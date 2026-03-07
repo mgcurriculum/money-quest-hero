@@ -157,8 +157,20 @@ const Questions = () => {
         <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" /> Add Question</Button>
       </div>
 
-      {/* Filter */}
-      <div className="flex gap-3 items-end">
+      {/* Filters */}
+      <div className="flex gap-3 items-end flex-wrap">
+        <div>
+          <label className="text-xs text-muted-foreground">Filter by Age Group</label>
+          <Select value={filterAgeGroup} onValueChange={setFilterAgeGroup}>
+            <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Age Groups</SelectItem>
+              {AGE_GROUPS.map(ag => (
+                <SelectItem key={ag} value={ag}>{ag}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div>
           <label className="text-xs text-muted-foreground">Filter by Level</label>
           <Select value={filterLevel} onValueChange={setFilterLevel}>

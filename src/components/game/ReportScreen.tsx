@@ -226,13 +226,6 @@ const ReportScreen = () => {
           </motion.div>
         ))}
 
-        {/* Reflection */}
-        {state.reflectionAnswer && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }} className="glass-card rounded-2xl p-4 mb-5 text-center">
-            
-            <p className="text-game-text font-display font-semibold text-sm">{state.reflectionAnswer}</p>
-          </motion.div>
-        )}
 
         {/* Social Sharing */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="glass-card rounded-2xl p-4 mb-5 text-center print:hidden">

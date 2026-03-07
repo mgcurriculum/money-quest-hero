@@ -110,11 +110,6 @@ serve(async (req) => {
       ${suggestionsHTML}
     </div>` : ''}
 
-    ${reflectionAnswer ? `
-    <div style="text-align:center;background:#f8f6ff;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #e8e0f0;">
-      
-      <p style="margin:0;font-size:14px;font-weight:700;color:#2D1B69;">${reflectionAnswer}</p>
-    </div>` : ''}
 
     <div style="text-align:center;margin-top:20px;">
       <p style="font-size:11px;color:#aaa;">Powered by FinQuo Versity</p>

@@ -14,16 +14,162 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      game_sessions: {
+        Row: {
+          answers: Json
+          band_level: string | null
+          created_at: string
+          fq_score: number | null
+          id: string
+          player_age: string | null
+          player_country: string | null
+          player_district: string | null
+          player_gender: string | null
+          player_income_type: string | null
+          player_name: string
+          player_phone: string | null
+          player_state: string | null
+          player_status: string | null
+          primary_archetype: string | null
+          reflection_answer: string | null
+          secondary_archetype: string | null
+        }
+        Insert: {
+          answers?: Json
+          band_level?: string | null
+          created_at?: string
+          fq_score?: number | null
+          id?: string
+          player_age?: string | null
+          player_country?: string | null
+          player_district?: string | null
+          player_gender?: string | null
+          player_income_type?: string | null
+          player_name: string
+          player_phone?: string | null
+          player_state?: string | null
+          player_status?: string | null
+          primary_archetype?: string | null
+          reflection_answer?: string | null
+          secondary_archetype?: string | null
+        }
+        Update: {
+          answers?: Json
+          band_level?: string | null
+          created_at?: string
+          fq_score?: number | null
+          id?: string
+          player_age?: string | null
+          player_country?: string | null
+          player_district?: string | null
+          player_gender?: string | null
+          player_income_type?: string | null
+          player_name?: string
+          player_phone?: string | null
+          player_state?: string | null
+          player_status?: string | null
+          primary_archetype?: string | null
+          reflection_answer?: string | null
+          secondary_archetype?: string | null
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          age_groups: string[]
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          level: number
+          options: Json
+          question_text: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          age_groups?: string[]
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level: number
+          options?: Json
+          question_text: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          age_groups?: string[]
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level?: number
+          options?: Json
+          question_text?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +296,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

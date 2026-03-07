@@ -1,21 +1,33 @@
 
 
-## Plan: Remove Questions-Per-Level Settings, Auto-Calculate
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
-### What Changes
+### Changes
 
-Remove the manual "questions per level" configuration. Instead, the game will automatically use **all active questions** for the player's age group per level — no limit, no random selection.
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-### Files Modified
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-**1. `src/pages/admin/Settings.tsx`** — Remove the questions-per-level card entirely. If no other settings remain, replace with a placeholder or remove the page.
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-**2. `src/hooks/useQuestions.ts`** — Remove the `questionsPerLevel` state, the `admin_settings` fetch, and the shuffle/limit logic. `getQuestionsForLevel` will simply return all active questions filtered by level + age group.
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
 
-**3. `src/pages/admin/Dashboard.tsx`** (if it links to Settings) — Check if Settings nav link should remain.
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
 
-### Scope
-- Settings page: Remove the questions-per-level card (keep page shell for future settings)
-- useQuestions hook: Remove `questionsPerLevel` state and the associated DB query + slicing logic
-- All active questions for the matching level and age group will be served to players
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

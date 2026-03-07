@@ -105,10 +105,8 @@ const ReportScreen = () => {
     if (!email || !email.includes('@')) return;
     setEmailSending(true);
     try {
-      // Save email to the session
       await supabase.from('game_sessions').update({ player_email: email } as any).eq('player_name', state.profile.name).eq('fq_score', fqScore);
 
-      // Call edge function to send email
       await supabase.functions.invoke('send-report-email', {
         body: {
           email,
@@ -123,6 +121,18 @@ const ReportScreen = () => {
             score: Math.round(normalizedScores[i]),
           })),
           reflectionAnswer: state.reflectionAnswer,
+          questionsAndAnswers: questionsAndAnswers.map(qa => ({
+            levelTitle: qa.levelTitle,
+            levelIcon: qa.levelIcon,
+            question: qa.question,
+            selectedOption: qa.selectedOption,
+            selectedEmoji: qa.selectedEmoji,
+            score: qa.score,
+          })),
+          tips,
+          suggestions,
+          primaryArchetype: { name: primaryArchetype.name, emoji: primaryArchetype.emoji, trait: primaryArchetype.trait },
+          secondaryArchetype: { name: secondaryArchetype.name, emoji: secondaryArchetype.emoji, trait: secondaryArchetype.trait },
         },
       });
       setEmailSent(true);

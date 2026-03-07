@@ -56,7 +56,9 @@ const LevelPlay = () => {
     }, 1200);
   };
 
-  const questionLabels = ["Quest 1 of 3", "Quest 2 of 3", "Final Quest!"];
+  const questionLabels = Array.from({ length: totalScenarios }, (_, i) =>
+    i === totalScenarios - 1 ? "Final Quest!" : `Quest ${i + 1} of ${totalScenarios}`
+  );
 
   return (
     <div className="min-h-screen game-gradient px-4 py-6 relative overflow-hidden">

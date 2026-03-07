@@ -5,7 +5,7 @@ import { useNarration } from '@/hooks/useNarration';
 import MuteButton from './MuteButton';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 
-const WELCOME_TEXT = "Hey there! I'm your financial guide. This is a quick quiz that'll help you understand how smart you really are with money. It only takes about 5 minutes. Ready? Just tap Start!";
+const WELCOME_TEXT = "Hey there! I'm your financial guide. This is a quick quiz that'll help you understand how smart you really are with money. It only takes about 3 minutes. Ready? Just tap Start!";
 
 const WelcomeScreen = () => {
   const { state, dispatch } = useGame();
@@ -56,7 +56,7 @@ const WelcomeScreen = () => {
         </motion.h1>
 
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-game-muted text-lg font-body mb-8 leading-relaxed">
-          Discover how smart you are with money through real-life scenarios. Takes only 5 minutes!
+          Discover how smart you are with money through real-life scenarios. Discover how smart you are with money through real-life scenarios. Takes only 3 minutes!
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="space-y-3">
@@ -66,7 +66,7 @@ const WelcomeScreen = () => {
         </motion.div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-8 flex items-center justify-center gap-6 text-game-muted text-sm">
-          <span className="flex items-center gap-1">⏱️ 5 min</span>
+          <span className="flex items-center gap-1"><span className="flex items-center gap-1">⏱️ 3 min</span></span>
           <span className="flex items-center gap-1">🎮 16 questions</span>
           <span className="flex items-center gap-1">🏅 Free report</span>
         </motion.div>

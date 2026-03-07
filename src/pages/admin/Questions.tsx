@@ -66,7 +66,7 @@ const Questions = () => {
     setFormText('');
     setFormCategory('');
     setFormLevel(0);
-    setFormAgeGroups([...AGE_GROUPS]);
+    setFormAgeGroups(filterAgeGroup !== 'all' ? [filterAgeGroup] : [...AGE_GROUPS]);
     setFormOptions(Array(5).fill(null).map(emptyOption));
     setFormActive(true);
     setFormOrder(0);

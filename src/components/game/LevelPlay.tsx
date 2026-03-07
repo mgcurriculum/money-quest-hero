@@ -18,6 +18,7 @@ const LevelPlay = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const level = levels[state.currentLevel];
+  const totalScenarios = level.scenarios.length;
   const scenario = level.scenarios[state.currentQuestion];
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);

@@ -98,13 +98,11 @@ export function generateReportHTML(params: {
   tips: string[];
   suggestions: string[];
   reflectionAnswer?: string;
-  primaryArchetype: { name: string; emoji: string; trait: string };
-  secondaryArchetype: { name: string; emoji: string; trait: string };
 }): string {
   const {
     playerName, fqScore, bandLevel, bandEmoji, bandMeaning,
     normalizedScores, questionsAndAnswers, tips, suggestions,
-    reflectionAnswer, primaryArchetype, secondaryArchetype,
+    reflectionAnswer,
   } = params;
 
   const dimensionRows = dimensionLabels.map((label, i) => `
@@ -178,21 +176,6 @@ export function generateReportHTML(params: {
       <div style="font-size:12px;color:#888;margin-top:4px;">${bandMeaning}</div>
     </div>
 
-    <!-- Archetypes -->
-    <div style="display:flex;gap:12px;margin-bottom:20px;">
-      <div style="flex:1;text-align:center;padding:16px;background:#f8f6ff;border-radius:12px;border:1px solid #e8e0f0;">
-        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Primary Archetype</div>
-        <div style="font-size:28px;">${primaryArchetype.emoji}</div>
-        <div style="font-size:14px;font-weight:700;color:#2D1B69;">${primaryArchetype.name}</div>
-        <div style="font-size:11px;color:#666;margin-top:2px;">${primaryArchetype.trait}</div>
-      </div>
-      <div style="flex:1;text-align:center;padding:16px;background:#f8f6ff;border-radius:12px;border:1px solid #e8e0f0;">
-        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Secondary Archetype</div>
-        <div style="font-size:28px;">${secondaryArchetype.emoji}</div>
-        <div style="font-size:14px;font-weight:700;color:#2D1B69;">${secondaryArchetype.name}</div>
-        <div style="font-size:11px;color:#666;margin-top:2px;">${secondaryArchetype.trait}</div>
-      </div>
-    </div>
 
     <!-- Dimension Breakdown -->
     <div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:20px;border:1px solid #e8e0f0;">

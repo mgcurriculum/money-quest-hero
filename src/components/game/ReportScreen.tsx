@@ -39,7 +39,7 @@ const ReportScreen = () => {
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
-  const { fqScore, normalizedScores, primaryArchetype, secondaryArchetype, band } =
+  const { fqScore, normalizedScores, band } =
     calculateFQScore(state.answers);
 
   const radarData = dimensionLabels.map((label, i) => ({
@@ -67,8 +67,6 @@ const ReportScreen = () => {
           player_income_type: state.profile.incomeType,
           answers: state.answers as any,
           fq_score: fqScore,
-          primary_archetype: `${primaryArchetype.emoji} ${primaryArchetype.name}`,
-          secondary_archetype: `${secondaryArchetype.emoji} ${secondaryArchetype.name}`,
           band_level: band.level,
           reflection_answer: state.reflectionAnswer,
         });
@@ -95,8 +93,6 @@ const ReportScreen = () => {
       tips,
       suggestions,
       reflectionAnswer: state.reflectionAnswer,
-      primaryArchetype,
-      secondaryArchetype,
     });
     openPrintableReport(html);
   };
@@ -131,8 +127,6 @@ const ReportScreen = () => {
           })),
           tips,
           suggestions,
-          primaryArchetype: { name: primaryArchetype.name, emoji: primaryArchetype.emoji, trait: primaryArchetype.trait },
-          secondaryArchetype: { name: secondaryArchetype.name, emoji: secondaryArchetype.emoji, trait: secondaryArchetype.trait },
         },
       });
       setEmailSent(true);
@@ -143,7 +137,7 @@ const ReportScreen = () => {
     }
   };
 
-  const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nI am a ${primaryArchetype.emoji} ${primaryArchetype.name}\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
+  const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
 
   const handleShare = (platform: string) => {
     const encoded = encodeURIComponent(shareText);

@@ -14,7 +14,7 @@ serve(async (req) => {
     const {
       email, playerName, fqScore, bandLevel, bandEmoji, bandMeaning,
       dimensionScores, reflectionAnswer, questionsAndAnswers,
-      tips, suggestions, primaryArchetype, secondaryArchetype,
+      tips, suggestions,
     } = await req.json();
 
     if (!email || !email.includes('@')) {
@@ -64,24 +64,6 @@ serve(async (req) => {
       <div style="padding:10px 14px;background:#e8f5e9;border-radius:8px;margin-bottom:6px;font-size:12px;color:#2e7d32;line-height:1.5;">${s}</div>
     `).join('');
 
-    const archetypeSection = (primaryArchetype && secondaryArchetype) ? `
-    <div style="margin:16px 0;">
-      <table width="100%" cellpadding="0" cellspacing="0"><tr>
-        <td style="width:48%;text-align:center;padding:14px;background:#f8f6ff;border-radius:12px;border:1px solid #e8e0f0;">
-          <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Primary</div>
-          <div style="font-size:28px;">${primaryArchetype.emoji}</div>
-          <div style="font-size:13px;font-weight:700;color:#2D1B69;">${primaryArchetype.name}</div>
-          <div style="font-size:10px;color:#666;">${primaryArchetype.trait}</div>
-        </td>
-        <td style="width:4%;"></td>
-        <td style="width:48%;text-align:center;padding:14px;background:#f8f6ff;border-radius:12px;border:1px solid #e8e0f0;">
-          <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Secondary</div>
-          <div style="font-size:28px;">${secondaryArchetype.emoji}</div>
-          <div style="font-size:13px;font-weight:700;color:#2D1B69;">${secondaryArchetype.name}</div>
-          <div style="font-size:10px;color:#666;">${secondaryArchetype.trait}</div>
-        </td>
-      </tr></table>
-    </div>` : '';
 
     const htmlBody = `
 <!DOCTYPE html>
@@ -102,8 +84,6 @@ serve(async (req) => {
       <div style="font-size:16px;font-weight:700;color:#4FC3F7;margin-top:4px;">${bandLevel}</div>
       <div style="font-size:11px;color:#888;margin-top:4px;">${bandMeaning}</div>
     </div>
-
-    ${archetypeSection}
 
     <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #e8e0f0;">
       <h2 style="font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:center;margin:0 0 12px;">Dimension Breakdown</h2>

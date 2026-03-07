@@ -41,6 +41,8 @@ const ReportScreen = () => {
   const hasSaved = useRef(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [email, setEmail] = useState('');
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { weights, bands, loading: configLoading } = useScoringConfig();
 
   // Calculate FQ score with dynamic weights/bands

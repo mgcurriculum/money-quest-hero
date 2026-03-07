@@ -98,13 +98,11 @@ export function generateReportHTML(params: {
   tips: string[];
   suggestions: string[];
   reflectionAnswer?: string;
-  primaryArchetype: { name: string; emoji: string; trait: string };
-  secondaryArchetype: { name: string; emoji: string; trait: string };
 }): string {
   const {
     playerName, fqScore, bandLevel, bandEmoji, bandMeaning,
     normalizedScores, questionsAndAnswers, tips, suggestions,
-    reflectionAnswer, primaryArchetype, secondaryArchetype,
+    reflectionAnswer,
   } = params;
 
   const dimensionRows = dimensionLabels.map((label, i) => `

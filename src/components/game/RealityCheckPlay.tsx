@@ -5,6 +5,7 @@ import { realityQuestions } from '@/data/questions';
 import { Zap, Star, ChevronRight } from 'lucide-react';
 import { useNarration } from '@/hooks/useNarration';
 import MuteButton from './MuteButton';
+import QuizProgressBar from './QuizProgressBar';
 
 const feedbackData = [
   { text: "Noted! 📝" },
@@ -92,22 +93,7 @@ const RealityCheckPlay = () => {
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl p-3 mb-5">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5">
-              <Star size={14} className="text-game-gold" />
-              <span className="text-game-muted text-xs font-body">Progress</span>
-            </div>
-            <span className="text-game-muted text-xs font-body">{Math.round(((state.currentQuestion) / totalQuestions) * 100)}%</span>
-          </div>
-          <div className="h-2 rounded-full overflow-hidden bg-game-bg/50">
-            <motion.div
-              className="h-full rounded-full gold-gradient"
-              animate={{ width: `${((state.currentQuestion) / totalQuestions) * 100}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-        </div>
+        <QuizProgressBar />
 
         <AnimatePresence mode="wait">
           <motion.div

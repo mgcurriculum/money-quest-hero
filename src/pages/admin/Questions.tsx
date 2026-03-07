@@ -38,6 +38,7 @@ const Questions = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterLevel, setFilterLevel] = useState('all');
+  const [filterAgeGroup, setFilterAgeGroup] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Question | null>(null);
   const { toast } = useToast();

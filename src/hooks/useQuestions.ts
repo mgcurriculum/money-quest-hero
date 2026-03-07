@@ -31,26 +31,23 @@ function getAgeGroup(age: string): string {
 
 export function useQuestions(playerAge?: string) {
   const [dbQuestions, setDbQuestions] = useState<DBQuestion[] | null>(null);
-  const [questionsPerLevel, setQuestionsPerLevel] = useState<Record<number, number> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [{ data: qData }, { data: settingsData }] = await Promise.all([
-          supabase.from('questions').select('*').eq('is_active', true).order('level').order('sort_order'),
-          supabase.from('admin_settings').select('*').eq('key', 'questions_per_level').maybeSingle(),
-        ]);
+        const { data: qData } = await supabase
+          .from('questions')
+          .select('*')
+          .eq('is_active', true)
+          .order('level')
+          .order('sort_order');
 
         if (qData && qData.length > 0) {
           setDbQuestions(qData.map(q => ({
             ...q,
             options: q.options as any as OptionItem[],
           })));
-        }
-
-        if (settingsData?.value && typeof settingsData.value === 'object') {
-          setQuestionsPerLevel(settingsData.value as Record<number, number>);
         }
       } catch {
         // fallback to hardcoded
@@ -64,13 +61,7 @@ export function useQuestions(playerAge?: string) {
     const ageGroup = getAgeGroup(playerAge || '');
 
     if (dbQuestions) {
-      let filtered = dbQuestions.filter(q => q.level === level && q.age_groups.includes(ageGroup));
-      const limit = questionsPerLevel?.[level];
-      if (limit && filtered.length > limit) {
-        // Shuffle and take limit
-        filtered = [...filtered].sort(() => Math.random() - 0.5).slice(0, limit);
-        filtered.sort((a, b) => a.sort_order - b.sort_order);
-      }
+      const filtered = dbQuestions.filter(q => q.level === level && q.age_groups.includes(ageGroup));
       return filtered.map(q => ({
         question: q.question_text,
         category: q.category,

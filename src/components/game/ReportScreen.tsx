@@ -4,9 +4,13 @@ import { useGame } from '@/context/GameContext';
 import {
   dimensionLabels,
   dimensionIcons,
-  calculateFQScore,
+  calculateNormalizedScore,
+  archetypes,
+  fqBands as defaultBands,
+  dimensionWeights as defaultWeights,
   levels,
 } from '@/data/questions';
+import { useScoringConfig } from '@/hooks/useScoringConfig';
 import {
   extractQuestionsAndAnswers,
   getFinancialTips,

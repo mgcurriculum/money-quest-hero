@@ -54,6 +54,7 @@ const Questions = () => {
   const [formActive, setFormActive] = useState(true);
   const [formOrder, setFormOrder] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => { fetchQuestions(); }, []);
 

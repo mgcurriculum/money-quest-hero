@@ -90,8 +90,8 @@ const ReportScreen = () => {
           answers: enrichedAnswers as any,
           fq_score: fqScore,
           band_level: band.level,
-          primary_archetype: band.level === 'Financial Beginner' ? 'Reality Explorer' : undefined,
-          secondary_archetype: undefined,
+          primary_archetype: primaryArchetype.name,
+          secondary_archetype: secondaryArchetype.name,
           reflection_answer: state.reflectionAnswer,
         });
       } catch (err) {

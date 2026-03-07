@@ -5,6 +5,7 @@ import {
   dimensionLabels,
   dimensionIcons,
   calculateFQScore,
+  levels,
 } from '@/data/questions';
 import {
   extractQuestionsAndAnswers,
@@ -39,7 +40,7 @@ const ReportScreen = () => {
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
-  const { fqScore, normalizedScores, band } =
+  const { fqScore, normalizedScores, band, primaryArchetype, secondaryArchetype } =
     calculateFQScore(state.answers);
 
   const radarData = dimensionLabels.map((label, i) => ({
@@ -55,6 +56,27 @@ const ReportScreen = () => {
 
     const saveSession = async () => {
       try {
+        // Build detailed Q&A data for admin analytics
+        const detailed = questionsAndAnswers.map((qa, idx) => ({
+          index: idx,
+          level: levels.findIndex(l => l.title === qa.levelTitle) ?? 0,
+          levelTitle: qa.levelTitle,
+          category: qa.levelTitle, // dimension name
+          question: qa.question,
+          selectedOption: qa.selectedOption,
+          selectedEmoji: qa.selectedEmoji,
+          score: qa.score,
+        }));
+
+        const enrichedAnswers = {
+          detailed,
+          raw: state.answers,
+          normalizedScores: normalizedScores.map((s, i) => ({
+            dimension: dimensionLabels[i],
+            score: Math.round(s),
+          })),
+        };
+
         await supabase.from('game_sessions').insert({
           player_name: state.profile.name,
           player_age: state.profile.age,
@@ -65,9 +87,11 @@ const ReportScreen = () => {
           player_district: state.profile.district,
           player_status: state.profile.status,
           player_income_type: state.profile.incomeType,
-          answers: state.answers as any,
+          answers: enrichedAnswers as any,
           fq_score: fqScore,
           band_level: band.level,
+          primary_archetype: primaryArchetype.name,
+          secondary_archetype: secondaryArchetype.name,
           reflection_answer: state.reflectionAnswer,
         });
       } catch (err) {

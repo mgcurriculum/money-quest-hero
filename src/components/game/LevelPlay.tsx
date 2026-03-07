@@ -48,7 +48,7 @@ const LevelPlay = () => {
       setShowFeedback(false);
       setSelectedOption(null);
       setXpGained(0);
-      if (state.currentQuestion < 2) {
+      if (state.currentQuestion < totalScenarios - 1) {
         dispatch({ type: 'NEXT_QUESTION' });
       } else {
         dispatch({ type: 'COMPLETE_LEVEL', level: state.currentLevel });

@@ -1,33 +1,37 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Problem
 
-### Changes
+**Question-wise analytics show nothing** because all 10 existing sessions store answers in the old format (`{0: {0: 4, 1: 3}, ...}` — just raw scores), with no `detailed` array. The `computeQuestionStats` function only reads from `answers.detailed`, so it returns empty for every session.
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+**Dashboard is also too complex** — too many filters and dense charts for a simple admin view.
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+## Plan
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+### 1. Fix question analytics for legacy sessions
+Update `computeQuestionStats` in `dashboardAnalytics.ts` to reconstruct question data from the `raw` format by matching level/index against the hardcoded questions in `data/questions.ts`. This way all 10 existing sessions will populate the Question Insights tab.
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+- Import `realityQuestions` and `levels` from `data/questions.ts`
+- When `detailed` is empty, iterate over `raw` keys (level -> question index -> score) and look up the question text and options from the hardcoded data
+- Reconstruct the selected option from the score index
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+### 2. Apply same fix to dimension scores
+The `getDimensionScores` fallback already computes from raw — verify it works. The `computeDimensionByAgeGroup` and `computeDimensionAverages` should work since they use `getDimensionScores`.
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+### 3. Simplify the Dashboard UI
+- **Reduce filters**: Keep only Age Group, Band, and Date range. Remove Gender, State, Status, Income filters (too granular).
+- **Simplify Overview tab**: Keep stat cards (Total Sessions, Avg Score) and the sessions table. Remove or collapse the charts into a simpler layout.
+- **Simplify Question Insights**: Keep the question selector with distribution chart, and the ranked questions table. Remove the heatmap.
+- **Simplify Financial Expert**: Keep dimension health cards and risk indicators. Remove archetype pairings and reflection summary charts.
+- **Cleaner layout**: Less visual clutter, bigger text, fewer cards.
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+### Files to modify
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+| File | Changes |
+|------|---------|
+| `src/utils/dashboardAnalytics.ts` | Add legacy raw-to-detailed reconstruction in `computeQuestionStats` |
+| `src/pages/admin/Dashboard.tsx` | Remove Gender/State/Status/Income filters |
+| `src/components/admin/DashboardOverview.tsx` | Simplify to stats + table |
+| `src/components/admin/QuestionInsights.tsx` | Remove heatmap table |
+| `src/components/admin/FinancialExpertView.tsx` | Remove archetype pairings and reflection charts |
 

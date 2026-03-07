@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame, PlayerProfile } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
+import { supabase } from '@/integrations/supabase/client';
 import MuteButton from './MuteButton';
 
-const statusOptions = [
+const fallbackStatusOptions = [
   { label: '🎒 In school (Class 11/12)', value: 'school' },
   { label: '🎓 In college', value: 'college' },
   { label: '🧑‍💻 Doing a course or skill program', value: 'skill' },
@@ -12,13 +13,23 @@ const statusOptions = [
   { label: '🚀 Running a business / startup', value: 'business' },
 ];
 
-const incomeOptions = [
+const fallbackIncomeOptions = [
   { label: '👨‍👩‍👧 Fully dependent on parents', value: 'dependent' },
   { label: '💸 Pocket money from family', value: 'pocket' },
   { label: '🧑‍💻 Freelance / gig work', value: 'freelance' },
   { label: '💼 Salary from job', value: 'salary' },
   { label: '🚀 Business / startup income', value: 'business' },
 ];
+
+function getAgeGroup(age: string): string {
+  if (!age) return '18-25';
+  const n = parseInt(age);
+  if (isNaN(n) || n < 18) return '18-25';
+  if (n <= 25) return '18-25';
+  if (n <= 39) return '26-39';
+  if (n <= 59) return '40-59';
+  return '60+';
+}
 
 const PROFILE_TEXT_0 = "Let's get to know you a bit! Just fill in your name, and optionally your age and gender. This helps us personalize your results.";
 const PROFILE_TEXT_1 = "Great! Now tell me — what best describes your current stage in life?";
@@ -34,6 +45,38 @@ const ProfileScreen = () => {
     status: '', incomeType: '',
   });
   const [step, setStep] = useState(0);
+
+  // Dynamic options from DB
+  const [statusOptions, setStatusOptions] = useState(fallbackStatusOptions);
+  const [incomeOptions, setIncomeOptions] = useState(fallbackIncomeOptions);
+
+  // Fetch profile options when age changes (moving to step 1)
+  useEffect(() => {
+    if (step < 1) return;
+    const ageGroup = getAgeGroup(profile.age);
+    const fetchOptions = async () => {
+      try {
+        const { data } = await supabase
+          .from('profile_options')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order');
+        if (data && data.length > 0) {
+          const statusOpts = data
+            .filter(o => o.type === 'status' && o.age_groups.includes(ageGroup))
+            .map(o => ({ label: o.label, value: o.value }));
+          const incomeOpts = data
+            .filter(o => o.type === 'income' && o.age_groups.includes(ageGroup))
+            .map(o => ({ label: o.label, value: o.value }));
+          if (statusOpts.length > 0) setStatusOptions(statusOpts);
+          if (incomeOpts.length > 0) setIncomeOptions(incomeOpts);
+        }
+      } catch {
+        // keep fallbacks
+      }
+    };
+    fetchOptions();
+  }, [step, profile.age]);
 
   useEffect(() => {
     if (!state.isMuted && hasNarrated.current !== step) {

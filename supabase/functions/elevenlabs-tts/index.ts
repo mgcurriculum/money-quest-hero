@@ -18,31 +18,47 @@ serve(async (req) => {
       throw new Error('ELEVENLABS_API_KEY is not configured');
     }
 
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId || 'Txmsc1sMMJjB3YTRQgpO'}?output_format=mp3_22050_32`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': ELEVENLABS_API_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_multilingual_v2',
-          voice_settings: {
-            stability: 0.55,
-            similarity_boost: 0.8,
-            style: 0.3,
-            use_speaker_boost: true,
-            speed: 1.0,
-          },
-        }),
-      }
-    );
+    const maxRetries = 3;
+    let response: Response | null = null;
 
-    if (!response.ok) {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      response = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId || 'Txmsc1sMMJjB3YTRQgpO'}?output_format=mp3_22050_32`,
+        {
+          method: 'POST',
+          headers: {
+            'xi-api-key': ELEVENLABS_API_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text,
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: {
+              stability: 0.55,
+              similarity_boost: 0.8,
+              style: 0.3,
+              use_speaker_boost: true,
+              speed: 1.0,
+            },
+          }),
+        }
+      );
+
+      if (response.ok) break;
+
+      if (response.status === 409 && attempt < maxRetries - 1) {
+        const delay = 1000 * (attempt + 1);
+        console.log(`409 conflict, retrying in ${delay}ms (attempt ${attempt + 1})`);
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+
       const errorText = await response.text();
       throw new Error(`ElevenLabs API error [${response.status}]: ${errorText}`);
+    }
+
+    if (!response || !response.ok) {
+      throw new Error('Failed after retries');
     }
 
     const audioBuffer = await response.arrayBuffer();

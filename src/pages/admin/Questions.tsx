@@ -152,7 +152,61 @@ const Questions = () => {
     });
   };
 
-  if (loading) {
+  const handleExport = () => {
+    const filtered = getFilteredQuestions(activeTab);
+    if (filtered.length === 0) {
+      toast({ title: 'No questions to export', description: `No questions found for age group ${activeTab}.`, variant: 'destructive' });
+      return;
+    }
+    const csv = exportQuestionsToCsv(filtered.map(q => ({
+      ...q,
+      options: (q.options as any) || [],
+    })));
+    downloadCsv(csv, `questions-${activeTab}.csv`);
+    toast({ title: 'Exported', description: `${filtered.length} questions exported for ${activeTab}.` });
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      setImporting(true);
+      try {
+        const text = await file.text();
+        const parsed = parseCsvToQuestions(text);
+        if (parsed.length === 0) {
+          toast({ title: 'Import failed', description: 'No valid questions found in CSV.', variant: 'destructive' });
+          setImporting(false);
+          return;
+        }
+        const rows = parsed.map(q => ({
+          question_text: q.question_text,
+          category: q.category,
+          level: q.level,
+          age_groups: q.age_groups.length > 0 ? q.age_groups : [activeTab],
+          options: q.options as any,
+          is_active: q.is_active,
+          sort_order: q.sort_order,
+          updated_at: new Date().toISOString(),
+        }));
+        const { error } = await supabase.from('questions').insert(rows);
+        if (error) {
+          toast({ title: 'Import error', description: error.message, variant: 'destructive' });
+        } else {
+          toast({ title: 'Imported', description: `${rows.length} questions imported successfully.` });
+          fetchQuestions();
+        }
+      } catch {
+        toast({ title: 'Import failed', description: 'Could not read CSV file.', variant: 'destructive' });
+      }
+      setImporting(false);
+    };
+    input.click();
+  };
+
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 

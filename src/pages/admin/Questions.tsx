@@ -194,7 +194,7 @@ const Questions = () => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>{cat.label}</span>
-                <Badge variant="secondary">{levelQs.length} questions</Badge>
+                <Badge variant="secondary">{levelQs.length} question{levelQs.length !== 1 ? 's' : ''}{filterAgeGroup !== 'all' ? ` for ${filterAgeGroup}` : ''}</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">

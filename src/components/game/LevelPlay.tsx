@@ -60,6 +60,8 @@ const LevelPlay = () => {
     i === totalScenarios - 1 ? "Final Quest!" : `Quest ${i + 1} of ${totalScenarios}`
   );
 
+  if (!scenario) return null;
+
   return (
     <div className="min-h-screen game-gradient px-4 py-6 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

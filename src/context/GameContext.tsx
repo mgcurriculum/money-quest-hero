@@ -94,7 +94,8 @@ function reducer(state: GameState, action: Action): GameState {
     case 'SET_LANGUAGE': return { ...state, language: action.lang };
     case 'SET_MUTE': return { ...state, isMuted: action.value };
     case 'SET_CAMPAIGN': return { ...state, campaignId: action.campaignId };
-    case 'RESET': return { ...initialState, campaignId: state.campaignId };
+    case 'SET_CAMPAIGN_CODE': return { ...state, campaignCode: action.code };
+    case 'RESET': return { ...initialState, campaignId: state.campaignId, campaignCode: state.campaignCode };
     default: return state;
   }
 }

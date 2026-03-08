@@ -41,6 +41,7 @@ type Action =
   | { type: 'SET_REFLECTION'; answer: string }
   | { type: 'SET_LANGUAGE'; lang: 'en' | 'ml' }
   | { type: 'SET_MUTE'; value: boolean }
+  | { type: 'SET_CAMPAIGN'; campaignId: string | null }
   | { type: 'RESET' };
 
 const initialState: GameState = {

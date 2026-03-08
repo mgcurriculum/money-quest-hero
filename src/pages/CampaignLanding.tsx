@@ -18,6 +18,7 @@ interface CampaignData {
   name: string;
   slug: string;
   is_active: boolean;
+  campaign_code: string;
 }
 
 const CampaignInit = ({ campaign }: { campaign: CampaignData }) => {

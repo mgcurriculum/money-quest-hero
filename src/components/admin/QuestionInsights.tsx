@@ -66,8 +66,17 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="option" fontSize={9} angle={-15} textAnchor="end" height={60} />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => [value, 'Responses']} labelFormatter={(label) => distributionData.find(d => d.option === label)?.fullOption || label} />
-                    <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    <Tooltip
+                      formatter={(value: number) => {
+                        const pct = selectedStat ? ((value / selectedStat.totalResponses) * 100).toFixed(1) : '0';
+                        return [`${value} (${pct}%)`, 'Responses'];
+                      }}
+                      labelFormatter={(label) => distributionData.find(d => d.option === label)?.fullOption || label}
+                    />
+                    <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} label={({ x, y, width, value }: any) => {
+                      const pct = selectedStat ? ((value / selectedStat.totalResponses) * 100).toFixed(0) : '0';
+                      return <text x={x + width / 2} y={y - 5} fill="hsl(var(--muted-foreground))" textAnchor="middle" fontSize={10}>{pct}%</text>;
+                    }} />
                   </BarChart>
                 </ResponsiveContainer>
               )}

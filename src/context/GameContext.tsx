@@ -55,6 +55,7 @@ const initialState: GameState = {
   reflectionAnswer: '',
   language: 'en',
   isMuted: false,
+  campaignId: null,
 };
 
 function reducer(state: GameState, action: Action): GameState {

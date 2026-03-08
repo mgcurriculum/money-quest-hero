@@ -58,6 +58,7 @@ const initialState: GameState = {
   language: 'en',
   isMuted: false,
   campaignId: null,
+  campaignCode: null,
 };
 
 function reducer(state: GameState, action: Action): GameState {

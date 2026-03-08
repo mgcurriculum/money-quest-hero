@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
@@ -24,6 +24,13 @@ const SpinWheel = ({ participants, onComplete, existingWinner }: SpinWheelProps)
   const [spinning, setSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [selected, setSelected] = useState<Participant | null>(existingWinner);
+
+  // Sync selected winner when parent updates after spin
+  useEffect(() => {
+    if (!spinning) {
+      setSelected(existingWinner);
+    }
+  }, [existingWinner, spinning]);
 
   const spin = () => {
     if (spinning || participants.length === 0) return;

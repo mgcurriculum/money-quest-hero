@@ -47,7 +47,7 @@ const CampaignDashboard = () => {
 
     const { data: s } = await supabase
       .from('game_sessions')
-      .select('id, player_name, player_email, player_phone, fq_score, band_level, created_at')
+      .select('id, player_name, player_email, player_phone, fq_score, band_level, created_at, answers')
       .eq('campaign_id', id)
       .order('created_at', { ascending: false });
     if (s) {

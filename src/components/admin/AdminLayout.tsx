@@ -2,11 +2,12 @@ import { useEffect } from 'react';
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, HelpCircle, Settings, LogOut, Loader2 } from 'lucide-react';
+import { LayoutDashboard, HelpCircle, Settings, LogOut, Loader2, Megaphone } from 'lucide-react';
 
 const navItems = [
   { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
   { label: 'Questions', path: '/admin/questions', icon: HelpCircle },
+  { label: 'Campaigns', path: '/admin/campaigns', icon: Megaphone },
   { label: 'Settings', path: '/admin/settings', icon: Settings },
 ];
 

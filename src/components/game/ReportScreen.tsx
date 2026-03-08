@@ -117,7 +117,8 @@ const ReportScreen = () => {
           primary_archetype: primaryArchetype.name,
           secondary_archetype: secondaryArchetype.name,
           reflection_answer: state.reflectionAnswer,
-        });
+          campaign_id: state.campaignId || null,
+        } as any);
       } catch (err) {
         console.error('Failed to save session:', err);
       }

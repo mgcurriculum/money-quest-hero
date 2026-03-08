@@ -20,45 +20,24 @@ interface CampaignData {
   is_active: boolean;
 }
 
+const CampaignInit = ({ campaign }: { campaign: CampaignData }) => {
+  const { dispatch } = useGame();
+  useEffect(() => {
+    dispatch({ type: 'SET_CAMPAIGN', campaignId: campaign.id });
+  }, [campaign.id, dispatch]);
+  return null;
+};
+
 const CampaignGameFlow = ({ campaign }: { campaign: CampaignData }) => {
   const { state } = useGame();
-  const [joinStep, setJoinStep] = useState<'check' | 'game' | null>(null);
-  const [existingSession, setExistingSession] = useState<any>(null);
-  const [checkingUser, setCheckingUser] = useState(false);
-
-  // If in 'check' step, show the join screen
-  if (joinStep === 'check' && existingSession) {
-    return (
-      <CampaignJoinScreen
-        campaign={campaign}
-        existingSession={existingSession}
-        onJoinExisting={async () => {
-          // Clone existing session into this campaign
-          await supabase.from('game_sessions').insert({
-            ...existingSession,
-            id: undefined,
-            campaign_id: campaign.id,
-            created_at: undefined,
-          } as any);
-          // Show a success message or redirect
-          setJoinStep('game');
-          // Jump to report
-        }}
-        onRetake={() => setJoinStep('game')}
-      />
-    );
-  }
 
   switch (state.step) {
     case 'welcome': return <WelcomeScreen />;
     case 'consent': return <ConsentScreen />;
-    case 'profile': return <ProfileScreen campaignId={campaign.id} onExistingUser={(session: any) => {
-      setExistingSession(session);
-      setJoinStep('check');
-    }} />;
+    case 'profile': return <ProfileScreen />;
     case 'level': return state.currentLevel === 0 ? <RealityCheckPlay /> : <LevelPlay />;
     case 'reflection': return <ReflectionScreen />;
-    case 'report': return <ReportScreen campaignId={campaign.id} />;
+    case 'report': return <ReportScreen />;
     default: return <WelcomeScreen />;
   }
 };
@@ -101,6 +80,7 @@ const CampaignLanding = () => {
 
   return (
     <GameProvider>
+      <CampaignInit campaign={campaign!} />
       <GlobalProgressBar />
       <CampaignGameFlow campaign={campaign!} />
     </GameProvider>

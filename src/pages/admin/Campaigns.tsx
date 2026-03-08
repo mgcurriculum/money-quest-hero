@@ -16,6 +16,7 @@ interface Campaign {
   name: string;
   description: string | null;
   slug: string;
+  campaign_code: string;
   is_active: boolean;
   created_at: string;
   response_count?: number;

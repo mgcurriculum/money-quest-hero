@@ -163,6 +163,19 @@ const ProfileScreen = () => {
                 className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
               />
             </div>
+            <div>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Campaign Code (optional)</label>
+              <input
+                type="text"
+                maxLength={5}
+                value={campaignCode}
+                onChange={e => { setCampaignCode(e.target.value.toUpperCase()); setCampaignCodeError(''); }}
+                placeholder="e.g. AB12C"
+                readOnly={!!state.campaignCode}
+                className={`w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border ${campaignCodeError ? 'border-red-500' : 'border-game-card'} focus:border-game-gold focus:outline-none transition-colors ${state.campaignCode ? 'opacity-70' : ''}`}
+              />
+              {campaignCodeError && <p className="text-red-400 text-xs mt-1">{campaignCodeError}</p>}
+            </div>
           </div>
         )}
 

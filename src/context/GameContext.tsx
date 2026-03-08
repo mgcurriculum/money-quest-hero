@@ -43,6 +43,7 @@ type Action =
   | { type: 'SET_LANGUAGE'; lang: 'en' | 'ml' }
   | { type: 'SET_MUTE'; value: boolean }
   | { type: 'SET_CAMPAIGN'; campaignId: string | null }
+  | { type: 'SET_CAMPAIGN_CODE'; code: string | null }
   | { type: 'RESET' };
 
 const initialState: GameState = {

@@ -40,6 +40,7 @@ export type Database = {
       }
       campaigns: {
         Row: {
+          campaign_code: string
           created_at: string
           created_by: string | null
           description: string | null
@@ -51,6 +52,7 @@ export type Database = {
           winner_session_id: string | null
         }
         Insert: {
+          campaign_code: string
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -62,6 +64,7 @@ export type Database = {
           winner_session_id?: string | null
         }
         Update: {
+          campaign_code?: string
           created_at?: string
           created_by?: string | null
           description?: string | null

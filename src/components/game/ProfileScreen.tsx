@@ -45,7 +45,8 @@ const ProfileScreen = () => {
     status: '', incomeType: '',
   });
   const [step, setStep] = useState(0);
-
+  const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
+  const [campaignCodeError, setCampaignCodeError] = useState('');
   // Dynamic options from DB
   const [statusOptions, setStatusOptions] = useState(fallbackStatusOptions);
   const [incomeOptions, setIncomeOptions] = useState(fallbackIncomeOptions);
@@ -91,7 +92,31 @@ const ProfileScreen = () => {
     setProfile(p => ({ ...p, [field]: value }));
   };
 
+  const [validatingCode, setValidatingCode] = useState(false);
   const canProceedStep0 = profile.name.trim().length > 0;
+
+  const handleStep0Next = async () => {
+    stop();
+    // If campaign code entered and not already set from QR
+    if (campaignCode.trim() && !state.campaignCode) {
+      setValidatingCode(true);
+      setCampaignCodeError('');
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('id, campaign_code')
+        .eq('campaign_code', campaignCode.trim().toUpperCase())
+        .eq('is_active', true)
+        .single();
+      setValidatingCode(false);
+      if (error || !data) {
+        setCampaignCodeError('Invalid campaign code');
+        return;
+      }
+      dispatch({ type: 'SET_CAMPAIGN', campaignId: data.id });
+      dispatch({ type: 'SET_CAMPAIGN_CODE', code: data.campaign_code });
+    }
+    setStep(1);
+  };
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
@@ -162,6 +187,19 @@ const ProfileScreen = () => {
                 className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
               />
             </div>
+            <div>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Campaign Code (optional)</label>
+              <input
+                type="text"
+                maxLength={5}
+                value={campaignCode}
+                onChange={e => { setCampaignCode(e.target.value.toUpperCase()); setCampaignCodeError(''); }}
+                placeholder="e.g. AB12C"
+                readOnly={!!state.campaignCode}
+                className={`w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border ${campaignCodeError ? 'border-red-500' : 'border-game-card'} focus:border-game-gold focus:outline-none transition-colors ${state.campaignCode ? 'opacity-70' : ''}`}
+              />
+              {campaignCodeError && <p className="text-red-400 text-xs mt-1">{campaignCodeError}</p>}
+            </div>
           </div>
         )}
 
@@ -207,11 +245,11 @@ const ProfileScreen = () => {
         <div className="mt-6 space-y-3">
           {step === 0 && (
             <button
-              disabled={!canProceedStep0}
-              onClick={() => { stop(); setStep(1); }}
+              disabled={!canProceedStep0 || validatingCode}
+              onClick={handleStep0Next}
               className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceedStep0 ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
             >
-              Next →
+              {validatingCode ? 'Validating...' : 'Next →'}
             </button>
           )}
           <button

@@ -16,6 +16,7 @@ interface Campaign {
   name: string;
   description: string | null;
   slug: string;
+  campaign_code: string;
   is_active: boolean;
   created_at: string;
   response_count?: number;
@@ -151,6 +152,7 @@ const Campaigns = () => {
                       <p className="text-sm text-muted-foreground mb-2">{c.description}</p>
                     )}
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span className="font-mono font-semibold text-foreground">Code: {c.campaign_code}</span>
                       <span>{c.response_count} responses</span>
                       <span>Avg Score: {c.avg_score}/1000</span>
                       <span>{new Date(c.created_at).toLocaleDateString()}</span>

@@ -18,13 +18,15 @@ interface CampaignData {
   name: string;
   slug: string;
   is_active: boolean;
+  campaign_code: string;
 }
 
 const CampaignInit = ({ campaign }: { campaign: CampaignData }) => {
   const { dispatch } = useGame();
   useEffect(() => {
     dispatch({ type: 'SET_CAMPAIGN', campaignId: campaign.id });
-  }, [campaign.id, dispatch]);
+    dispatch({ type: 'SET_CAMPAIGN_CODE', code: campaign.campaign_code });
+  }, [campaign.id, campaign.campaign_code, dispatch]);
   return null;
 };
 
@@ -53,7 +55,7 @@ const CampaignLanding = () => {
       if (!slug) { setError('Invalid campaign link'); setLoading(false); return; }
       const { data, error: err } = await supabase
         .from('campaigns')
-        .select('id, name, slug, is_active')
+        .select('id, name, slug, is_active, campaign_code')
         .eq('slug', slug)
         .eq('is_active', true)
         .single();

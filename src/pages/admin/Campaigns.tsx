@@ -211,6 +211,9 @@ const Campaigns = () => {
               <div className="bg-white p-4 rounded-xl inline-block">
                 <QRCodeSVG value={getCampaignUrl(qrOpen.slug)} size={220} />
               </div>
+              <p className="text-lg font-bold font-mono tracking-widest text-foreground">
+                Campaign Code: {qrOpen.campaign_code}
+              </p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <LinkIcon className="h-4 w-4" />
                 <span className="truncate max-w-[300px]">{getCampaignUrl(qrOpen.slug)}</span>

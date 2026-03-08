@@ -181,6 +181,11 @@ const CampaignDashboard = () => {
         </Card>
       )}
 
+      {/* Question Insights */}
+      {sessions.length > 0 && (
+        <QuestionInsights sessions={sessions as any} />
+      )}
+
       {/* Sessions Table */}
       <Card>
         <CardHeader><CardTitle className="text-sm">Responses ({sessions.length})</CardTitle></CardHeader>

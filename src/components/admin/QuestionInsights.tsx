@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Progress } from '@/components/ui/progress';
 import type { Tables } from '@/integrations/supabase/types';
 import { computeQuestionStats } from '@/utils/dashboardAnalytics';
 
@@ -85,39 +86,51 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
         </CardContent>
       </Card>
 
-      {/* All Questions Ranked */}
+      {/* All Questions with Distribution */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Questions Ranked by Average Score (Weakest First)</CardTitle>
+          <CardTitle className="text-base">All Questions – Answer Distribution</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Level</TableHead>
-                <TableHead>Question</TableHead>
-                <TableHead className="text-right">Responses</TableHead>
-                <TableHead className="text-right">Avg Score</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {questionStats.map((q, i) => (
-                <TableRow key={i}>
-                  <TableCell className="text-xs text-muted-foreground whitespace-nowrap">L{q.level}</TableCell>
-                  <TableCell className="text-sm max-w-[300px] truncate">{q.question.replace(/[🎬🎨🛍️⚡📞😨🎮🏛️🎰🕸️📱🎁]/g, '').trim()}</TableCell>
-                  <TableCell className="text-right text-sm">{q.totalResponses}</TableCell>
-                  <TableCell className={`text-right text-sm font-semibold ${scoreColor(q.avgScore)}`}>{q.avgScore}</TableCell>
-                </TableRow>
-              ))}
-              {questionStats.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                    No question data available yet.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          {questionStats.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No question data available yet.</p>
+          ) : (
+            <Accordion type="multiple" className="w-full">
+              {questionStats.map((q, i) => {
+                const distEntries = Object.entries(q.distribution).sort((a, b) => b[1] - a[1]);
+                return (
+                  <AccordionItem key={i} value={`q-${i}`}>
+                    <AccordionTrigger className="text-left gap-2 py-3">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="text-xs text-muted-foreground shrink-0">L{q.level}</span>
+                        <span className="text-sm truncate">{q.question.replace(/[🎬🎨🛍️⚡📞😨🎮🏛️🎰🕸️📱🎁]/g, '').trim()}</span>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 mr-2">
+                        <span className="text-xs text-muted-foreground">{q.totalResponses} resp</span>
+                        <span className={`text-xs font-semibold ${scoreColor(q.avgScore)}`}>{q.avgScore}/5</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2 pl-6">
+                        {distEntries.map(([option, count]) => {
+                          const pct = q.totalResponses > 0 ? (count / q.totalResponses) * 100 : 0;
+                          return (
+                            <div key={option} className="space-y-1">
+                              <div className="flex justify-between text-xs">
+                                <span className="text-foreground truncate max-w-[70%]">{option}</span>
+                                <span className="text-muted-foreground font-medium">{pct.toFixed(0)}% ({count})</span>
+                              </div>
+                              <Progress value={pct} className="h-2" />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          )}
         </CardContent>
       </Card>
     </div>

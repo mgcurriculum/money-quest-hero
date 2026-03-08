@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Users, Trophy, BarChart3, Loader2 } from 'lucide-react';
 import SpinWheel from '@/components/admin/SpinWheel';
+import QuestionInsights from '@/components/admin/QuestionInsights';
 import { useToast } from '@/hooks/use-toast';
+import type { Json } from '@/integrations/supabase/types';
 
 interface Session {
   id: string;
@@ -16,6 +18,7 @@ interface Session {
   fq_score: number | null;
   band_level: string | null;
   created_at: string;
+  answers: Json;
 }
 
 interface Campaign {

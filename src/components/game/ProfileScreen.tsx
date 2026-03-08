@@ -245,11 +245,11 @@ const ProfileScreen = () => {
         <div className="mt-6 space-y-3">
           {step === 0 && (
             <button
-              disabled={!canProceedStep0}
-              onClick={() => { stop(); setStep(1); }}
+              disabled={!canProceedStep0 || validatingCode}
+              onClick={handleStep0Next}
               className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceedStep0 ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
             >
-              Next →
+              {validatingCode ? 'Validating...' : 'Next →'}
             </button>
           )}
           <button

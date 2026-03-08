@@ -38,10 +38,55 @@ export type Database = {
         }
         Relationships: []
       }
+      campaigns: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+          winner_session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+          winner_session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+          winner_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_winner_session_id_fkey"
+            columns: ["winner_session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_sessions: {
         Row: {
           answers: Json
           band_level: string | null
+          campaign_id: string | null
           created_at: string
           fq_score: number | null
           id: string
@@ -62,6 +107,7 @@ export type Database = {
         Insert: {
           answers?: Json
           band_level?: string | null
+          campaign_id?: string | null
           created_at?: string
           fq_score?: number | null
           id?: string
@@ -82,6 +128,7 @@ export type Database = {
         Update: {
           answers?: Json
           band_level?: string | null
+          campaign_id?: string | null
           created_at?: string
           fq_score?: number | null
           id?: string
@@ -99,7 +146,15 @@ export type Database = {
           reflection_answer?: string | null
           secondary_archetype?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "game_sessions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profile_options: {
         Row: {

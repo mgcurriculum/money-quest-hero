@@ -90,7 +90,8 @@ function reducer(state: GameState, action: Action): GameState {
     case 'SET_REFLECTION': return { ...state, reflectionAnswer: action.answer };
     case 'SET_LANGUAGE': return { ...state, language: action.lang };
     case 'SET_MUTE': return { ...state, isMuted: action.value };
-    case 'RESET': return initialState;
+    case 'SET_CAMPAIGN': return { ...state, campaignId: action.campaignId };
+    case 'RESET': return { ...initialState, campaignId: state.campaignId };
     default: return state;
   }
 }

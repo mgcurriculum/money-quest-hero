@@ -28,6 +28,7 @@ export interface GameState {
   language: 'en' | 'ml';
   isMuted: boolean;
   campaignId: string | null;
+  campaignCode: string | null;
 }
 
 type Action =

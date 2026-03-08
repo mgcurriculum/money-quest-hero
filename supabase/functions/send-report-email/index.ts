@@ -5,6 +5,27 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+// AWS Signature V4 helpers
+function toHex(buffer: ArrayBuffer): string {
+  return [...new Uint8Array(buffer)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hmac(key: ArrayBuffer | Uint8Array, data: string): Promise<ArrayBuffer> {
+  const cryptoKey = await crypto.subtle.importKey('raw', key instanceof ArrayBuffer ? key : key.buffer, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return crypto.subtle.sign('HMAC', cryptoKey, new TextEncoder().encode(data));
+}
+
+async function sha256(data: string): Promise<string> {
+  return toHex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data)));
+}
+
+async function getSignatureKey(secretKey: string, dateStamp: string, region: string, service: string): Promise<ArrayBuffer> {
+  const kDate = await hmac(new TextEncoder().encode('AWS4' + secretKey), dateStamp);
+  const kRegion = await hmac(kDate, region);
+  const kService = await hmac(kRegion, service);
+  return hmac(kService, 'aws4_request');
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -24,6 +45,20 @@ serve(async (req) => {
       });
     }
 
+    const accessKeyId = Deno.env.get('AWS_ACCESS_KEY_ID');
+    const secretAccessKey = Deno.env.get('AWS_SECRET_ACCESS_KEY');
+    const region = Deno.env.get('AWS_REGION') || 'ap-south-1';
+    const fromEmail = Deno.env.get('AWS_SES_FROM_EMAIL') || 'info@finquo.ai';
+
+    if (!accessKeyId || !secretAccessKey) {
+      console.error('AWS credentials not configured');
+      return new Response(JSON.stringify({ error: 'Email service not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Build HTML email body
     const dimensionRows = (dimensionScores || []).map((d: any) =>
       `<tr>
         <td style="padding:10px 12px;border-bottom:1px solid #e8e0f0;font-size:14px;color:#333;">${d.icon} ${d.label}</td>
@@ -36,7 +71,6 @@ serve(async (req) => {
       </tr>`
     ).join('');
 
-    // Group Q&A by level
     const qaByLevel: Record<string, any[]> = {};
     (questionsAndAnswers || []).forEach((qa: any) => {
       const key = `${qa.levelIcon} ${qa.levelTitle}`;
@@ -64,94 +98,85 @@ serve(async (req) => {
       <div style="padding:10px 14px;background:#e8f5e9;border-radius:8px;margin-bottom:6px;font-size:12px;color:#2e7d32;line-height:1.5;">${s}</div>
     `).join('');
 
-
-    const htmlBody = `
-<!DOCTYPE html>
+    const htmlBody = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:24px;">
-
     <div style="text-align:center;padding:24px;background:linear-gradient(135deg,#2D1B69,#1a103f);border-radius:16px;color:#fff;margin-bottom:16px;">
       <div style="font-size:12px;font-weight:600;letter-spacing:2px;opacity:0.8;margin-bottom:4px;">FINQUO VERSITY</div>
       <h1 style="margin:0 0 4px;font-size:22px;">FQ Test Report</h1>
       <p style="margin:0;opacity:0.7;font-size:12px;">${playerName}'s Financial Journey Results</p>
     </div>
-    
     <div style="text-align:center;padding:24px;margin-bottom:16px;background:#f8f6ff;border-radius:12px;border:1px solid #e8e0f0;">
       <div style="font-size:48px;margin-bottom:4px;">${bandEmoji}</div>
       <div style="font-size:42px;font-weight:800;color:#2D1B69;">${fqScore}<span style="font-size:16px;color:#999;font-weight:400;">/1000</span></div>
       <div style="font-size:16px;font-weight:700;color:#4FC3F7;margin-top:4px;">${bandLevel}</div>
       <div style="font-size:11px;color:#888;margin-top:4px;">${bandMeaning}</div>
     </div>
-
     <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #e8e0f0;">
       <h2 style="font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:center;margin:0 0 12px;">Dimension Breakdown</h2>
-      <table style="width:100%;border-collapse:collapse;">
-        ${dimensionRows}
-      </table>
+      <table style="width:100%;border-collapse:collapse;">${dimensionRows}</table>
     </div>
-
-    ${qaHTML ? `
-    <div style="margin-bottom:16px;">
-      <h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">📝 Your Answers</h2>
-      ${qaHTML}
-    </div>` : ''}
-
-    ${tipsHTML ? `
-    <div style="margin-bottom:16px;">
-      <h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">🎯 Personalized Tips</h2>
-      ${tipsHTML}
-    </div>` : ''}
-
-    ${suggestionsHTML ? `
-    <div style="margin-bottom:16px;">
-      <h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">💡 Suggestions</h2>
-      ${suggestionsHTML}
-    </div>` : ''}
-
-
-    <div style="text-align:center;margin-top:20px;">
-      <p style="font-size:11px;color:#aaa;">Powered by FinQuo Versity</p>
-    </div>
+    ${qaHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">📝 Your Answers</h2>${qaHTML}</div>` : ''}
+    ${tipsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">🎯 Personalized Tips</h2>${tipsHTML}</div>` : ''}
+    ${suggestionsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">💡 Suggestions</h2>${suggestionsHTML}</div>` : ''}
+    <div style="text-align:center;margin-top:20px;"><p style="font-size:11px;color:#aaa;">Powered by FinQuo Versity</p></div>
   </div>
 </body>
 </html>`;
 
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) {
-      console.error('LOVABLE_API_KEY not configured');
-      return new Response(JSON.stringify({ success: true, note: 'Email saved but sending not configured' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // Send via AWS SES using SigV4
+    const subject = `${playerName}'s FQ Test Report — Score: ${fqScore}/1000 ${bandEmoji}`;
+    const now = new Date();
+    const amzDate = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const dateStamp = amzDate.slice(0, 8);
+    const service = 'ses';
+    const host = `email.${region}.amazonaws.com`;
+    const endpoint = `https://${host}/`;
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-    const projectId = supabaseUrl.replace('https://', '').split('.')[0];
+    const params = new URLSearchParams();
+    params.append('Action', 'SendEmail');
+    params.append('Source', fromEmail);
+    params.append('Destination.ToAddresses.member.1', email);
+    params.append('Message.Subject.Data', subject);
+    params.append('Message.Subject.Charset', 'UTF-8');
+    params.append('Message.Body.Html.Data', htmlBody);
+    params.append('Message.Body.Html.Charset', 'UTF-8');
+    params.append('Version', '2010-12-01');
 
-    const emailResponse = await fetch('https://api.lovable.dev/api/v1/emails/send', {
+    const requestBody = params.toString();
+    const payloadHash = await sha256(requestBody);
+    const canonicalHeaders = `content-type:application/x-www-form-urlencoded\nhost:${host}\nx-amz-date:${amzDate}\n`;
+    const signedHeaders = 'content-type;host;x-amz-date';
+    const canonicalRequest = `POST\n/\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+    const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+    const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${credentialScope}\n${await sha256(canonicalRequest)}`;
+    const signingKey = await getSignatureKey(secretAccessKey, dateStamp, region, service);
+    const signature = toHex(await hmac(signingKey, stringToSign));
+    const authHeader = `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+    const sesResponse = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Host': host,
+        'X-Amz-Date': amzDate,
+        'Authorization': authHeader,
       },
-      body: JSON.stringify({
-        projectId,
-        to: email,
-        subject: `${playerName}'s FQ Test Report — Score: ${fqScore}/1000 ${bandEmoji}`,
-        html: htmlBody,
-        purpose: 'transactional',
-      }),
+      body: requestBody,
     });
 
-    if (!emailResponse.ok) {
-      const errText = await emailResponse.text();
-      console.error('Email send failed:', errText);
-      return new Response(JSON.stringify({ success: true, note: 'Email saved, delivery pending' }), {
+    if (!sesResponse.ok) {
+      const errText = await sesResponse.text();
+      console.error('SES send failed:', sesResponse.status, errText);
+      return new Response(JSON.stringify({ error: 'Failed to send email', details: errText }), {
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
+    console.log('Email sent successfully via AWS SES to:', email);
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

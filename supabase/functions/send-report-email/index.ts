@@ -118,16 +118,17 @@ serve(async (req) => {
       <h2 style="font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:center;margin:0 0 12px;">Dimension Breakdown</h2>
       <table style="width:100%;border-collapse:collapse;">${dimensionRows}</table>
     </div>
-    ${qaHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">📝 Your Answers</h2>${qaHTML}</div>` : ''}
-    ${tipsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">🎯 Personalized Tips</h2>${tipsHTML}</div>` : ''}
-    ${suggestionsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">💡 Suggestions</h2>${suggestionsHTML}</div>` : ''}
+    ${qaHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">Your Answers</h2>${qaHTML}</div>` : ''}
+    ${tipsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">Personalized Tips</h2>${tipsHTML}</div>` : ''}
+    ${suggestionsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">Suggestions for You</h2>${suggestionsHTML}</div>` : ''}
     <div style="text-align:center;margin-top:20px;"><p style="font-size:11px;color:#aaa;">Powered by FinQuo Versity</p></div>
   </div>
 </body>
 </html>`;
 
     // Send via AWS SES using SigV4
-    const subject = `${playerName}'s FQ Test Report — Score: ${fqScore}/1000 ${bandEmoji}`;
+    const subject = `Your Financial Intelligence Report from FinQuo Versity`;
+    const plainText = `Hi ${playerName},\n\nThank you for completing the FQ Test on FinQuo Versity.\n\nYour FQ Score: ${fqScore}/1000\nBand: ${bandLevel}\n\nPlease view the HTML version of this email for your full detailed report with dimension breakdown, tips, and suggestions.\n\nBest regards,\nFinQuo Versity Team\nhttps://finquo.ai`;
     const now = new Date();
     const amzDate = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
     const dateStamp = amzDate.slice(0, 8);
@@ -137,12 +138,15 @@ serve(async (req) => {
 
     const params = new URLSearchParams();
     params.append('Action', 'SendEmail');
-    params.append('Source', fromEmail);
+    params.append('Source', `FinQuo Versity <${fromEmail}>`);
+    params.append('ReplyToAddresses.member.1', fromEmail);
     params.append('Destination.ToAddresses.member.1', email);
     params.append('Message.Subject.Data', subject);
     params.append('Message.Subject.Charset', 'UTF-8');
     params.append('Message.Body.Html.Data', htmlBody);
     params.append('Message.Body.Html.Charset', 'UTF-8');
+    params.append('Message.Body.Text.Data', plainText);
+    params.append('Message.Body.Text.Charset', 'UTF-8');
     params.append('Version', '2010-12-01');
 
     const requestBody = params.toString();

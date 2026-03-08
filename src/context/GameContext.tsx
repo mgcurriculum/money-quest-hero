@@ -27,6 +27,7 @@ export interface GameState {
   reflectionAnswer: string;
   language: 'en' | 'ml';
   isMuted: boolean;
+  campaignId: string | null;
 }
 
 type Action =
@@ -40,6 +41,7 @@ type Action =
   | { type: 'SET_REFLECTION'; answer: string }
   | { type: 'SET_LANGUAGE'; lang: 'en' | 'ml' }
   | { type: 'SET_MUTE'; value: boolean }
+  | { type: 'SET_CAMPAIGN'; campaignId: string | null }
   | { type: 'RESET' };
 
 const initialState: GameState = {
@@ -53,6 +55,7 @@ const initialState: GameState = {
   reflectionAnswer: '',
   language: 'en',
   isMuted: false,
+  campaignId: null,
 };
 
 function reducer(state: GameState, action: Action): GameState {
@@ -87,7 +90,8 @@ function reducer(state: GameState, action: Action): GameState {
     case 'SET_REFLECTION': return { ...state, reflectionAnswer: action.answer };
     case 'SET_LANGUAGE': return { ...state, language: action.lang };
     case 'SET_MUTE': return { ...state, isMuted: action.value };
-    case 'RESET': return initialState;
+    case 'SET_CAMPAIGN': return { ...state, campaignId: action.campaignId };
+    case 'RESET': return { ...initialState, campaignId: state.campaignId };
     default: return state;
   }
 }

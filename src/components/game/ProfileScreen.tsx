@@ -45,7 +45,8 @@ const ProfileScreen = () => {
     status: '', incomeType: '',
   });
   const [step, setStep] = useState(0);
-
+  const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
+  const [campaignCodeError, setCampaignCodeError] = useState('');
   // Dynamic options from DB
   const [statusOptions, setStatusOptions] = useState(fallbackStatusOptions);
   const [incomeOptions, setIncomeOptions] = useState(fallbackIncomeOptions);

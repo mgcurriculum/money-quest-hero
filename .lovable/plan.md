@@ -1,14 +1,29 @@
 
 
-## Campaign Buttons in Admin Panel — Already Implemented
+# Add Question Answer Distribution to Campaign Dashboard
 
-The Campaigns feature is already fully wired up in the admin panel:
+## What's needed
+The Campaign Dashboard currently fetches only basic session fields (name, email, score, etc.) but not the `answers` JSON column. To show per-question answer distribution percentages, we need to:
 
-1. **Sidebar navigation**: `AdminLayout.tsx` already includes a "Campaigns" link with a Megaphone icon pointing to `/admin/campaigns`.
-2. **Routes**: `App.tsx` has both `/admin/campaigns` (list) and `/admin/campaigns/:id` (dashboard) routes under the AdminLayout.
-3. **Pages**: `Campaigns.tsx` and `CampaignDashboard.tsx` are already created.
+## Changes
 
-**No code changes are needed.** Navigate to `/admin` in the preview and you should see the "Campaigns" item in the left sidebar.
+### 1. Update `CampaignDashboard.tsx`
+- Add `answers` to the `select()` query for `game_sessions`
+- Update the `Session` interface to include `answers`
+- Import and render the existing `QuestionInsights` component (already built for the main dashboard) which shows:
+  - A dropdown to select any question and see its answer distribution as a bar chart
+  - A ranked table of all questions with response counts and average scores
+- Cast sessions to the format expected by `QuestionInsights` (it expects `Tables<'game_sessions'>`)
 
-If the sidebar item is not appearing, the most likely cause would be a build or caching issue. I can investigate further if you confirm the button is missing after navigating to the admin panel.
+### 2. No new components needed
+The existing `QuestionInsights` component and `computeQuestionStats` utility already handle:
+- Parsing enriched answer data from session JSON
+- Computing per-option counts (distribution)
+- Displaying bar charts with response counts per option
+- The distribution data already contains counts; we just need to also show percentages
+
+### 3. Add percentage display to `QuestionInsights`
+- In the bar chart tooltip and/or distribution display, show percentage alongside count (count / totalResponses * 100)
+
+This reuses existing analytics infrastructure with minimal new code.
 

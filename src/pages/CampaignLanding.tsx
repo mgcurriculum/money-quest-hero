@@ -55,7 +55,7 @@ const CampaignLanding = () => {
       if (!slug) { setError('Invalid campaign link'); setLoading(false); return; }
       const { data, error: err } = await supabase
         .from('campaigns')
-        .select('id, name, slug, is_active')
+        .select('id, name, slug, is_active, campaign_code')
         .eq('slug', slug)
         .eq('is_active', true)
         .single();

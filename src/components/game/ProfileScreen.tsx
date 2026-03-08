@@ -92,7 +92,31 @@ const ProfileScreen = () => {
     setProfile(p => ({ ...p, [field]: value }));
   };
 
+  const [validatingCode, setValidatingCode] = useState(false);
   const canProceedStep0 = profile.name.trim().length > 0;
+
+  const handleStep0Next = async () => {
+    stop();
+    // If campaign code entered and not already set from QR
+    if (campaignCode.trim() && !state.campaignCode) {
+      setValidatingCode(true);
+      setCampaignCodeError('');
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('id, campaign_code')
+        .eq('campaign_code', campaignCode.trim().toUpperCase())
+        .eq('is_active', true)
+        .single();
+      setValidatingCode(false);
+      if (error || !data) {
+        setCampaignCodeError('Invalid campaign code');
+        return;
+      }
+      dispatch({ type: 'SET_CAMPAIGN', campaignId: data.id });
+      dispatch({ type: 'SET_CAMPAIGN_CODE', code: data.campaign_code });
+    }
+    setStep(1);
+  };
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">

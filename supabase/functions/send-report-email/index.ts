@@ -118,9 +118,9 @@ serve(async (req) => {
       <h2 style="font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:center;margin:0 0 12px;">Dimension Breakdown</h2>
       <table style="width:100%;border-collapse:collapse;">${dimensionRows}</table>
     </div>
-    ${qaHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">📝 Your Answers</h2>${qaHTML}</div>` : ''}
-    ${tipsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">🎯 Personalized Tips</h2>${tipsHTML}</div>` : ''}
-    ${suggestionsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">💡 Suggestions</h2>${suggestionsHTML}</div>` : ''}
+    ${qaHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">Your Answers</h2>${qaHTML}</div>` : ''}
+    ${tipsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">Personalized Tips</h2>${tipsHTML}</div>` : ''}
+    ${suggestionsHTML ? `<div style="margin-bottom:16px;"><h2 style="font-size:15px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">Suggestions for You</h2>${suggestionsHTML}</div>` : ''}
     <div style="text-align:center;margin-top:20px;"><p style="font-size:11px;color:#aaa;">Powered by FinQuo Versity</p></div>
   </div>
 </body>

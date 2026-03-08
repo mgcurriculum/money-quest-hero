@@ -25,7 +25,8 @@ const CampaignInit = ({ campaign }: { campaign: CampaignData }) => {
   const { dispatch } = useGame();
   useEffect(() => {
     dispatch({ type: 'SET_CAMPAIGN', campaignId: campaign.id });
-  }, [campaign.id, dispatch]);
+    dispatch({ type: 'SET_CAMPAIGN_CODE', code: campaign.campaign_code });
+  }, [campaign.id, campaign.campaign_code, dispatch]);
   return null;
 };
 

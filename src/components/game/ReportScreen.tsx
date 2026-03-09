@@ -159,7 +159,16 @@ const ReportScreen = () => {
     saveSession();
   }, []);
 
-  const questionsAndAnswers = extractQuestionsAndAnswers(state.answers);
+  const questionsAndAnswers = isAdaptive
+    ? state.adaptiveAnswers.map(a => ({
+        levelTitle: dimensionLabels[a.level] || `Level ${a.level}`,
+        levelIcon: dimensionIcons[a.level] || '📋',
+        question: a.questionText,
+        selectedOption: a.selectedOption,
+        selectedEmoji: a.selectedEmoji,
+        score: a.score,
+      }))
+    : extractQuestionsAndAnswers(state.answers);
   const { tips, suggestions } = getFinancialTips(normalizedScores);
 
   const handleDownloadPDF = () => {

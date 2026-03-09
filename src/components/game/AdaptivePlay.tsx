@@ -6,6 +6,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { dimensionLabels, dimensionIcons } from '@/data/questions';
 import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight } from 'lucide-react';
 import MuteButton from './MuteButton';
+import { getQuestionNarration, getAnswerFeedback } from '@/utils/narrationPrompts';
 
 const feedbackData = [
   { text: "Noted! 📝", icon: <Zap className="text-game-gold" size={28} /> },
@@ -36,7 +37,8 @@ const AdaptivePlay = () => {
   // Narrate on question change
   useEffect(() => {
     if (!state.isMuted && currentQuestion) {
-      const timer = setTimeout(() => speak("Read the question and choose your answer."), 500);
+      const narration = getQuestionNarration(currentQuestion.dimension, currentQuestion.category, questionsAnswered + 1, estimatedTotal);
+      const timer = setTimeout(() => speak(narration), 500);
       return () => clearTimeout(timer);
     }
   }, [state.isMuted, speak, currentQuestion?.id]);
@@ -81,9 +83,9 @@ const AdaptivePlay = () => {
       },
     });
 
-    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
     if (!state.isMuted) {
-      speak(feedbackText);
+      const feedbackNarration = getAnswerFeedback(score, currentQuestion.dimension);
+      speak(feedbackNarration);
     }
 
     setShowFeedback(true);

@@ -481,6 +481,66 @@ const Questions = () => {
               <div><Label>Sort Order</Label><Input type="number" value={formOrder} onChange={e => setFormOrder(Number(e.target.value))} /></div>
               <div className="flex items-center gap-2 pt-6"><Switch checked={formActive} onCheckedChange={setFormActive} /><Label>Active</Label></div>
             </div>
+
+            {/* Adaptive Branching Config */}
+            <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">🔀 Adaptive Branching</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Dimension</Label>
+                  <Select value={formDimension} onValueChange={setFormDimension}>
+                    <SelectTrigger><SelectValue placeholder="Select dimension" /></SelectTrigger>
+                    <SelectContent>
+                      {DIMENSIONS.map(d => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Difficulty</Label>
+                  <Select value={String(formDifficulty)} onValueChange={v => setFormDifficulty(Number(v))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 — Easy</SelectItem>
+                      <SelectItem value="2">2 — Medium</SelectItem>
+                      <SelectItem value="3">3 — Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label className="text-xs">Branch Low (score ≤1)</Label>
+                  <Select value={formBranchLow} onValueChange={setFormBranchLow}>
+                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs">Branch Mid (score = 2)</Label>
+                  <Select value={formBranchMid} onValueChange={setFormBranchMid}>
+                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs">Branch High (score ≥3)</Label>
+                  <Select value={formBranchHigh} onValueChange={setFormBranchHigh}>
+                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">Set branching to control which level the engine jumps to based on the user's answer score. Leave empty for sequential flow.</p>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>

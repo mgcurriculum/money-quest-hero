@@ -1,33 +1,48 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+# Plan: Dynamic & Interactive Voice Narration
 
-### Changes
+## Problem
+Every question plays the same static narration line ("Read the question and choose your answer" / "picture this scenario"), making the voice feel repetitive and robotic.
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+## Solution
+Make narration contextual and varied by generating dynamic prompts based on the question's dimension, category, question number, and progress. Add varied feedback responses tied to the score level (not just rotating through 5 fixed lines).
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+## Changes
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+### 1. Create narration prompt generator — `src/utils/narrationPrompts.ts` (new)
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+A utility with two functions:
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+**`getQuestionNarration(dimension, category, questionNumber, totalQuestions)`** — returns a randomly selected prompt from dimension-specific pools. Examples:
+- Financial Reality: "Let's see where you stand with money right now.", "Time for a reality check on your finances.", "How well do you know your money situation?"
+- Spending: "This one's about your spending habits.", "Let's talk about where your money goes.", "How do you handle the urge to spend?"
+- Saving: "Saving money — easier said than done, right?", "Let's see how you handle putting money aside."
+- Investment: "Now we're getting into investment territory.", "This is about growing your money."
+- Plus milestone prompts at Q5, Q10, Q15: "You're on a roll! Question 10 already.", "Halfway there, keep going!"
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+Each dimension gets 6-8 unique prompts, randomly picked (no repeat of the last used one).
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+**`getAnswerFeedback(score, dimension)`** — returns dynamic feedback based on score level:
+- Score 1-2 (low): "Hmm, there's room to grow here.", "That's honest — and that's the first step."
+- Score 3 (mid): "Not bad at all!", "You're on the right track."
+- Score 4-5 (high): "Now that's a smart move!", "You really know your stuff!"
+- Dimension-specific variants too (e.g., for Saving: "Your saving game is strong!")
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+### 2. Update `AdaptivePlay.tsx`
+- Import `getQuestionNarration` and `getAnswerFeedback`
+- Replace static `speak("Read the question...")` with `speak(getQuestionNarration(currentQuestion.dimension, currentQuestion.category, questionsAnswered, estimatedTotal))`
+- Replace static feedback narration with `speak(getAnswerFeedback(score, currentQuestion.dimension))`
+
+### 3. Update `LevelPlay.tsx`
+- Same pattern: replace static "picture this scenario" with dimension-aware dynamic prompts
+- Replace static feedback with score-aware feedback
+
+### 4. Update `RealityCheckPlay.tsx`
+- Replace static narration with category-aware prompts from the generator
+- Use score-aware feedback on answer
+
+### Files
+- **Create**: `src/utils/narrationPrompts.ts`
+- **Modify**: `src/components/game/AdaptivePlay.tsx`, `src/components/game/LevelPlay.tsx`, `src/components/game/RealityCheckPlay.tsx`
 

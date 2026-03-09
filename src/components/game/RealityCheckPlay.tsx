@@ -6,6 +6,7 @@ import { Zap, Star, ChevronRight } from 'lucide-react';
 import { useNarration } from '@/hooks/useNarration';
 import MuteButton from './MuteButton';
 import QuizProgressBar from './QuizProgressBar';
+import { getQuestionNarration, getAnswerFeedback } from '@/utils/narrationPrompts';
 
 const feedbackData = [
   { text: "Noted! 📝" },

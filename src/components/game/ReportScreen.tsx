@@ -45,11 +45,31 @@ const ReportScreen = () => {
   const [emailSent, setEmailSent] = useState(false);
   const { weights, bands, loading: configLoading } = useScoringConfig();
 
-  // Calculate FQ score with dynamic weights/bands
-  const normalizedScores = Array.from({ length: 7 }, (_, level) => {
-    const levelAnswers = state.answers[level] || {};
-    return calculateNormalizedScore(levelAnswers);
-  });
+  // Calculate FQ score — support both fixed and adaptive modes
+  const isAdaptive = state.assessmentMode === 'adaptive' && state.adaptiveAnswers.length > 0;
+
+  const normalizedScores = (() => {
+    if (isAdaptive) {
+      // Group adaptive answers by level (dimension)
+      const byLevel: Record<number, number[]> = {};
+      state.adaptiveAnswers.forEach(a => {
+        if (!byLevel[a.level]) byLevel[a.level] = [];
+        byLevel[a.level].push(a.score);
+      });
+      return Array.from({ length: 7 }, (_, level) => {
+        const scores = byLevel[level] || [];
+        if (scores.length === 0) return 0;
+        const userScore = scores.reduce((a, b) => a + b, 0);
+        const minScore = scores.length * 1;
+        const maxScore = scores.length * 5;
+        return ((userScore - minScore) / (maxScore - minScore)) * 100;
+      });
+    }
+    return Array.from({ length: 7 }, (_, level) => {
+      const levelAnswers = state.answers[level] || {};
+      return calculateNormalizedScore(levelAnswers);
+    });
+  })();
 
   const weightedTotal = normalizedScores.reduce(
     (sum, score, idx) => sum + score * weights[idx], 0

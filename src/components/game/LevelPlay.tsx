@@ -28,7 +28,8 @@ const LevelPlay = () => {
 
   useEffect(() => {
     if (!state.isMuted && scenario) {
-      const timer = setTimeout(() => speak("Alright, picture this scenario. Read through the situation and choose how you'd handle it."), 500);
+      const narration = getQuestionNarration(level.theme, scenario.situation?.slice(0, 20) || '', state.currentQuestion + 1, totalScenarios);
+      const timer = setTimeout(() => speak(narration), 500);
       return () => clearTimeout(timer);
     }
   }, [state.isMuted, speak, state.currentLevel, state.currentQuestion]);

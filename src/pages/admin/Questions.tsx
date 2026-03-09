@@ -523,7 +523,7 @@ const Questions = () => {
                   <Select value={formBranchMid} onValueChange={setFormBranchMid}>
                     <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
                     </SelectContent>
                   </Select>

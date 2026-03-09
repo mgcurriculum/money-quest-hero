@@ -41,9 +41,9 @@ const LevelPlay = () => {
     setXpGained(score * 20);
     dispatch({ type: 'ANSWER_QUESTION', level: state.currentLevel, question: state.currentQuestion, score });
 
-    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
     if (!state.isMuted) {
-      speak(feedbackText);
+      const feedbackNarration = getAnswerFeedback(score, level.theme);
+      speak(feedbackNarration);
     }
 
     setShowFeedback(true);

@@ -42,9 +42,9 @@ const RealityCheckPlay = () => {
     setSelectedOption(optIndex);
     dispatch({ type: 'ANSWER_QUESTION', level: 0, question: state.currentQuestion, score });
 
-    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
     if (!state.isMuted) {
-      speak(feedbackText);
+      const feedbackNarration = getAnswerFeedback(score, 'Financial Reality');
+      speak(feedbackNarration);
     }
 
     setShowFeedback(true);

@@ -83,9 +83,9 @@ const AdaptivePlay = () => {
       },
     });
 
-    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
     if (!state.isMuted) {
-      speak(feedbackText);
+      const feedbackNarration = getAnswerFeedback(score, currentQuestion.dimension);
+      speak(feedbackNarration);
     }
 
     setShowFeedback(true);

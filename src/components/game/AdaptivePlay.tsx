@@ -37,7 +37,8 @@ const AdaptivePlay = () => {
   // Narrate on question change
   useEffect(() => {
     if (!state.isMuted && currentQuestion) {
-      const timer = setTimeout(() => speak("Read the question and choose your answer."), 500);
+      const narration = getQuestionNarration(currentQuestion.dimension, currentQuestion.category, questionsAnswered + 1, estimatedTotal);
+      const timer = setTimeout(() => speak(narration), 500);
       return () => clearTimeout(timer);
     }
   }, [state.isMuted, speak, currentQuestion?.id]);

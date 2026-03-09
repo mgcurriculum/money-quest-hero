@@ -198,8 +198,13 @@ export type Database = {
       questions: {
         Row: {
           age_groups: string[]
+          branch_high: number | null
+          branch_low: number | null
+          branch_mid: number | null
           category: string
           created_at: string
+          difficulty: number | null
+          dimension: string | null
           id: string
           is_active: boolean
           level: number
@@ -210,8 +215,13 @@ export type Database = {
         }
         Insert: {
           age_groups?: string[]
+          branch_high?: number | null
+          branch_low?: number | null
+          branch_mid?: number | null
           category: string
           created_at?: string
+          difficulty?: number | null
+          dimension?: string | null
           id?: string
           is_active?: boolean
           level: number
@@ -222,8 +232,13 @@ export type Database = {
         }
         Update: {
           age_groups?: string[]
+          branch_high?: number | null
+          branch_low?: number | null
+          branch_mid?: number | null
           category?: string
           created_at?: string
+          difficulty?: number | null
+          dimension?: string | null
           id?: string
           is_active?: boolean
           level?: number

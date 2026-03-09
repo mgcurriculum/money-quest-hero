@@ -45,11 +45,31 @@ const ReportScreen = () => {
   const [emailSent, setEmailSent] = useState(false);
   const { weights, bands, loading: configLoading } = useScoringConfig();
 
-  // Calculate FQ score with dynamic weights/bands
-  const normalizedScores = Array.from({ length: 7 }, (_, level) => {
-    const levelAnswers = state.answers[level] || {};
-    return calculateNormalizedScore(levelAnswers);
-  });
+  // Calculate FQ score — support both fixed and adaptive modes
+  const isAdaptive = state.assessmentMode === 'adaptive' && state.adaptiveAnswers.length > 0;
+
+  const normalizedScores = (() => {
+    if (isAdaptive) {
+      // Group adaptive answers by level (dimension)
+      const byLevel: Record<number, number[]> = {};
+      state.adaptiveAnswers.forEach(a => {
+        if (!byLevel[a.level]) byLevel[a.level] = [];
+        byLevel[a.level].push(a.score);
+      });
+      return Array.from({ length: 7 }, (_, level) => {
+        const scores = byLevel[level] || [];
+        if (scores.length === 0) return 0;
+        const userScore = scores.reduce((a, b) => a + b, 0);
+        const minScore = scores.length * 1;
+        const maxScore = scores.length * 5;
+        return ((userScore - minScore) / (maxScore - minScore)) * 100;
+      });
+    }
+    return Array.from({ length: 7 }, (_, level) => {
+      const levelAnswers = state.answers[level] || {};
+      return calculateNormalizedScore(levelAnswers);
+    });
+  })();
 
   const weightedTotal = normalizedScores.reduce(
     (sum, score, idx) => sum + score * weights[idx], 0
@@ -81,20 +101,32 @@ const ReportScreen = () => {
     const saveSession = async () => {
       try {
         // Build detailed Q&A data for admin analytics
-        const detailed = questionsAndAnswers.map((qa, idx) => ({
-          index: idx,
-          level: levels.findIndex(l => l.title === qa.levelTitle) ?? 0,
-          levelTitle: qa.levelTitle,
-          category: qa.levelTitle, // dimension name
-          question: qa.question,
-          selectedOption: qa.selectedOption,
-          selectedEmoji: qa.selectedEmoji,
-          score: qa.score,
-        }));
+        const detailed = isAdaptive
+          ? state.adaptiveAnswers.map((a, idx) => ({
+              index: idx,
+              level: a.level,
+              levelTitle: dimensionLabels[a.level] || `Level ${a.level}`,
+              category: a.dimension,
+              question: a.questionText,
+              selectedOption: a.selectedOption,
+              selectedEmoji: a.selectedEmoji,
+              score: a.score,
+            }))
+          : questionsAndAnswers.map((qa, idx) => ({
+              index: idx,
+              level: levels.findIndex(l => l.title === qa.levelTitle) ?? 0,
+              levelTitle: qa.levelTitle,
+              category: qa.levelTitle,
+              question: qa.question,
+              selectedOption: qa.selectedOption,
+              selectedEmoji: qa.selectedEmoji,
+              score: qa.score,
+            }));
 
         const enrichedAnswers = {
           detailed,
-          raw: state.answers,
+          raw: isAdaptive ? {} : state.answers,
+          adaptive: isAdaptive,
           normalizedScores: normalizedScores.map((s, i) => ({
             dimension: dimensionLabels[i],
             score: Math.round(s),
@@ -127,7 +159,16 @@ const ReportScreen = () => {
     saveSession();
   }, []);
 
-  const questionsAndAnswers = extractQuestionsAndAnswers(state.answers);
+  const questionsAndAnswers = isAdaptive
+    ? state.adaptiveAnswers.map(a => ({
+        levelTitle: dimensionLabels[a.level] || `Level ${a.level}`,
+        levelIcon: dimensionIcons[a.level] || '📋',
+        question: a.questionText,
+        selectedOption: a.selectedOption,
+        selectedEmoji: a.selectedEmoji,
+        score: a.score,
+      }))
+    : extractQuestionsAndAnswers(state.answers);
   const { tips, suggestions } = getFinancialTips(normalizedScores);
 
   const handleDownloadPDF = () => {

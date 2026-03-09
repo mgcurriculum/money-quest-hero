@@ -325,7 +325,7 @@ const Questions = () => {
                         {(q as any).dimension && <Badge variant="outline" className="text-xs">📐 {(q as any).dimension}</Badge>}
                         {(q as any).difficulty != null && <Badge variant="outline" className="text-xs">⚡ D{(q as any).difficulty}</Badge>}
                         {((q as any).branch_low != null || (q as any).branch_mid != null || (q as any).branch_high != null) && (
-                          <Badge variant="outline" className="text-xs text-amber-600">🔀 Branching</Badge>
+                          <Badge variant="outline" className="text-xs text-primary">🔀 Branching</Badge>
                         )}
                       </div>
                     </div>

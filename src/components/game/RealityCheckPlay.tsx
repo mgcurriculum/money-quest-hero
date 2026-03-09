@@ -30,7 +30,7 @@ const RealityCheckPlay = () => {
     if (!state.isMuted && question && state.currentQuestion !== lastNarratedQuestion.current) {
       lastNarratedQuestion.current = state.currentQuestion;
       const timer = setTimeout(() => {
-        speak(`Here's a question about ${question.category}. Take a moment to read it and pick the answer that feels most like you.`);
+        speak(getQuestionNarration('Financial Reality', question.category, state.currentQuestion + 1, totalQuestions));
       }, 500);
       return () => clearTimeout(timer);
     }

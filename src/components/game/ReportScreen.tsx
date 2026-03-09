@@ -101,20 +101,32 @@ const ReportScreen = () => {
     const saveSession = async () => {
       try {
         // Build detailed Q&A data for admin analytics
-        const detailed = questionsAndAnswers.map((qa, idx) => ({
-          index: idx,
-          level: levels.findIndex(l => l.title === qa.levelTitle) ?? 0,
-          levelTitle: qa.levelTitle,
-          category: qa.levelTitle, // dimension name
-          question: qa.question,
-          selectedOption: qa.selectedOption,
-          selectedEmoji: qa.selectedEmoji,
-          score: qa.score,
-        }));
+        const detailed = isAdaptive
+          ? state.adaptiveAnswers.map((a, idx) => ({
+              index: idx,
+              level: a.level,
+              levelTitle: dimensionLabels[a.level] || `Level ${a.level}`,
+              category: a.dimension,
+              question: a.questionText,
+              selectedOption: a.selectedOption,
+              selectedEmoji: a.selectedEmoji,
+              score: a.score,
+            }))
+          : questionsAndAnswers.map((qa, idx) => ({
+              index: idx,
+              level: levels.findIndex(l => l.title === qa.levelTitle) ?? 0,
+              levelTitle: qa.levelTitle,
+              category: qa.levelTitle,
+              question: qa.question,
+              selectedOption: qa.selectedOption,
+              selectedEmoji: qa.selectedEmoji,
+              score: qa.score,
+            }));
 
         const enrichedAnswers = {
           detailed,
-          raw: state.answers,
+          raw: isAdaptive ? {} : state.answers,
+          adaptive: isAdaptive,
           normalizedScores: normalizedScores.map((s, i) => ({
             dimension: dimensionLabels[i],
             score: Math.round(s),

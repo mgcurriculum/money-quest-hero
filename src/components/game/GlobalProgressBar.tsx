@@ -11,14 +11,17 @@ const GlobalProgressBar = () => {
       case 'consent': return 3;
       case 'profile': return 7;
       case 'level': {
-        // Level 0: questions 0-6 → progress 12-25%
-        // Levels 1-6: 3 questions each → progress 25-88%
+        if (state.assessmentMode === 'adaptive') {
+          // Adaptive: progress based on questions answered out of ~16
+          const answered = state.adaptiveAnswers.length;
+          return 12 + (answered / 16) * 76;
+        }
+        // Fixed mode
         if (state.currentLevel === 0) {
           const totalQ = realityQuestions.length;
           const qProgress = state.currentQuestion / totalQ;
           return 12 + qProgress * 13;
         }
-        // Levels 1-6: each level is ~10.5% of total
         const levelBase = 25 + (state.currentLevel - 1) * 10.5;
         const qProgress = state.currentQuestion / 3;
         return levelBase + qProgress * 10.5;

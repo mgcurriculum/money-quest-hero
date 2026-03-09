@@ -112,24 +112,24 @@ const feedbackByScore: Record<string, string[]> = {
 
 const dimensionFeedback: Record<string, Record<string, string[]>> = {
   'Spending Discipline': {
-    high: ["Your spending discipline is on point!", "That's some serious self-control with money."],
-    low: ["Spending wisely is a skill you can build.", "Small changes in spending can make a big difference."],
+    high: ["You manage your spending very well.", "That shows excellent self-control with money."],
+    low: ["Spending wisely is a skill you can develop.", "Small changes in spending habits can make a big difference."],
   },
   'Saving Behaviour': {
-    high: ["Your saving game is strong!", "You've got the saving mindset locked in."],
-    low: ["Even small savings add up over time.", "Building a saving habit starts with one step."],
+    high: ["Your saving habits are very strong.", "You clearly understand the value of saving."],
+    low: ["Even small amounts saved regularly add up over time.", "Building a saving habit starts with one step."],
   },
   'Investment Awareness': {
-    high: ["You think like an investor!", "Great investment awareness for your age."],
-    low: ["Investing can feel complex, but you'll get there.", "Learning about investments is a great next step."],
+    high: ["You have a strong understanding of investments.", "Your investment awareness is commendable."],
+    low: ["Investing can feel complex, but you will get there.", "Learning about investments is a great next step for you."],
   },
   'Debt Awareness': {
-    high: ["You handle debt like a pro!", "Smart approach to credit and borrowing."],
-    low: ["Understanding debt early will save you a lot.", "Being aware of debt traps is really important."],
+    high: ["You handle borrowing and credit very responsibly.", "That is a wise approach to managing debt."],
+    low: ["Understanding debt early will benefit you greatly.", "Being aware of debt traps is very important."],
   },
   'Financial Safety': {
-    high: ["You take financial safety seriously. Love it!", "Your protection instincts are sharp."],
-    low: ["Financial safety is worth thinking about more.", "A little preparation goes a long way."],
+    high: ["You take financial safety very seriously, and that is commendable.", "Your awareness about financial protection is excellent."],
+    low: ["Financial safety is worth thinking about more carefully.", "A little preparation goes a long way in protecting your money."],
   },
 };
 

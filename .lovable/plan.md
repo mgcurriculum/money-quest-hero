@@ -1,33 +1,55 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+# Plan: Populate Adaptive Question Bank (~105 Questions)
 
-### Changes
+## Overview
+Insert ~105 questions into the `questions` table via database migration, covering all 7 financial dimensions with branching rules, difficulty levels, and age-appropriate content for the 18-25 age group (primary target). Questions use professional Indian English with gamified scenarios — no slang.
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+## Question Distribution
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+| Level | Dimension | Questions | Difficulty Spread |
+|-------|-----------|-----------|-------------------|
+| 0 | Financial Reality | 10 | 4 easy, 3 medium, 3 hard |
+| 1 | Earning Mindset | 15 | 5 easy, 5 medium, 5 hard |
+| 2 | Spending Discipline | 20 | 7 easy, 7 medium, 6 hard |
+| 3 | Saving Behaviour | 20 | 7 easy, 7 medium, 6 hard |
+| 4 | Debt Awareness | 15 | 5 easy, 5 medium, 5 hard |
+| 5 | Investment Awareness | 15 | 5 easy, 5 medium, 5 hard |
+| 6 | Financial Safety | 10 | 4 easy, 3 medium, 3 hard |
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+**Total: 105 questions**, each with 5 options scored 1-5 (low to high financial awareness).
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+## Branching Rules Strategy
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+Each question will have `branch_low`, `branch_mid`, `branch_high` values following the PRD logic:
+- **Low score (0-1)**: Branch to a foundational/related dimension (e.g., poor spending → debt awareness)
+- **Mid score (2)**: Stay in same dimension or move sequentially
+- **High score (3-4)**: Skip ahead to an advanced dimension (e.g., strong saving → investment)
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+Key branching patterns:
+- Level 0 (Reality) low → stays at 0, mid → 1, high → 2
+- Level 1 (Earning) low → 0, mid → 2, high → 3
+- Level 2 (Spending) low → 4 (debt), mid → 3, high → 5
+- Level 3 (Saving) low → 2, mid → 4, high → 5
+- Level 4 (Debt) low → 2, mid → 5, high → 6
+- Level 5 (Investment) low → 3, mid → 6, high → 6
+- Level 6 (Safety) low → 4, mid → 6, high → 6
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+## Question Content Style
+- Professional Indian English, age-appropriate for 18-25
+- Real-life financial scenarios (UPI, online shopping, gig work, college fees, roommate expenses)
+- Currency in INR with amounts relevant to young Indians
+- 5 options per question with emoji, scored progressively (option 1 = lowest awareness, option 5 = highest)
+- Categories describe the focus area (e.g., "Income Tracking", "Impulse Control", "Emergency Fund")
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+## Implementation
+- Single large SQL migration inserting all 105 questions
+- All questions set to `age_groups = ARRAY['18-25']` (the primary segment; other age groups can be added later via admin panel or CSV import)
+- `is_active = true`, with appropriate `sort_order` within each level
+- Existing hardcoded fallback questions in `data/questions.ts` remain untouched as fallback
+
+## Files Changed
+- **New migration file** — single SQL INSERT with 105 question rows
+
+No code file changes needed — the adaptive engine already reads from the database.
 

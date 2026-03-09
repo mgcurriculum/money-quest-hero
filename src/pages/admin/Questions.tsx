@@ -112,7 +112,7 @@ const Questions = () => {
     setFormAgeGroups([activeTab]);
     setFormOptions(Array(5).fill(null).map(emptyOption));
     setFormActive(true); setFormOrder(0);
-    setFormDifficulty(2); setFormBranchLow(''); setFormBranchMid(''); setFormBranchHigh('');
+    setFormDifficulty(2); setFormBranchLow('none'); setFormBranchMid('none'); setFormBranchHigh('none');
     setFormDimension(DIMENSIONS[0]);
     setDialogOpen(true);
   };
@@ -126,9 +126,9 @@ const Questions = () => {
     setFormActive(q.is_active); setFormOrder(q.sort_order);
     const ext = q as any;
     setFormDifficulty(ext.difficulty ?? 2);
-    setFormBranchLow(ext.branch_low != null ? String(ext.branch_low) : '');
-    setFormBranchMid(ext.branch_mid != null ? String(ext.branch_mid) : '');
-    setFormBranchHigh(ext.branch_high != null ? String(ext.branch_high) : '');
+    setFormBranchLow(ext.branch_low != null ? String(ext.branch_low) : 'none');
+    setFormBranchMid(ext.branch_mid != null ? String(ext.branch_mid) : 'none');
+    setFormBranchHigh(ext.branch_high != null ? String(ext.branch_high) : 'none');
     setFormDimension(ext.dimension || DIMENSIONS[q.level] || '');
     setDialogOpen(true);
   };
@@ -145,9 +145,9 @@ const Questions = () => {
       age_groups: formAgeGroups, options: validOptions as any,
       is_active: formActive, sort_order: formOrder, updated_at: new Date().toISOString(),
       difficulty: formDifficulty,
-      branch_low: formBranchLow !== '' ? Number(formBranchLow) : null,
-      branch_mid: formBranchMid !== '' ? Number(formBranchMid) : null,
-      branch_high: formBranchHigh !== '' ? Number(formBranchHigh) : null,
+      branch_low: formBranchLow !== 'none' ? Number(formBranchLow) : null,
+      branch_mid: formBranchMid !== 'none' ? Number(formBranchMid) : null,
+      branch_high: formBranchHigh !== 'none' ? Number(formBranchHigh) : null,
       dimension: formDimension || DIMENSIONS[formLevel] || null,
     };
     if (editing) {
@@ -513,7 +513,7 @@ const Questions = () => {
                   <Select value={formBranchLow} onValueChange={setFormBranchLow}>
                     <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
                     </SelectContent>
                   </Select>
@@ -523,7 +523,7 @@ const Questions = () => {
                   <Select value={formBranchMid} onValueChange={setFormBranchMid}>
                     <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
                     </SelectContent>
                   </Select>
@@ -533,7 +533,7 @@ const Questions = () => {
                   <Select value={formBranchHigh} onValueChange={setFormBranchHigh}>
                     <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
                     </SelectContent>
                   </Select>

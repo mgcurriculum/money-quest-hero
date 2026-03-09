@@ -145,9 +145,9 @@ const Questions = () => {
       age_groups: formAgeGroups, options: validOptions as any,
       is_active: formActive, sort_order: formOrder, updated_at: new Date().toISOString(),
       difficulty: formDifficulty,
-      branch_low: formBranchLow !== '' ? Number(formBranchLow) : null,
-      branch_mid: formBranchMid !== '' ? Number(formBranchMid) : null,
-      branch_high: formBranchHigh !== '' ? Number(formBranchHigh) : null,
+      branch_low: formBranchLow !== 'none' ? Number(formBranchLow) : null,
+      branch_mid: formBranchMid !== 'none' ? Number(formBranchMid) : null,
+      branch_high: formBranchHigh !== 'none' ? Number(formBranchHigh) : null,
       dimension: formDimension || DIMENSIONS[formLevel] || null,
     };
     if (editing) {

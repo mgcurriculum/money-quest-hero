@@ -124,6 +124,12 @@ const Questions = () => {
     const opts = (q.options as any as OptionItem[]) || [];
     setFormOptions([...opts, ...Array(Math.max(0, 5 - opts.length)).fill(null).map(emptyOption)]);
     setFormActive(q.is_active); setFormOrder(q.sort_order);
+    const ext = q as any;
+    setFormDifficulty(ext.difficulty ?? 2);
+    setFormBranchLow(ext.branch_low != null ? String(ext.branch_low) : '');
+    setFormBranchMid(ext.branch_mid != null ? String(ext.branch_mid) : '');
+    setFormBranchHigh(ext.branch_high != null ? String(ext.branch_high) : '');
+    setFormDimension(ext.dimension || DIMENSIONS[q.level] || '');
     setDialogOpen(true);
   };
 

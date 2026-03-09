@@ -112,7 +112,7 @@ const Questions = () => {
     setFormAgeGroups([activeTab]);
     setFormOptions(Array(5).fill(null).map(emptyOption));
     setFormActive(true); setFormOrder(0);
-    setFormDifficulty(2); setFormBranchLow(''); setFormBranchMid(''); setFormBranchHigh('');
+    setFormDifficulty(2); setFormBranchLow('none'); setFormBranchMid('none'); setFormBranchHigh('none');
     setFormDimension(DIMENSIONS[0]);
     setDialogOpen(true);
   };

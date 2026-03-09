@@ -1,33 +1,50 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+# Plan: Rewrite All Questions in Simple, Formal Indian English
 
-### Changes
+## Problem
+Current questions use informal gaming language ("BOSS BATTLE!", "TRAP DETECTED!", "Quest unlocked!", "*swipes*", "Nah", emojis in question text) that is difficult for many Indian users to understand. The tone needs to be simple, clear, and professionally communicative.
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+## Scope
+- **169 active questions** in the database across 7 levels
+- **Hardcoded fallback questions** in `src/data/questions.ts`
+- **Narration prompts** in `src/utils/narrationPrompts.ts` (minor cleanup)
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+## What Changes
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+### 1. Database Migration — Rewrite all 169 questions
+Replace all question text and option text with simple, formal Indian English:
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+**Before:**
+```
+🕸️ TRAP DETECTED! Your friend says: 'Just use Buy Now Pay Later — everyone does it!' The siren song of easy money plays... 🎵
+Options: "Sounds genius! *clicks buy*", "Hard pass! I don't borrow for wants!"
+```
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+**After:**
+```
+Your friend suggests using a Buy Now Pay Later option for a purchase you do not need right now. What would you do?
+Options: "I would use it immediately without thinking", "I never borrow money for things I do not need"
+```
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+Rules applied across all 169 questions:
+- Remove all emojis from question text (keep emojis only in option emoji field)
+- Remove gaming framing ("Boss Battle", "Trap Detected", "Quest unlocked", "Power-Up")
+- Use complete sentences, no slang ("Nah", "Hmm", "*scrolls past*")
+- Keep scenarios relatable to Indian context (UPI, EMI, SIP, gold loans, etc.)
+- Simple vocabulary — no jargon without context
+- Formal but warm tone, not stiff
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+### 2. Update `src/data/questions.ts` — Fallback questions
+Rewrite the ~14 hardcoded scenario questions and 4 reality questions with the same formal tone. Remove gaming framing from scenario `situation` fields.
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+### 3. Update `src/utils/narrationPrompts.ts` — Minor refinements
+The narration prompts are already mostly clean. Small adjustments:
+- Replace informal phrases like "on point", "locked in", "like a pro" with formal alternatives
+- Example: "Your spending discipline is on point!" → "You manage your spending very well."
+
+## Files Changed
+- **New migration** — UPDATE statements for all 169 questions (question_text + options JSON)
+- **Modified**: `src/data/questions.ts` — rewrite fallback scenarios
+- **Modified**: `src/utils/narrationPrompts.ts` — tone adjustments
 

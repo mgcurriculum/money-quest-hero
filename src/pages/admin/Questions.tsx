@@ -320,7 +320,14 @@ const Questions = () => {
                     <span className="text-sm text-muted-foreground font-mono w-6">{idx + 1}</span>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm ${q.is_active ? 'text-foreground' : 'text-muted-foreground line-through'}`}>{q.question_text}</p>
-                      {q.category && <Badge variant="secondary" className="text-xs mt-1">{q.category}</Badge>}
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {q.category && <Badge variant="secondary" className="text-xs">{q.category}</Badge>}
+                        {(q as any).dimension && <Badge variant="outline" className="text-xs">📐 {(q as any).dimension}</Badge>}
+                        {(q as any).difficulty != null && <Badge variant="outline" className="text-xs">⚡ D{(q as any).difficulty}</Badge>}
+                        {((q as any).branch_low != null || (q as any).branch_mid != null || (q as any).branch_high != null) && (
+                          <Badge variant="outline" className="text-xs text-amber-600">🔀 Branching</Badge>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <Switch checked={q.is_active} onCheckedChange={() => toggleActive(q)} />

@@ -37,13 +37,17 @@ interface ProfileOption {
 
 const AGE_GROUPS = ['18-25', '26-39', '40-59', '60+'];
 const CATEGORIES = [
-  { level: 0, label: 'Level 0 — Reality Check' },
-  { level: 1, label: 'Level 1 — Earning Quest' },
-  { level: 2, label: 'Level 2 — Spending Challenge' },
-  { level: 3, label: 'Level 3 — Saving Mission' },
-  { level: 4, label: 'Level 4 — Debt Trap' },
-  { level: 5, label: 'Level 5 — Investment World' },
-  { level: 6, label: 'Level 6 — Protection Shield' },
+  { level: 0, label: 'Level 0 — Financial Reality' },
+  { level: 1, label: 'Level 1 — Earning Mindset' },
+  { level: 2, label: 'Level 2 — Spending Discipline' },
+  { level: 3, label: 'Level 3 — Saving Behaviour' },
+  { level: 4, label: 'Level 4 — Debt Awareness' },
+  { level: 5, label: 'Level 5 — Investment Awareness' },
+  { level: 6, label: 'Level 6 — Financial Safety' },
+];
+const DIMENSIONS = [
+  'Financial Reality', 'Earning Mindset', 'Spending Discipline',
+  'Saving Behaviour', 'Debt Awareness', 'Investment Awareness', 'Financial Safety',
 ];
 
 const emptyOption = (): OptionItem => ({ text: '', emoji: '' });

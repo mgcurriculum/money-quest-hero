@@ -73,6 +73,11 @@ const Questions = () => {
   const [formOptions, setFormOptions] = useState<OptionItem[]>(Array(5).fill(null).map(emptyOption));
   const [formActive, setFormActive] = useState(true);
   const [formOrder, setFormOrder] = useState(0);
+  const [formDifficulty, setFormDifficulty] = useState(2);
+  const [formBranchLow, setFormBranchLow] = useState<string>('');
+  const [formBranchMid, setFormBranchMid] = useState<string>('');
+  const [formBranchHigh, setFormBranchHigh] = useState<string>('');
+  const [formDimension, setFormDimension] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
 

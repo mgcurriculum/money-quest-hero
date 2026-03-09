@@ -126,9 +126,9 @@ const Questions = () => {
     setFormActive(q.is_active); setFormOrder(q.sort_order);
     const ext = q as any;
     setFormDifficulty(ext.difficulty ?? 2);
-    setFormBranchLow(ext.branch_low != null ? String(ext.branch_low) : '');
-    setFormBranchMid(ext.branch_mid != null ? String(ext.branch_mid) : '');
-    setFormBranchHigh(ext.branch_high != null ? String(ext.branch_high) : '');
+    setFormBranchLow(ext.branch_low != null ? String(ext.branch_low) : 'none');
+    setFormBranchMid(ext.branch_mid != null ? String(ext.branch_mid) : 'none');
+    setFormBranchHigh(ext.branch_high != null ? String(ext.branch_high) : 'none');
     setFormDimension(ext.dimension || DIMENSIONS[q.level] || '');
     setDialogOpen(true);
   };

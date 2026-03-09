@@ -6,6 +6,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { dimensionLabels, dimensionIcons } from '@/data/questions';
 import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight } from 'lucide-react';
 import MuteButton from './MuteButton';
+import { getQuestionNarration, getAnswerFeedback } from '@/utils/narrationPrompts';
 
 const feedbackData = [
   { text: "Noted! 📝", icon: <Zap className="text-game-gold" size={28} /> },

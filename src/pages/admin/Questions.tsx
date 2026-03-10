@@ -58,6 +58,7 @@ const Questions = () => {
   const [importing, setImporting] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [importSummary, setImportSummary] = useState<ImportSummary | null>(null);
+  const [gsheetOpen, setGsheetOpen] = useState(false);
   const { toast } = useToast();
 
   // Form state

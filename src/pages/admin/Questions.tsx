@@ -10,11 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Loader2, Download, Upload, AlertTriangle, CheckCircle2, XCircle, Info } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Download, Upload, FileSpreadsheet, AlertTriangle, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { exportQuestionsToCsv, parseCsvToQuestions, downloadCsv } from '@/utils/questionsCsv';
 import { getAllProfileCodes, getProfileLabel, dimensions } from '@/data/questions';
 import QuestionEditDialog from '@/components/admin/QuestionEditDialog';
 import ImportSummaryDialog from '@/components/admin/ImportSummaryDialog';
+import GoogleSheetImportDialog from '@/components/admin/GoogleSheetImportDialog';
 
 interface Question {
   id: string;
@@ -57,6 +58,7 @@ const Questions = () => {
   const [importing, setImporting] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [importSummary, setImportSummary] = useState<ImportSummary | null>(null);
+  const [gsheetOpen, setGsheetOpen] = useState(false);
   const { toast } = useToast();
 
   // Form state
@@ -282,6 +284,9 @@ const Questions = () => {
           <Button variant="outline" size="sm" onClick={handleImport} disabled={importing}>
             {importing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}Import CSV
           </Button>
+          <Button variant="outline" size="sm" onClick={() => setGsheetOpen(true)}>
+            <FileSpreadsheet className="h-4 w-4 mr-2" />Google Sheets
+          </Button>
           <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" /> Add Question</Button>
         </div>
       </div>
@@ -374,6 +379,16 @@ const Questions = () => {
       <ImportSummaryDialog
         summary={importSummary}
         onClose={() => setImportSummary(null)}
+      />
+
+      {/* Google Sheets Import Dialog */}
+      <GoogleSheetImportDialog
+        open={gsheetOpen}
+        onOpenChange={setGsheetOpen}
+        onImportComplete={(summary) => {
+          setImportSummary(summary);
+          fetchQuestions();
+        }}
       />
     </div>
   );

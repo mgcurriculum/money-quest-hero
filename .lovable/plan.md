@@ -1,33 +1,21 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+# Updated DOCUMENTATION.md
 
-### Changes
+The current documentation is outdated — it still references the Journey Map (removed), personality archetypes, and lacks details on campaigns, admin panel, edge functions, and the campaign code feature. Here is the updated version to write:
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+## Key Updates
+1. **Game Flow** — Remove Journey Map step; update to reflect auto-advance through levels
+2. **Campaign System** — New section covering campaign creation, codes, QR, slugs, and the spin wheel
+3. **Admin Panel** — Document all admin routes (Dashboard, Questions, Settings, Campaigns, Campaign Dashboard)
+4. **Edge Functions** — Document `create-admin`, `elevenlabs-tts`, `send-report-email`
+5. **Database Schema** — Document all tables: `admin_settings`, `campaigns`, `game_sessions`, `questions`
+6. **Profile Screen** — Document optional campaign code input and auto-fill from QR
+7. **Remove** personality archetypes section (per project memory)
+8. **Technical Architecture** — Update key files list, add edge functions, routes
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+## File to modify
+- `DOCUMENTATION.md` — Full rewrite with all current features
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
-
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
-
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
-
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
-
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
-
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+Single file change, comprehensive documentation update.
 

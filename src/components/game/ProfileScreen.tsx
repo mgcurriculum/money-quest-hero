@@ -3,101 +3,40 @@ import { motion } from 'framer-motion';
 import { useGame, PlayerProfile } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
 import { supabase } from '@/integrations/supabase/client';
+import { AGE_GROUPS, ROLE_EMOJIS, buildProfileCode } from '@/data/questions';
 import MuteButton from './MuteButton';
 
-const fallbackStatusOptions = [
-  { label: '🎒 In school (Class 11/12)', value: 'school' },
-  { label: '🎓 In college', value: 'college' },
-  { label: '🧑‍💻 Doing a course or skill program', value: 'skill' },
-  { label: '💼 Working part-time or full-time', value: 'working' },
-  { label: '🚀 Running a business / startup', value: 'business' },
+const NARRATION_TEXTS = [
+  "Let's get to know you a bit! Just fill in your name. This helps us personalize your results.",
+  "Great! Now tell me — which age group do you belong to?",
+  "Almost there! What best describes your current role?",
 ];
-
-const fallbackIncomeOptions = [
-  { label: '👨‍👩‍👧 Fully dependent on parents', value: 'dependent' },
-  { label: '💸 Pocket money from family', value: 'pocket' },
-  { label: '🧑‍💻 Freelance / gig work', value: 'freelance' },
-  { label: '💼 Salary from job', value: 'salary' },
-  { label: '🚀 Business / startup income', value: 'business' },
-];
-
-function getAgeGroup(age: string): string {
-  if (!age) return '18-25';
-  const n = parseInt(age);
-  if (isNaN(n) || n < 18) return '18-25';
-  if (n <= 25) return '18-25';
-  if (n <= 39) return '26-39';
-  if (n <= 59) return '40-59';
-  return '60+';
-}
-
-const PROFILE_TEXT_0 = "Let's get to know you a bit! Just fill in your name, and optionally your age and gender. This helps us personalize your results.";
-const PROFILE_TEXT_1 = "Great! Now tell me — what best describes your current stage in life?";
-const PROFILE_TEXT_2 = "Almost there! How does money usually come your way?";
 
 const ProfileScreen = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef<number>(-1);
-  const [profile, setProfile] = useState<PlayerProfile>({
-    name: '', age: '', gender: '', phone: '',
-    country: 'India', state: '', district: '',
-    status: '', incomeType: '',
-  });
   const [step, setStep] = useState(0);
+  const [name, setName] = useState('');
+  const [gender, setGender] = useState('');
+  const [phone, setPhone] = useState('');
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
   const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
   const [campaignCodeError, setCampaignCodeError] = useState('');
-  // Dynamic options from DB
-  const [statusOptions, setStatusOptions] = useState(fallbackStatusOptions);
-  const [incomeOptions, setIncomeOptions] = useState(fallbackIncomeOptions);
-
-  // Fetch profile options when age changes (moving to step 1)
-  useEffect(() => {
-    if (step < 1) return;
-    const ageGroup = getAgeGroup(profile.age);
-    const fetchOptions = async () => {
-      try {
-        const { data } = await supabase
-          .from('profile_options')
-          .select('*')
-          .eq('is_active', true)
-          .order('sort_order');
-        if (data && data.length > 0) {
-          const statusOpts = data
-            .filter(o => o.type === 'status' && o.age_groups.includes(ageGroup))
-            .map(o => ({ label: o.label, value: o.value }));
-          const incomeOpts = data
-            .filter(o => o.type === 'income' && o.age_groups.includes(ageGroup))
-            .map(o => ({ label: o.label, value: o.value }));
-          if (statusOpts.length > 0) setStatusOptions(statusOpts);
-          if (incomeOpts.length > 0) setIncomeOptions(incomeOpts);
-        }
-      } catch {
-        // keep fallbacks
-      }
-    };
-    fetchOptions();
-  }, [step, profile.age]);
+  const [validatingCode, setValidatingCode] = useState(false);
 
   useEffect(() => {
     if (!state.isMuted && hasNarrated.current !== step) {
       hasNarrated.current = step;
-      const texts = [PROFILE_TEXT_0, PROFILE_TEXT_1, PROFILE_TEXT_2];
-      const timer = setTimeout(() => speak(texts[step]), 500);
+      const timer = setTimeout(() => speak(NARRATION_TEXTS[step]), 500);
       return () => clearTimeout(timer);
     }
   }, [state.isMuted, speak, step]);
 
-  const updateField = (field: keyof PlayerProfile, value: string) => {
-    setProfile(p => ({ ...p, [field]: value }));
-  };
-
-  const [validatingCode, setValidatingCode] = useState(false);
-  const canProceedStep0 = profile.name.trim().length > 0;
+  const canProceedStep0 = name.trim().length > 0;
 
   const handleStep0Next = async () => {
     stop();
-    // If campaign code entered and not already set from QR
     if (campaignCode.trim() && !state.campaignCode) {
       setValidatingCode(true);
       setCampaignCodeError('');
@@ -118,6 +57,37 @@ const ProfileScreen = () => {
     setStep(1);
   };
 
+  const handleAgeGroupSelect = (ageGroup: string) => {
+    stop();
+    setSelectedAgeGroup(ageGroup);
+    setStep(2);
+  };
+
+  const handleRoleSelect = (roleCode: string, roleLabel: string) => {
+    stop();
+    const ageConfig = AGE_GROUPS.find(a => a.ageGroup === selectedAgeGroup);
+    if (!ageConfig) return;
+    const profileCode = buildProfileCode(ageConfig.ageCode, roleCode);
+
+    const profile: PlayerProfile = {
+      name: name.trim(),
+      ageGroup: selectedAgeGroup,
+      gender,
+      phone,
+      country: 'India',
+      state: '',
+      district: '',
+      role: roleCode,
+      roleLabel,
+      profileCode,
+    };
+
+    dispatch({ type: 'SET_PROFILE', profile });
+    dispatch({ type: 'START_QUIZ' });
+  };
+
+  const selectedAgeConfig = AGE_GROUPS.find(a => a.ageGroup === selectedAgeGroup);
+
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
       <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
@@ -129,9 +99,9 @@ const ProfileScreen = () => {
         className="max-w-md w-full"
       >
         <div className="text-center mb-8">
-          <span className="text-5xl mb-4 block">{step === 0 ? '🧑‍🎮' : step === 1 ? '🎯' : '💰'}</span>
+          <span className="text-5xl mb-4 block">{step === 0 ? '🧑‍🎮' : step === 1 ? '📅' : '🎯'}</span>
           <h2 className="text-3xl font-display font-bold text-game-text mb-2">
-            {step === 0 ? 'Create Your Profile' : step === 1 ? 'Your Current Stage' : 'Your Income Source'}
+            {step === 0 ? 'Create Your Profile' : step === 1 ? 'Your Age Group' : 'Your Role'}
           </h2>
           <div className="flex justify-center gap-2 mt-4">
             {[0, 1, 2].map(i => (
@@ -146,43 +116,31 @@ const ProfileScreen = () => {
               <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Name</label>
               <input
                 type="text"
-                value={profile.name}
-                onChange={e => updateField('name', e.target.value)}
+                value={name}
+                onChange={e => setName(e.target.value)}
                 placeholder="Enter your name"
                 className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Age</label>
-                <input
-                  type="number"
-                  value={profile.age}
-                  onChange={e => updateField('age', e.target.value)}
-                  placeholder="Age"
-                  className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
-                />
-              </div>
-              <div>
-                <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Gender</label>
-                <select
-                  value={profile.gender}
-                  onChange={e => updateField('gender', e.target.value)}
-                  className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
-                >
-                  <option value="">Select</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+            <div>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Gender (optional)</label>
+              <select
+                value={gender}
+                onChange={e => setGender(e.target.value)}
+                className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+              >
+                <option value="">Select</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
             </div>
             <div>
               <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Phone (optional)</label>
               <input
                 type="tel"
-                value={profile.phone}
-                onChange={e => updateField('phone', e.target.value)}
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
                 placeholder="+91"
                 className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
               />
@@ -205,37 +163,32 @@ const ProfileScreen = () => {
 
         {step === 1 && (
           <div>
-            <p className="text-game-muted text-sm font-body text-center mb-4">What best describes your current stage?</p>
+            <p className="text-game-muted text-sm font-body text-center mb-4">Select your age group</p>
             <div className="space-y-2.5">
-              {statusOptions.map(opt => (
+              {AGE_GROUPS.map(ag => (
                 <button
-                  key={opt.value}
-                  onClick={() => { updateField('status', opt.value); stop(); setStep(2); }}
-                  className={`w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all ${profile.status === opt.value ? 'border-2 border-game-gold text-game-gold' : 'text-game-text hover:border-game-gold/30 hover:scale-[1.01] active:scale-[0.99]'}`}
+                  key={ag.ageGroup}
+                  onClick={() => handleAgeGroupSelect(ag.ageGroup)}
+                  className="w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all text-game-text hover:border-game-gold/30 hover:scale-[1.01] active:scale-[0.99]"
                 >
-                  {opt.label}
+                  📅 {ag.ageGroup} years
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {step === 2 && (
+        {step === 2 && selectedAgeConfig && (
           <div>
-            <p className="text-game-muted text-sm font-body text-center mb-4">How do you usually receive money?</p>
+            <p className="text-game-muted text-sm font-body text-center mb-4">What best describes your current role?</p>
             <div className="space-y-2.5">
-              {incomeOptions.map(opt => (
+              {selectedAgeConfig.roles.map(role => (
                 <button
-                  key={opt.value}
-                  onClick={() => {
-                    const updatedProfile = { ...profile, incomeType: opt.value };
-                    stop();
-                    dispatch({ type: 'SET_PROFILE', profile: updatedProfile });
-                    dispatch({ type: 'START_LEVEL', level: 0 });
-                  }}
-                  className={`w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all ${profile.incomeType === opt.value ? 'border-2 border-game-gold text-game-gold' : 'text-game-text hover:border-game-gold/30 hover:scale-[1.01] active:scale-[0.99]'}`}
+                  key={role.code}
+                  onClick={() => handleRoleSelect(role.code, role.label)}
+                  className="w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all text-game-text hover:border-game-gold/30 hover:scale-[1.01] active:scale-[0.99]"
                 >
-                  {opt.label}
+                  {ROLE_EMOJIS[role.code] || '👤'} {role.label}
                 </button>
               ))}
             </div>

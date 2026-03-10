@@ -1,83 +1,58 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { realityQuestions, levels } from '@/data/questions';
 
-interface OptionItem {
-  text: string;
-  emoji: string;
-}
-
-interface DBQuestion {
+export interface QuestionItem {
   id: string;
-  level: number;
+  profileCode: string;
+  questionNo: number;
+  dimension: string;
   category: string;
-  question_text: string;
-  options: OptionItem[];
-  age_groups: string[];
-  is_active: boolean;
-  sort_order: number;
+  questionText: string;
+  options: { text: string; score: number }[];
+  isActive: boolean;
 }
 
-function getAgeGroup(age: string): string {
-  if (!age) return '18-25';
-  if (['18-25', '26-39', '40-59', '60+'].includes(age)) return age;
-  const n = parseInt(age);
-  if (n < 18) return '18-25';
-  if (n <= 25) return '18-25';
-  if (n <= 39) return '26-39';
-  if (n <= 59) return '40-59';
-  return '60+';
-}
-
-export function useQuestions(playerAge?: string) {
-  const [dbQuestions, setDbQuestions] = useState<DBQuestion[] | null>(null);
+export function useQuestions(profileCode: string) {
+  const [questions, setQuestions] = useState<QuestionItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!profileCode) { setLoading(false); return; }
     const load = async () => {
+      setLoading(true);
       try {
-        const { data: qData } = await supabase
+        const { data } = await supabase
           .from('questions')
           .select('*')
+          .eq('profile_code', profileCode)
           .eq('is_active', true)
-          .order('level')
-          .order('sort_order');
+          .order('question_no');
 
-        if (qData && qData.length > 0) {
-          setDbQuestions(qData.map(q => ({
-            ...q,
-            options: q.options as any as OptionItem[],
+        if (data) {
+          setQuestions(data.map((q: any) => ({
+            id: q.id,
+            profileCode: q.profile_code,
+            questionNo: q.question_no,
+            dimension: q.dimension || '',
+            category: q.category || '',
+            questionText: q.question_text,
+            options: [
+              { text: q.option_1, score: q.score_1 },
+              { text: q.option_2, score: q.score_2 },
+              { text: q.option_3, score: q.score_3 },
+              { text: q.option_4, score: q.score_4 },
+              { text: q.option_5, score: q.score_5 },
+            ].filter(o => o.text.trim()),
+            isActive: q.is_active,
           })));
         }
-      } catch {
-        // fallback to hardcoded
+      } catch (err) {
+        console.error('Failed to load questions:', err);
       }
       setLoading(false);
     };
     load();
-  }, []);
+  }, [profileCode]);
 
-  const getQuestionsForLevel = (level: number) => {
-    const ageGroup = getAgeGroup(playerAge || '');
-
-    if (dbQuestions) {
-      const filtered = dbQuestions.filter(q => q.level === level && q.age_groups.includes(ageGroup));
-      return filtered.map(q => ({
-        question: q.question_text,
-        category: q.category,
-        options: q.options,
-      }));
-    }
-
-    // Fallback to hardcoded
-    if (level === 0) return realityQuestions;
-    const lvl = levels.find(l => l.id === level);
-    return (lvl?.scenarios || []).map(s => ({
-      question: s.situation,
-      category: '',
-      options: s.options,
-    }));
-  };
-
-  return { getQuestionsForLevel, loading };
+  return { questions, loading };
 }

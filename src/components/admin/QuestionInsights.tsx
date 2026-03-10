@@ -10,8 +10,8 @@ import { computeQuestionStats } from '@/utils/dashboardAnalytics';
 type Session = Tables<'game_sessions'>;
 
 const scoreColor = (score: number) => {
-  if (score >= 4) return 'text-green-600';
-  if (score >= 3) return 'text-yellow-600';
+  if (score >= 40) return 'text-green-600';
+  if (score >= 25) return 'text-yellow-600';
   return 'text-red-600';
 };
 
@@ -35,11 +35,8 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
 
   return (
     <div className="space-y-6">
-      {/* Question Selector */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Explore a Question</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle className="text-base">Explore a Question</CardTitle></CardHeader>
         <CardContent>
           <Select value={selectedQuestion} onValueChange={setSelectedQuestion}>
             <SelectTrigger className="w-full">
@@ -48,7 +45,7 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
             <SelectContent>
               {questionStats.map(q => (
                 <SelectItem key={q.question.substring(0, 60)} value={q.question.substring(0, 60)}>
-                  <span className="text-xs text-muted-foreground mr-2">L{q.level}</span>
+                  <span className="text-xs text-muted-foreground mr-2">{q.dimension}</span>
                   {q.question.substring(0, 80)}{q.question.length > 80 ? '…' : ''}
                 </SelectItem>
               ))}
@@ -59,7 +56,7 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
             <div className="mt-4 space-y-4">
               <div className="flex gap-4 text-sm">
                 <span className="text-muted-foreground">Responses: <strong className="text-foreground">{selectedStat.totalResponses}</strong></span>
-                <span className="text-muted-foreground">Avg Score: <strong className={scoreColor(selectedStat.avgScore)}>{selectedStat.avgScore}/5</strong></span>
+                <span className="text-muted-foreground">Avg Score: <strong className={scoreColor(selectedStat.avgScore)}>{selectedStat.avgScore}/50</strong></span>
               </div>
               {distributionData.length > 0 && (
                 <ResponsiveContainer width="100%" height={200}>
@@ -74,10 +71,7 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
                       }}
                       labelFormatter={(label) => distributionData.find(d => d.option === label)?.fullOption || label}
                     />
-                    <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} label={({ x, y, width, value }: any) => {
-                      const pct = selectedStat ? ((value / selectedStat.totalResponses) * 100).toFixed(0) : '0';
-                      return <text x={x + width / 2} y={y - 5} fill="hsl(var(--muted-foreground))" textAnchor="middle" fontSize={10}>{pct}%</text>;
-                    }} />
+                    <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -86,11 +80,8 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
         </CardContent>
       </Card>
 
-      {/* All Questions with Distribution */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">All Questions – Answer Distribution</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle className="text-base">All Questions – Answer Distribution</CardTitle></CardHeader>
         <CardContent>
           {questionStats.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">No question data available yet.</p>
@@ -102,12 +93,12 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
                   <AccordionItem key={i} value={`q-${i}`}>
                     <AccordionTrigger className="text-left gap-2 py-3">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="text-xs text-muted-foreground shrink-0">L{q.level}</span>
-                        <span className="text-sm truncate">{q.question.replace(/[🎬🎨🛍️⚡📞😨🎮🏛️🎰🕸️📱🎁]/g, '').trim()}</span>
+                        <span className="text-xs text-muted-foreground shrink-0">{q.dimension}</span>
+                        <span className="text-sm truncate">{q.question}</span>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 mr-2">
                         <span className="text-xs text-muted-foreground">{q.totalResponses} resp</span>
-                        <span className={`text-xs font-semibold ${scoreColor(q.avgScore)}`}>{q.avgScore}/5</span>
+                        <span className={`text-xs font-semibold ${scoreColor(q.avgScore)}`}>{q.avgScore}/50</span>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>

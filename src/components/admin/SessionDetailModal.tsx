@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import type { Tables } from '@/integrations/supabase/types';
 import { getDetailedAnswers, getDimensionScores } from '@/utils/dashboardAnalytics';
+import { MAX_SCORE } from '@/data/questions';
 
 type Session = Tables<'game_sessions'>;
 
@@ -24,22 +25,18 @@ const SessionDetailModal = ({ session, open, onClose }: Props) => {
         <DialogHeader>
           <DialogTitle>{session.player_name}'s Session</DialogTitle>
           <DialogDescription>
-            {new Date(session.created_at).toLocaleString()} · Score: {session.fq_score}/1000 · {session.band_level}
+            {new Date(session.created_at).toLocaleString()} · Score: {session.fq_score}/{MAX_SCORE} · {session.band_level}
+            {(session as any).profile_code && ` · Profile: ${(session as any).profile_code}`}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Player Info */}
         <div className="flex flex-wrap gap-2 mb-4">
           {session.player_age && <Badge variant="outline">Age: {session.player_age}</Badge>}
           {session.player_gender && <Badge variant="outline">{session.player_gender}</Badge>}
-          {session.player_state && <Badge variant="outline">{session.player_state}</Badge>}
-          {session.player_status && <Badge variant="outline">{session.player_status}</Badge>}
-          {session.player_income_type && <Badge variant="outline">{session.player_income_type}</Badge>}
-          {session.primary_archetype && <Badge>Primary: {session.primary_archetype}</Badge>}
-          {session.secondary_archetype && <Badge variant="secondary">Secondary: {session.secondary_archetype}</Badge>}
+          {session.player_status && <Badge variant="outline">Role: {session.player_status}</Badge>}
+          {(session as any).profile_code && <Badge>Profile: {(session as any).profile_code}</Badge>}
         </div>
 
-        {/* Dimension Scores */}
         {dimensionScores.length > 0 && (
           <div className="mb-4">
             <h4 className="text-sm font-semibold mb-2">Dimension Scores</h4>
@@ -48,10 +45,8 @@ const SessionDetailModal = ({ session, open, onClose }: Props) => {
                 <div key={i} className="flex items-center gap-2">
                   <span className="text-xs w-32 truncate">{ds.dimension}</span>
                   <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${ds.score < 40 ? 'bg-destructive' : ds.score < 70 ? 'bg-yellow-500' : 'bg-green-500'}`}
-                      style={{ width: `${ds.score}%` }}
-                    />
+                    <div className={`h-full rounded-full ${ds.score < 40 ? 'bg-destructive' : ds.score < 70 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                      style={{ width: `${ds.score}%` }} />
                   </div>
                   <span className="text-xs font-semibold w-10 text-right">{ds.score}%</span>
                 </div>
@@ -60,7 +55,6 @@ const SessionDetailModal = ({ session, open, onClose }: Props) => {
           </div>
         )}
 
-        {/* Detailed Q&A */}
         {detailed.length > 0 ? (
           <div>
             <h4 className="text-sm font-semibold mb-2">Question-by-Question Breakdown</h4>
@@ -76,13 +70,13 @@ const SessionDetailModal = ({ session, open, onClose }: Props) => {
               <TableBody>
                 {detailed.map((d, i) => (
                   <TableRow key={i}>
-                    <TableCell className="text-xs text-muted-foreground">{i + 1}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{d.questionNo || i + 1}</TableCell>
                     <TableCell className="text-xs max-w-[200px]">
-                      <span className="text-muted-foreground">L{d.level}:</span> {d.question.replace(/[🎬🎨🛍️⚡📞😨🎮🏛️🎰🕸️📱🎁]/g, '').trim().substring(0, 80)}
+                      <span className="text-muted-foreground">{d.dimension}:</span> {d.question.substring(0, 80)}
                     </TableCell>
-                    <TableCell className="text-xs">{d.selectedEmoji} {d.selectedOption}</TableCell>
-                    <TableCell className={`text-right text-xs font-semibold ${d.score <= 2 ? 'text-destructive' : d.score >= 4 ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {d.score}/5
+                    <TableCell className="text-xs">{d.selectedOption}</TableCell>
+                    <TableCell className={`text-right text-xs font-semibold ${d.score <= 20 ? 'text-destructive' : d.score >= 40 ? 'text-green-600' : 'text-yellow-600'}`}>
+                      {d.score}/50
                     </TableCell>
                   </TableRow>
                 ))}
@@ -90,9 +84,7 @@ const SessionDetailModal = ({ session, open, onClose }: Props) => {
             </Table>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Detailed Q&A data not available for this session (legacy format).
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-4">Detailed Q&A data not available for this session.</p>
         )}
 
         {session.reflection_answer && (

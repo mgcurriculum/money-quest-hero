@@ -1,187 +1,93 @@
 import type { Tables } from '@/integrations/supabase/types';
-import { dimensionLabels, dimensionIcons, dimensionWeights, realityQuestions, levels } from '@/data/questions';
+import { dimensions, dimensionIcons } from '@/data/questions';
 
 type Session = Tables<'game_sessions'>;
 
 export interface DetailedAnswer {
-  index: number;
-  level: number;
-  levelTitle: string;
+  questionNo: number;
+  dimension: string;
   category: string;
   question: string;
   selectedOption: string;
-  selectedEmoji: string;
   score: number;
 }
 
-export interface NormalizedDimensionScore {
+export interface DimensionScoreEntry {
   dimension: string;
   score: number;
+  maxScore: number;
+  percentage: number;
 }
 
 export interface EnrichedAnswers {
   detailed?: DetailedAnswer[];
-  raw?: Record<string, Record<string, number>>;
-  normalizedScores?: NormalizedDimensionScore[];
+  dimensionScores?: DimensionScoreEntry[];
+  totalScore?: number;
 }
 
 export function getEnrichedAnswers(session: Session): EnrichedAnswers {
   const answers = session.answers as any;
   if (answers?.detailed) return answers as EnrichedAnswers;
-  // Legacy format: just raw scores
-  return { raw: answers, detailed: [], normalizedScores: [] };
+  return { detailed: [], dimensionScores: [], totalScore: session.fq_score || 0 };
 }
 
 export function getDetailedAnswers(session: Session): DetailedAnswer[] {
   return getEnrichedAnswers(session).detailed || [];
 }
 
-export function getDimensionScores(session: Session): NormalizedDimensionScore[] {
+export function getDimensionScores(session: Session): { dimension: string; score: number }[] {
   const enriched = getEnrichedAnswers(session);
-  if (enriched.normalizedScores && enriched.normalizedScores.length > 0) {
-    return enriched.normalizedScores;
+  if (enriched.dimensionScores && enriched.dimensionScores.length > 0) {
+    return enriched.dimensionScores.map(ds => ({
+      dimension: ds.dimension,
+      score: ds.percentage,
+    }));
   }
-  // Compute from raw if available
-  const raw = enriched.raw || (session.answers as any);
-  if (!raw || typeof raw !== 'object') return [];
-  
-  return dimensionLabels.map((dim, level) => {
-    const levelAnswers = raw[level] || {};
-    const vals = Object.values(levelAnswers) as number[];
-    if (vals.length === 0) return { dimension: dim, score: 0 };
-    const userScore = vals.reduce((a: number, b: number) => a + b, 0);
-    const minScore = vals.length;
-    const maxScore = vals.length * 5;
-    const normalized = maxScore > minScore ? ((userScore - minScore) / (maxScore - minScore)) * 100 : 0;
-    return { dimension: dim, score: Math.round(normalized) };
-  });
+  return dimensions.map(dim => ({ dimension: dim, score: 0 }));
 }
 
 // Question-level analytics
 export interface QuestionStat {
   question: string;
-  level: number;
-  levelTitle: string;
+  dimension: string;
   totalResponses: number;
   avgScore: number;
-  distribution: Record<string, number>; // option text -> count
-  scoreDistribution: number[]; // index 0-4 for scores 1-5
-}
-
-// Reconstruct detailed answers from legacy raw format
-function reconstructFromRaw(session: Session): DetailedAnswer[] {
-  const raw = (session.answers as any);
-  if (!raw || typeof raw !== 'object') return [];
-  
-  // If it has a .raw sub-key, use that; otherwise treat the whole thing as raw
-  const rawData = raw.raw || raw;
-  const results: DetailedAnswer[] = [];
-  let globalIndex = 0;
-
-  for (let levelIdx = 0; levelIdx < 7; levelIdx++) {
-    const levelAnswers = rawData[levelIdx] || rawData[String(levelIdx)];
-    if (!levelAnswers || typeof levelAnswers !== 'object') continue;
-
-    const levelDef = levels[levelIdx];
-    const levelTitle = levelDef?.title || dimensionLabels[levelIdx];
-
-    // Get questions for this level
-    let questionsForLevel: { text: string; emoji: string }[][] = [];
-    if (levelIdx === 0) {
-      questionsForLevel = realityQuestions.map(rq => rq.options);
-    } else if (levelDef?.scenarios) {
-      questionsForLevel = levelDef.scenarios.map(sc => sc.options);
-    }
-
-    const qIndices = Object.keys(levelAnswers).map(Number).sort((a, b) => a - b);
-    for (const qIdx of qIndices) {
-      const score = levelAnswers[qIdx] || levelAnswers[String(qIdx)];
-      if (typeof score !== 'number') continue;
-
-      let questionText = '';
-      let selectedOption = '';
-      let selectedEmoji = '';
-      let category = '';
-
-      if (levelIdx === 0 && realityQuestions[qIdx]) {
-        const rq = realityQuestions[qIdx];
-        questionText = rq.question;
-        category = rq.category;
-        const opt = rq.options[score - 1];
-        selectedOption = opt?.text || `Score ${score}`;
-        selectedEmoji = opt?.emoji || '';
-      } else if (levelDef?.scenarios?.[qIdx]) {
-        const sc = levelDef.scenarios[qIdx];
-        questionText = sc.situation;
-        category = levelTitle;
-        const opt = sc.options[score - 1];
-        selectedOption = opt?.text || `Score ${score}`;
-        selectedEmoji = opt?.emoji || '';
-      } else {
-        questionText = `Level ${levelIdx} Q${qIdx + 1}`;
-        category = levelTitle;
-        selectedOption = `Score ${score}`;
-      }
-
-      results.push({
-        index: globalIndex++,
-        level: levelIdx,
-        levelTitle,
-        category,
-        question: questionText,
-        selectedOption,
-        selectedEmoji,
-        score,
-      });
-    }
-  }
-  return results;
+  distribution: Record<string, number>;
 }
 
 export function computeQuestionStats(sessions: Session[]): QuestionStat[] {
   const questionMap = new Map<string, {
     question: string;
-    level: number;
-    levelTitle: string;
+    dimension: string;
     scores: number[];
     optionCounts: Record<string, number>;
-    scoreDist: number[];
   }>();
 
   sessions.forEach(s => {
-    let detailed = getDetailedAnswers(s);
-    // Fallback: reconstruct from raw for legacy sessions
-    if (detailed.length === 0) {
-      detailed = reconstructFromRaw(s);
-    }
+    const detailed = getDetailedAnswers(s);
     detailed.forEach(d => {
-      const key = `${d.level}-${d.question.substring(0, 60)}`;
+      const key = `${d.dimension}-${d.question.substring(0, 60)}`;
       if (!questionMap.has(key)) {
         questionMap.set(key, {
           question: d.question,
-          level: d.level,
-          levelTitle: d.levelTitle,
+          dimension: d.dimension,
           scores: [],
           optionCounts: {},
-          scoreDist: [0, 0, 0, 0, 0],
         });
       }
       const stat = questionMap.get(key)!;
       stat.scores.push(d.score);
       stat.optionCounts[d.selectedOption] = (stat.optionCounts[d.selectedOption] || 0) + 1;
-      if (d.score >= 1 && d.score <= 5) stat.scoreDist[d.score - 1]++;
     });
   });
 
   return Array.from(questionMap.values()).map(stat => ({
     question: stat.question,
-    level: stat.level,
-    levelTitle: stat.levelTitle,
+    dimension: stat.dimension,
     totalResponses: stat.scores.length,
-    avgScore: stat.scores.length > 0 ? +(stat.scores.reduce((a, b) => a + b, 0) / stat.scores.length).toFixed(2) : 0,
+    avgScore: stat.scores.length > 0 ? +(stat.scores.reduce((a, b) => a + b, 0) / stat.scores.length).toFixed(0) : 0,
     distribution: stat.optionCounts,
-    scoreDistribution: stat.scoreDist,
-  })).sort((a, b) => a.level - b.level || a.avgScore - b.avgScore);
+  })).sort((a, b) => a.dimension.localeCompare(b.dimension));
 }
 
 // Dimension averages across sessions
@@ -189,37 +95,34 @@ export interface DimensionAverage {
   dimension: string;
   icon: string;
   avgScore: number;
-  weight: number;
   sessionCount: number;
 }
 
 export function computeDimensionAverages(sessions: Session[]): DimensionAverage[] {
-  const sums = new Array(7).fill(0);
-  const counts = new Array(7).fill(0);
+  const sums: number[] = new Array(dimensions.length).fill(0);
+  const counts: number[] = new Array(dimensions.length).fill(0);
 
   sessions.forEach(s => {
     const scores = getDimensionScores(s);
     scores.forEach((ds, i) => {
-      if (i < 7 && ds.score > 0) {
+      if (i < dimensions.length && ds.score > 0) {
         sums[i] += ds.score;
         counts[i]++;
       }
     });
   });
 
-  return dimensionLabels.map((dim, i) => ({
+  return dimensions.map((dim, i) => ({
     dimension: dim,
     icon: dimensionIcons[i],
     avgScore: counts[i] > 0 ? Math.round(sums[i] / counts[i]) : 0,
-    weight: dimensionWeights[i],
     sessionCount: counts[i],
   }));
 }
 
-// Risk indicators: % of players scoring 1-2 on critical dimensions (Debt, Safety)
+// Risk indicators
 export function computeRiskIndicators(sessions: Session[]): { dimension: string; icon: string; riskPercent: number; totalPlayers: number }[] {
-  const criticalDimensions = [4, 6]; // Debt Awareness, Financial Safety
-  
+  const criticalDimensions = [3, 5]; // Debt Awareness, Financial Safety (indices in 6-dim array)
   return criticalDimensions.map(dimIdx => {
     let atRisk = 0;
     let total = 0;
@@ -231,54 +134,11 @@ export function computeRiskIndicators(sessions: Session[]): { dimension: string;
       }
     });
     return {
-      dimension: dimensionLabels[dimIdx],
+      dimension: dimensions[dimIdx],
       icon: dimensionIcons[dimIdx],
       riskPercent: total > 0 ? Math.round((atRisk / total) * 100) : 0,
       totalPlayers: total,
     };
-  });
-}
-
-// Archetype pairing analysis
-export function computeArchetypePairings(sessions: Session[]): { pair: string; count: number }[] {
-  const pairMap: Record<string, number> = {};
-  sessions.forEach(s => {
-    if (s.primary_archetype && s.secondary_archetype) {
-      const pair = `${s.primary_archetype} + ${s.secondary_archetype}`;
-      pairMap[pair] = (pairMap[pair] || 0) + 1;
-    }
-  });
-  return Object.entries(pairMap)
-    .map(([pair, count]) => ({ pair, count }))
-    .sort((a, b) => b.count - a.count);
-}
-
-// Dimension scores by age group (heatmap data)
-export function computeDimensionByAgeGroup(sessions: Session[]): { dimension: string; icon: string; ageGroups: Record<string, number> }[] {
-  const ageGroups = ['18-25', '26-39', '40-59', '60+'];
-  const data: { sums: number[]; counts: number[] }[][] = dimensionLabels.map(() =>
-    ageGroups.map(() => ({ sums: [0], counts: [0] }))
-  );
-
-  sessions.forEach(s => {
-    const ageIdx = ageGroups.indexOf(s.player_age || '');
-    if (ageIdx === -1) return;
-    const scores = getDimensionScores(s);
-    scores.forEach((ds, dimIdx) => {
-      if (dimIdx < 7 && ds.score > 0) {
-        data[dimIdx][ageIdx].sums[0] += ds.score;
-        data[dimIdx][ageIdx].counts[0]++;
-      }
-    });
-  });
-
-  return dimensionLabels.map((dim, dimIdx) => {
-    const ageGroupScores: Record<string, number> = {};
-    ageGroups.forEach((ag, agIdx) => {
-      const d = data[dimIdx][agIdx];
-      ageGroupScores[ag] = d.counts[0] > 0 ? Math.round(d.sums[0] / d.counts[0]) : 0;
-    });
-    return { dimension: dim, icon: dimensionIcons[dimIdx], ageGroups: ageGroupScores };
   });
 }
 
@@ -297,18 +157,6 @@ export function computeReflectionSummary(sessions: Session[]): { option: string;
     .sort((a, b) => b.count - a.count);
 }
 
-// Geographic breakdown
-export function computeStateDistribution(sessions: Session[]): { state: string; count: number }[] {
-  const stateCounts: Record<string, number> = {};
-  sessions.forEach(s => {
-    const st = s.player_state || 'Unknown';
-    stateCounts[st] = (stateCounts[st] || 0) + 1;
-  });
-  return Object.entries(stateCounts)
-    .map(([state, count]) => ({ state, count }))
-    .sort((a, b) => b.count - a.count);
-}
-
 // Score trend over time
 export function computeScoreTrend(sessions: Session[]): { date: string; avgScore: number; count: number }[] {
   const byDate: Record<string, { sum: number; count: number }> = {};
@@ -321,4 +169,16 @@ export function computeScoreTrend(sessions: Session[]): { date: string; avgScore
   return Object.entries(byDate)
     .map(([date, d]) => ({ date, avgScore: Math.round(d.sum / d.count), count: d.count }))
     .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+// Profile code distribution
+export function computeProfileDistribution(sessions: Session[]): { profileCode: string; count: number }[] {
+  const counts: Record<string, number> = {};
+  sessions.forEach(s => {
+    const code = (s as any).profile_code || 'Unknown';
+    counts[code] = (counts[code] || 0) + 1;
+  });
+  return Object.entries(counts)
+    .map(([profileCode, count]) => ({ profileCode, count }))
+    .sort((a, b) => b.count - a.count);
 }

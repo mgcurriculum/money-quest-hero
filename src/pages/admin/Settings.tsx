@@ -4,15 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
-import { dimensionWeights as defaultWeights, dimensionLabels, dimensionIcons, fqBands as defaultBands } from '@/data/questions';
+import { fqBands as defaultBands, MAX_SCORE } from '@/data/questions';
 import { toast } from 'sonner';
 import { Save, RotateCcw } from 'lucide-react';
 
 const Settings = () => {
-  const [weights, setWeights] = useState<number[]>([...defaultWeights]);
   const [bands, setBands] = useState([...defaultBands]);
   const [loading, setLoading] = useState(true);
-  const [savingWeights, setSavingWeights] = useState(false);
   const [savingBands, setSavingBands] = useState(false);
 
   useEffect(() => {
@@ -21,14 +19,10 @@ const Settings = () => {
         const { data } = await supabase
           .from('admin_settings')
           .select('key, value')
-          .in('key', ['dimension_weights', 'score_bands']);
+          .eq('key', 'score_bands');
 
         if (data) {
           for (const row of data) {
-            if (row.key === 'dimension_weights') {
-              const val = row.value as any;
-              if (val?.weights?.length === 7) setWeights(val.weights);
-            }
             if (row.key === 'score_bands') {
               const val = row.value as any;
               if (val?.bands?.length > 0) setBands(val.bands);
@@ -43,16 +37,6 @@ const Settings = () => {
     };
     load();
   }, []);
-
-  const weightTotal = weights.reduce((a, b) => a + b, 0);
-  const isWeightValid = Math.abs(weightTotal - 1.0) < 0.005;
-
-  const handleWeightChange = (idx: number, val: string) => {
-    const num = parseFloat(val) || 0;
-    const next = [...weights];
-    next[idx] = Math.round(num * 100) / 100;
-    setWeights(next);
-  };
 
   const handleBandChange = (idx: number, field: string, val: string | number) => {
     const next = [...bands];
@@ -69,16 +53,6 @@ const Settings = () => {
     }
   };
 
-  const saveWeights = async () => {
-    if (!isWeightValid) { toast.error('Weights must sum to 1.00'); return; }
-    setSavingWeights(true);
-    try {
-      await upsert('dimension_weights', { weights });
-      toast.success('Dimension weights saved');
-    } catch { toast.error('Failed to save weights'); }
-    finally { setSavingWeights(false); }
-  };
-
   const saveBands = async () => {
     setSavingBands(true);
     try {
@@ -92,7 +66,7 @@ const Settings = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-semibold text-foreground">Scoring Algorithm</h1>
+      <h1 className="text-2xl font-semibold text-foreground">Scoring Settings</h1>
 
       {/* Formula */}
       <Card>
@@ -101,61 +75,11 @@ const Settings = () => {
         </CardHeader>
         <CardContent>
           <div className="bg-muted rounded-lg p-4 font-mono text-sm text-center">
-            FQ Score = ( Σ <span className="text-primary">normalized[i]</span> × <span className="text-primary">weight[i]</span> ) × 10 → <strong>0–1000</strong>
+            FQ Score = Σ <span className="text-primary">option_scores</span> → <strong>0–{MAX_SCORE}</strong>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">Each dimension is normalized to 0–100%, then multiplied by its weight. The weighted sum is scaled to 0–1000.</p>
-        </CardContent>
-      </Card>
-
-      {/* Dimension Weights */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base">Dimension Weights</CardTitle>
-              <CardDescription>Must total 1.00. Currently: <span className={isWeightValid ? 'text-green-600 font-semibold' : 'text-destructive font-semibold'}>{weightTotal.toFixed(2)}</span></CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => setWeights([...defaultWeights])}>
-                <RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset
-              </Button>
-              <Button size="sm" onClick={saveWeights} disabled={savingWeights || !isWeightValid}>
-                <Save className="h-3.5 w-3.5 mr-1" /> {savingWeights ? 'Saving...' : 'Save'}
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Dimension</TableHead>
-                <TableHead className="w-28 text-right">Weight</TableHead>
-                <TableHead className="w-20 text-right">%</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {dimensionLabels.map((label, i) => (
-                <TableRow key={label}>
-                  <TableCell className="font-medium">{dimensionIcons[i]} {label}</TableCell>
-                  <TableCell className="text-right">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="1"
-                      value={weights[i]}
-                      onChange={(e) => handleWeightChange(i, e.target.value)}
-                      className="w-24 text-right ml-auto h-8 text-sm"
-                    />
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground text-sm">
-                    {(weights[i] * 100).toFixed(0)}%
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <p className="text-xs text-muted-foreground mt-2">
+            Each of the 18 questions has 5 options scored 10-50 by admin. Total score is the sum of all selected option scores. Maximum possible score is {MAX_SCORE} (18 × 50).
+          </p>
         </CardContent>
       </Card>
 
@@ -165,7 +89,7 @@ const Settings = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-base">Score Bands</CardTitle>
-              <CardDescription>Define FQ score ranges and their labels</CardDescription>
+              <CardDescription>Define FQ score ranges (0–{MAX_SCORE}) and their labels</CardDescription>
             </div>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => setBands([...defaultBands])}>
@@ -192,19 +116,19 @@ const Settings = () => {
               {bands.map((band, i) => (
                 <TableRow key={i}>
                   <TableCell>
-                    <Input value={band.emoji} onChange={(e) => handleBandChange(i, 'emoji', e.target.value)} className="w-14 h-8 text-center text-sm" />
+                    <Input value={band.emoji} onChange={e => handleBandChange(i, 'emoji', e.target.value)} className="w-14 h-8 text-center text-sm" />
                   </TableCell>
                   <TableCell>
-                    <Input type="number" value={band.min} onChange={(e) => handleBandChange(i, 'min', e.target.value)} className="w-20 h-8 text-sm" />
+                    <Input type="number" value={band.min} onChange={e => handleBandChange(i, 'min', e.target.value)} className="w-20 h-8 text-sm" />
                   </TableCell>
                   <TableCell>
-                    <Input type="number" value={band.max} onChange={(e) => handleBandChange(i, 'max', e.target.value)} className="w-20 h-8 text-sm" />
+                    <Input type="number" value={band.max} onChange={e => handleBandChange(i, 'max', e.target.value)} className="w-20 h-8 text-sm" />
                   </TableCell>
                   <TableCell>
-                    <Input value={band.level} onChange={(e) => handleBandChange(i, 'level', e.target.value)} className="h-8 text-sm" />
+                    <Input value={band.level} onChange={e => handleBandChange(i, 'level', e.target.value)} className="h-8 text-sm" />
                   </TableCell>
                   <TableCell>
-                    <Input value={band.meaning} onChange={(e) => handleBandChange(i, 'meaning', e.target.value)} className="h-8 text-sm" />
+                    <Input value={band.meaning} onChange={e => handleBandChange(i, 'meaning', e.target.value)} className="h-8 text-sm" />
                   </TableCell>
                 </TableRow>
               ))}

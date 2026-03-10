@@ -18,12 +18,11 @@ const FinancialExpertView = ({ sessions }: { sessions: Session[] }) => {
 
   return (
     <div className="space-y-6">
-      {/* Dimension Health Cards */}
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
           <Target className="h-4 w-4" /> Dimension Health (Population Averages)
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {dimensionAvgs.map(d => (
             <Card key={d.dimension} className={`border ${dimColor(d.avgScore)}`}>
               <CardContent className="p-4">
@@ -41,7 +40,6 @@ const FinancialExpertView = ({ sessions }: { sessions: Session[] }) => {
         </div>
       </div>
 
-      {/* Risk Indicators */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">

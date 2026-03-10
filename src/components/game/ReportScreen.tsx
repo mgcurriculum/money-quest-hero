@@ -1,16 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
-import {
-  dimensionLabels,
-  dimensionIcons,
-  calculateNormalizedScore,
-  archetypes,
-  fqBands as defaultBands,
-  dimensionWeights as defaultWeights,
-  levels,
-} from '@/data/questions';
-import { useScoringConfig } from '@/hooks/useScoringConfig';
+import { useQuestions, type QuestionItem } from '@/hooks/useQuestions';
+import { dimensions, dimensionIcons, fqBands, MAX_SCORE, getProfileLabel } from '@/data/questions';
 import {
   extractQuestionsAndAnswers,
   getFinancialTips,
@@ -18,104 +10,92 @@ import {
   openPrintableReport,
 } from '@/utils/generateReportPDF';
 import {
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  Radar,
-  ResponsiveContainer,
+  RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer,
 } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+function computeDimensionScores(questions: QuestionItem[], answers: { [idx: number]: number }) {
+  const dimMap: Record<string, { total: number; count: number }> = {};
+  questions.forEach((q, idx) => {
+    const dim = q.dimension || 'Other';
+    if (!dimMap[dim]) dimMap[dim] = { total: 0, count: 0 };
+    const score = answers[idx] || 0;
+    dimMap[dim].total += score;
+    dimMap[dim].count++;
+  });
+  return dimensions.map((dim, i) => {
+    const d = dimMap[dim];
+    if (!d || d.count === 0) return { dimension: dim, icon: dimensionIcons[i], score: 0, maxScore: 0, percentage: 0 };
+    const maxScore = d.count * 50;
+    return {
+      dimension: dim,
+      icon: dimensionIcons[i],
+      score: d.total,
+      maxScore,
+      percentage: Math.round((d.total / maxScore) * 100),
+    };
+  });
+}
+
 const ReportScreen = () => {
   const { state, dispatch } = useGame();
+  const { questions } = useQuestions(state.profile.profileCode);
   const hasSaved = useRef(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const { weights, bands, loading: configLoading } = useScoringConfig();
 
-  // Calculate FQ score with dynamic weights/bands
-  const normalizedScores = Array.from({ length: 7 }, (_, level) => {
-    const levelAnswers = state.answers[level] || {};
-    return calculateNormalizedScore(levelAnswers);
-  });
+  const totalScore = Object.values(state.answers).reduce((sum, s) => sum + s, 0);
+  const band = fqBands.find(b => totalScore >= b.min && totalScore < b.max) || fqBands[0];
+  const dimScores = computeDimensionScores(questions, state.answers);
 
-  const weightedTotal = normalizedScores.reduce(
-    (sum, score, idx) => sum + score * weights[idx], 0
-  );
-  const fqScore = Math.round(weightedTotal * 10);
-
-  const scored = normalizedScores.map((s, i) => ({ score: s, index: i }));
-  scored.sort((a, b) => b.score - a.score);
-  const primaryIdx = scored[0].index;
-  const secondaryIdx = scored[1]?.index ?? scored[0].index;
-  const threshold = 50;
-  const primaryArchetype = normalizedScores[primaryIdx] >= threshold
-    ? archetypes[primaryIdx].high : archetypes[primaryIdx].low;
-  const secondaryArchetype = normalizedScores[secondaryIdx] >= threshold
-    ? archetypes[secondaryIdx].high : archetypes[secondaryIdx].low;
-  const band = bands.find(b => fqScore >= b.min && fqScore < b.max) || bands[0];
-
-  const radarData = dimensionLabels.map((label, i) => ({
-    dimension: `${dimensionIcons[i]} ${label}`,
-    score: Math.round(normalizedScores[i]),
+  const radarData = dimScores.map(ds => ({
+    dimension: `${ds.icon} ${ds.dimension}`,
+    score: ds.percentage,
     fullMark: 100,
   }));
 
-  // Save session to backend
+  const questionsAndAnswers = extractQuestionsAndAnswers(questions, state.answers);
+  const tips = getFinancialTips(dimScores);
+
   useEffect(() => {
-    if (hasSaved.current) return;
+    if (hasSaved.current || questions.length === 0) return;
     hasSaved.current = true;
 
     const saveSession = async () => {
       try {
-        // Build detailed Q&A data for admin analytics
-        const detailed = questionsAndAnswers.map((qa, idx) => ({
-          index: idx,
-          level: levels.findIndex(l => l.title === qa.levelTitle) ?? 0,
-          levelTitle: qa.levelTitle,
-          category: qa.levelTitle, // dimension name
-          question: qa.question,
-          selectedOption: qa.selectedOption,
-          selectedEmoji: qa.selectedEmoji,
-          score: qa.score,
-        }));
-
         const enrichedAnswers = {
-          detailed,
-          raw: state.answers,
-          normalizedScores: normalizedScores.map((s, i) => ({
-            dimension: dimensionLabels[i],
-            score: Math.round(s),
+          detailed: questionsAndAnswers,
+          dimensionScores: dimScores.map(ds => ({
+            dimension: ds.dimension,
+            score: ds.score,
+            maxScore: ds.maxScore,
+            percentage: ds.percentage,
           })),
+          totalScore,
         };
 
         await supabase.from('game_sessions').insert({
           player_name: state.profile.name,
-          player_age: state.profile.age,
+          player_age: state.profile.ageGroup,
           player_gender: state.profile.gender,
           player_phone: state.profile.phone,
           player_country: state.profile.country,
           player_state: state.profile.state,
           player_district: state.profile.district,
-          player_status: state.profile.status,
-          player_income_type: state.profile.incomeType,
+          player_status: state.profile.role,
+          player_income_type: state.profile.roleLabel,
+          profile_code: state.profile.profileCode,
           answers: enrichedAnswers as any,
-          fq_score: fqScore,
+          fq_score: totalScore,
           band_level: band.level,
-          primary_archetype: primaryArchetype.name,
-          secondary_archetype: secondaryArchetype.name,
           reflection_answer: state.reflectionAnswer,
           campaign_id: state.campaignId || null,
         } as any);
@@ -123,25 +103,22 @@ const ReportScreen = () => {
         console.error('Failed to save session:', err);
       }
     };
-
     saveSession();
-  }, []);
-
-  const questionsAndAnswers = extractQuestionsAndAnswers(state.answers);
-  const { tips, suggestions } = getFinancialTips(normalizedScores);
+  }, [questions.length]);
 
   const handleDownloadPDF = () => {
     const html = generateReportHTML({
       logoUrl: window.location.origin + finquoLogo,
       playerName: state.profile.name,
-      fqScore,
+      profileLabel: getProfileLabel(state.profile.profileCode),
+      totalScore,
+      maxScore: MAX_SCORE,
       bandLevel: band.level,
       bandEmoji: band.emoji,
       bandMeaning: band.meaning,
-      normalizedScores,
+      dimensionScores: dimScores,
       questionsAndAnswers,
       tips,
-      suggestions,
       reflectionAnswer: state.reflectionAnswer,
     });
     openPrintableReport(html);
@@ -151,32 +128,26 @@ const ReportScreen = () => {
     if (!email || !email.includes('@')) return;
     setEmailSending(true);
     try {
-      await supabase.from('game_sessions').update({ player_email: email } as any).eq('player_name', state.profile.name).eq('fq_score', fqScore);
+      await supabase.from('game_sessions').update({ player_email: email } as any)
+        .eq('player_name', state.profile.name).eq('fq_score', totalScore);
 
       await supabase.functions.invoke('send-report-email', {
         body: {
           email,
           playerName: state.profile.name,
-          fqScore,
+          fqScore: totalScore,
+          maxScore: MAX_SCORE,
           bandLevel: band.level,
           bandEmoji: band.emoji,
           bandMeaning: band.meaning,
-          dimensionScores: dimensionLabels.map((label, i) => ({
-            label,
-            icon: dimensionIcons[i],
-            score: Math.round(normalizedScores[i]),
+          dimensionScores: dimScores.map(ds => ({
+            label: ds.dimension,
+            icon: ds.icon,
+            score: ds.percentage,
           })),
           reflectionAnswer: state.reflectionAnswer,
-          questionsAndAnswers: questionsAndAnswers.map(qa => ({
-            levelTitle: qa.levelTitle,
-            levelIcon: qa.levelIcon,
-            question: qa.question,
-            selectedOption: qa.selectedOption,
-            selectedEmoji: qa.selectedEmoji,
-            score: qa.score,
-          })),
+          questionsAndAnswers,
           tips,
-          suggestions,
         },
       });
       setEmailSent(true);
@@ -187,7 +158,7 @@ const ReportScreen = () => {
     }
   };
 
-  const shareText = `My FQ Test Score is ${fqScore}/1000! 🏆\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
+  const shareText = `My FQ Test Score is ${totalScore}/${MAX_SCORE}! 🏆\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
 
   const handleShare = (platform: string) => {
     const encoded = encodeURIComponent(shareText);
@@ -207,7 +178,6 @@ const ReportScreen = () => {
   return (
     <div className="min-h-screen game-gradient px-4 py-6 print:bg-white print:text-black">
       <div className="max-w-md mx-auto">
-        {/* Header */}
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center mb-6">
           <img src={finquoLogo} alt="FinQuo Versity" className="w-24 h-auto mx-auto mb-2" />
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }} className="text-5xl mb-2">
@@ -228,7 +198,7 @@ const ReportScreen = () => {
                 stroke="url(#fqGrad)" strokeWidth="7" strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 42}`}
                 initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
-                animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - fqScore / 1000) }}
+                animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - totalScore / MAX_SCORE) }}
                 transition={{ delay: 0.5, duration: 1.5, ease: 'easeOut' }}
               />
               <defs>
@@ -240,9 +210,9 @@ const ReportScreen = () => {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <motion.span className="text-4xl font-display font-bold gold-text" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
-                {fqScore}
+                {totalScore}
               </motion.span>
-              <span className="text-game-muted text-xs font-body">/1000</span>
+              <span className="text-game-muted text-xs font-body">/{MAX_SCORE}</span>
             </div>
           </div>
           <p className="text-game-gold font-display font-semibold text-lg">{band.level}</p>
@@ -264,33 +234,29 @@ const ReportScreen = () => {
         </motion.div>
 
         {/* Dimension Score Bars */}
-        {dimensionLabels.map((label, i) => (
-          <motion.div key={label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.1 }} className="glass-card rounded-2xl p-4 mb-3">
+        {dimScores.map((ds, i) => (
+          <motion.div key={ds.dimension} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.1 }} className="glass-card rounded-2xl p-4 mb-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-game-text font-display text-sm">{dimensionIcons[i]} {label}</span>
-              <span className="text-game-gold font-display font-bold">{Math.round(normalizedScores[i])}%</span>
+              <span className="text-game-text font-display text-sm">{ds.icon} {ds.dimension}</span>
+              <span className="text-game-gold font-display font-bold">{ds.percentage}%</span>
             </div>
             <div className="h-2.5 bg-game-card rounded-full overflow-hidden">
-              <motion.div className="h-full gold-gradient rounded-full" initial={{ width: 0 }} animate={{ width: `${Math.round(normalizedScores[i])}%` }} transition={{ delay: 0.6 + i * 0.1, duration: 1, ease: 'easeOut' }} />
+              <motion.div className="h-full gold-gradient rounded-full" initial={{ width: 0 }} animate={{ width: `${ds.percentage}%` }} transition={{ delay: 0.6 + i * 0.1, duration: 1, ease: 'easeOut' }} />
             </div>
           </motion.div>
         ))}
 
-
         {/* Social Sharing */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="glass-card rounded-2xl p-4 mb-5 text-center print:hidden">
-          <p className="text-game-text font-display font-semibold text-sm mb-3">📢 Share Your Superpower</p>
+          <p className="text-game-text font-display font-semibold text-sm mb-3">📢 Share Your Results</p>
           <div className="flex justify-center gap-3">
             {[
               { name: 'whatsapp', emoji: '💬', label: 'WhatsApp', color: 'bg-green-600' },
               { name: 'facebook', emoji: '📘', label: 'Facebook', color: 'bg-blue-600' },
               { name: 'instagram', emoji: '📸', label: 'Instagram', color: 'bg-pink-600' },
-            ].map((p) => (
-              <button
-                key={p.name}
-                onClick={() => handleShare(p.name)}
-                className={`${p.color} text-white px-4 py-2 rounded-xl font-body text-xs font-semibold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-transform`}
-              >
+            ].map(p => (
+              <button key={p.name} onClick={() => handleShare(p.name)}
+                className={`${p.color} text-white px-4 py-2 rounded-xl font-body text-xs font-semibold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-transform`}>
                 <span>{p.emoji}</span> {p.label}
               </button>
             ))}
@@ -299,32 +265,21 @@ const ReportScreen = () => {
 
         {/* Download PDF & Send Email */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="grid grid-cols-2 gap-3 mb-5 print:hidden">
-          <button
-            onClick={handleDownloadPDF}
-            className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2"
-          >
+          <button onClick={handleDownloadPDF} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
             📥 Download PDF
           </button>
-          <button
-            onClick={() => setEmailOpen(true)}
-            className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2"
-          >
+          <button onClick={() => setEmailOpen(true)} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
             📧 Send to Email
           </button>
         </motion.div>
 
-        {/* Play Again */}
         <div className="pb-8 print:hidden">
-          <button
-            onClick={() => dispatch({ type: 'RESET' })}
-            className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform"
-          >
+          <button onClick={() => dispatch({ type: 'RESET' })} className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform">
             Take Test Again 🔄
           </button>
         </div>
       </div>
 
-      {/* Email Dialog */}
       <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
         <DialogContent className="bg-game-surface border-game-card text-game-text max-w-sm">
           <DialogHeader>
@@ -338,24 +293,14 @@ const ReportScreen = () => {
               <span className="text-4xl block mb-2">✅</span>
               <p className="text-game-text font-display font-semibold">Report Sent!</p>
               <p className="text-game-muted font-body text-xs mt-1">Check your inbox for your FQ Test report.</p>
-              <Button onClick={() => { setEmailOpen(false); setEmailSent(false); setEmail(''); }} className="mt-4 gold-gradient text-white font-display">
-                Close
-              </Button>
+              <Button onClick={() => { setEmailOpen(false); setEmailSent(false); setEmail(''); }} className="mt-4 gold-gradient text-white font-display">Close</Button>
             </div>
           ) : (
             <div className="space-y-4">
-              <Input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-game-card border-game-muted/30 text-game-text placeholder:text-game-muted/50 font-body"
-              />
-              <Button
-                onClick={handleSendEmail}
-                disabled={emailSending || !email.includes('@')}
-                className="w-full gold-gradient text-white font-display font-semibold hover:scale-105 active:scale-95 transition-transform"
-              >
+              <Input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)}
+                className="bg-game-card border-game-muted/30 text-game-text placeholder:text-game-muted/50 font-body" />
+              <Button onClick={handleSendEmail} disabled={emailSending || !email.includes('@')}
+                className="w-full gold-gradient text-white font-display font-semibold hover:scale-105 active:scale-95 transition-transform">
                 {emailSending ? 'Sending...' : 'Send Report 📨'}
               </Button>
             </div>

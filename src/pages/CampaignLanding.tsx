@@ -5,12 +5,10 @@ import { GameProvider, useGame } from '@/context/GameContext';
 import WelcomeScreen from '@/components/game/WelcomeScreen';
 import ConsentScreen from '@/components/game/ConsentScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
-import LevelPlay from '@/components/game/LevelPlay';
-import RealityCheckPlay from '@/components/game/RealityCheckPlay';
+import QuestionPlay from '@/components/game/QuestionPlay';
 import ReflectionScreen from '@/components/game/ReflectionScreen';
 import ReportScreen from '@/components/game/ReportScreen';
 import GlobalProgressBar from '@/components/game/GlobalProgressBar';
-import CampaignJoinScreen from '@/components/game/CampaignJoinScreen';
 import { Loader2 } from 'lucide-react';
 
 interface CampaignData {
@@ -30,14 +28,13 @@ const CampaignInit = ({ campaign }: { campaign: CampaignData }) => {
   return null;
 };
 
-const CampaignGameFlow = ({ campaign }: { campaign: CampaignData }) => {
+const CampaignGameFlow = () => {
   const { state } = useGame();
-
   switch (state.step) {
     case 'welcome': return <WelcomeScreen />;
     case 'consent': return <ConsentScreen />;
     case 'profile': return <ProfileScreen />;
-    case 'level': return state.currentLevel === 0 ? <RealityCheckPlay /> : <LevelPlay />;
+    case 'quiz': return <QuestionPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;
     default: return <WelcomeScreen />;
@@ -84,7 +81,7 @@ const CampaignLanding = () => {
     <GameProvider>
       <CampaignInit campaign={campaign!} />
       <GlobalProgressBar />
-      <CampaignGameFlow campaign={campaign!} />
+      <CampaignGameFlow />
     </GameProvider>
   );
 };

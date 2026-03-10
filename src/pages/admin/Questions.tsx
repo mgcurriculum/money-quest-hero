@@ -10,11 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Loader2, Download, Upload, AlertTriangle, CheckCircle2, XCircle, Info } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Download, Upload, FileSpreadsheet, AlertTriangle, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { exportQuestionsToCsv, parseCsvToQuestions, downloadCsv } from '@/utils/questionsCsv';
 import { getAllProfileCodes, getProfileLabel, dimensions } from '@/data/questions';
 import QuestionEditDialog from '@/components/admin/QuestionEditDialog';
 import ImportSummaryDialog from '@/components/admin/ImportSummaryDialog';
+import GoogleSheetImportDialog from '@/components/admin/GoogleSheetImportDialog';
 
 interface Question {
   id: string;

@@ -6,7 +6,6 @@ import { Zap, Star, ChevronRight } from 'lucide-react';
 import { useNarration } from '@/hooks/useNarration';
 import MuteButton from './MuteButton';
 import QuizProgressBar from './QuizProgressBar';
-import { getQuestionNarration, getAnswerFeedback } from '@/utils/narrationPrompts';
 
 const feedbackData = [
   { text: "Noted! 📝" },
@@ -30,7 +29,7 @@ const RealityCheckPlay = () => {
     if (!state.isMuted && question && state.currentQuestion !== lastNarratedQuestion.current) {
       lastNarratedQuestion.current = state.currentQuestion;
       const timer = setTimeout(() => {
-        speak(getQuestionNarration('Financial Reality', question.category, state.currentQuestion + 1, totalQuestions));
+        speak(`Here's a question about ${question.category}. Take a moment to read it and pick the answer that feels most like you.`);
       }, 500);
       return () => clearTimeout(timer);
     }
@@ -42,9 +41,9 @@ const RealityCheckPlay = () => {
     setSelectedOption(optIndex);
     dispatch({ type: 'ANSWER_QUESTION', level: 0, question: state.currentQuestion, score });
 
+    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
     if (!state.isMuted) {
-      const feedbackNarration = getAnswerFeedback(score, 'Financial Reality');
-      speak(feedbackNarration);
+      speak(feedbackText);
     }
 
     setShowFeedback(true);

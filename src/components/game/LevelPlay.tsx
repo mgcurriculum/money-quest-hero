@@ -6,7 +6,6 @@ import { levels } from '@/data/questions';
 import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight } from 'lucide-react';
 import MuteButton from './MuteButton';
 import QuizProgressBar from './QuizProgressBar';
-import { getQuestionNarration, getAnswerFeedback } from '@/utils/narrationPrompts';
 
 const feedbackData = [
   { text: "Noted! 📝", icon: <Zap className="text-game-gold" size={28} /> },
@@ -28,8 +27,7 @@ const LevelPlay = () => {
 
   useEffect(() => {
     if (!state.isMuted && scenario) {
-      const narration = getQuestionNarration(level.theme, scenario.situation?.slice(0, 20) || '', state.currentQuestion + 1, totalScenarios);
-      const timer = setTimeout(() => speak(narration), 500);
+      const timer = setTimeout(() => speak("Alright, picture this scenario. Read through the situation and choose how you'd handle it."), 500);
       return () => clearTimeout(timer);
     }
   }, [state.isMuted, speak, state.currentLevel, state.currentQuestion]);
@@ -41,9 +39,9 @@ const LevelPlay = () => {
     setXpGained(score * 20);
     dispatch({ type: 'ANSWER_QUESTION', level: state.currentLevel, question: state.currentQuestion, score });
 
+    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
     if (!state.isMuted) {
-      const feedbackNarration = getAnswerFeedback(score, level.theme);
-      speak(feedbackNarration);
+      speak(feedbackText);
     }
 
     setShowFeedback(true);

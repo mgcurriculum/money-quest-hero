@@ -37,17 +37,13 @@ interface ProfileOption {
 
 const AGE_GROUPS = ['18-25', '26-39', '40-59', '60+'];
 const CATEGORIES = [
-  { level: 0, label: 'Level 0 — Financial Reality' },
-  { level: 1, label: 'Level 1 — Earning Mindset' },
-  { level: 2, label: 'Level 2 — Spending Discipline' },
-  { level: 3, label: 'Level 3 — Saving Behaviour' },
-  { level: 4, label: 'Level 4 — Debt Awareness' },
-  { level: 5, label: 'Level 5 — Investment Awareness' },
-  { level: 6, label: 'Level 6 — Financial Safety' },
-];
-const DIMENSIONS = [
-  'Financial Reality', 'Earning Mindset', 'Spending Discipline',
-  'Saving Behaviour', 'Debt Awareness', 'Investment Awareness', 'Financial Safety',
+  { level: 0, label: 'Level 0 — Reality Check' },
+  { level: 1, label: 'Level 1 — Earning Quest' },
+  { level: 2, label: 'Level 2 — Spending Challenge' },
+  { level: 3, label: 'Level 3 — Saving Mission' },
+  { level: 4, label: 'Level 4 — Debt Trap' },
+  { level: 5, label: 'Level 5 — Investment World' },
+  { level: 6, label: 'Level 6 — Protection Shield' },
 ];
 
 const emptyOption = (): OptionItem => ({ text: '', emoji: '' });
@@ -73,11 +69,6 @@ const Questions = () => {
   const [formOptions, setFormOptions] = useState<OptionItem[]>(Array(5).fill(null).map(emptyOption));
   const [formActive, setFormActive] = useState(true);
   const [formOrder, setFormOrder] = useState(0);
-  const [formDifficulty, setFormDifficulty] = useState(2);
-  const [formBranchLow, setFormBranchLow] = useState<string>('');
-  const [formBranchMid, setFormBranchMid] = useState<string>('');
-  const [formBranchHigh, setFormBranchHigh] = useState<string>('');
-  const [formDimension, setFormDimension] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
 
@@ -112,8 +103,6 @@ const Questions = () => {
     setFormAgeGroups([activeTab]);
     setFormOptions(Array(5).fill(null).map(emptyOption));
     setFormActive(true); setFormOrder(0);
-    setFormDifficulty(2); setFormBranchLow('none'); setFormBranchMid('none'); setFormBranchHigh('none');
-    setFormDimension(DIMENSIONS[0]);
     setDialogOpen(true);
   };
 
@@ -124,12 +113,6 @@ const Questions = () => {
     const opts = (q.options as any as OptionItem[]) || [];
     setFormOptions([...opts, ...Array(Math.max(0, 5 - opts.length)).fill(null).map(emptyOption)]);
     setFormActive(q.is_active); setFormOrder(q.sort_order);
-    const ext = q as any;
-    setFormDifficulty(ext.difficulty ?? 2);
-    setFormBranchLow(ext.branch_low != null ? String(ext.branch_low) : 'none');
-    setFormBranchMid(ext.branch_mid != null ? String(ext.branch_mid) : 'none');
-    setFormBranchHigh(ext.branch_high != null ? String(ext.branch_high) : 'none');
-    setFormDimension(ext.dimension || DIMENSIONS[q.level] || '');
     setDialogOpen(true);
   };
 
@@ -140,15 +123,10 @@ const Questions = () => {
       return;
     }
     setSaving(true);
-    const payload: any = {
+    const payload = {
       question_text: formText.trim(), category: formCategory.trim(), level: formLevel,
       age_groups: formAgeGroups, options: validOptions as any,
       is_active: formActive, sort_order: formOrder, updated_at: new Date().toISOString(),
-      difficulty: formDifficulty,
-      branch_low: formBranchLow !== 'none' ? Number(formBranchLow) : null,
-      branch_mid: formBranchMid !== 'none' ? Number(formBranchMid) : null,
-      branch_high: formBranchHigh !== 'none' ? Number(formBranchHigh) : null,
-      dimension: formDimension || DIMENSIONS[formLevel] || null,
     };
     if (editing) {
       const { error } = await supabase.from('questions').update(payload).eq('id', editing.id);
@@ -320,14 +298,7 @@ const Questions = () => {
                     <span className="text-sm text-muted-foreground font-mono w-6">{idx + 1}</span>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm ${q.is_active ? 'text-foreground' : 'text-muted-foreground line-through'}`}>{q.question_text}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {q.category && <Badge variant="secondary" className="text-xs">{q.category}</Badge>}
-                        {(q as any).dimension && <Badge variant="outline" className="text-xs">📐 {(q as any).dimension}</Badge>}
-                        {(q as any).difficulty != null && <Badge variant="outline" className="text-xs">⚡ D{(q as any).difficulty}</Badge>}
-                        {((q as any).branch_low != null || (q as any).branch_mid != null || (q as any).branch_high != null) && (
-                          <Badge variant="outline" className="text-xs text-primary">🔀 Branching</Badge>
-                        )}
-                      </div>
+                      {q.category && <Badge variant="secondary" className="text-xs mt-1">{q.category}</Badge>}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <Switch checked={q.is_active} onCheckedChange={() => toggleActive(q)} />
@@ -480,66 +451,6 @@ const Questions = () => {
             <div className="grid grid-cols-2 gap-4">
               <div><Label>Sort Order</Label><Input type="number" value={formOrder} onChange={e => setFormOrder(Number(e.target.value))} /></div>
               <div className="flex items-center gap-2 pt-6"><Switch checked={formActive} onCheckedChange={setFormActive} /><Label>Active</Label></div>
-            </div>
-
-            {/* Adaptive Branching Config */}
-            <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
-              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">🔀 Adaptive Branching</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Dimension</Label>
-                  <Select value={formDimension} onValueChange={setFormDimension}>
-                    <SelectTrigger><SelectValue placeholder="Select dimension" /></SelectTrigger>
-                    <SelectContent>
-                      {DIMENSIONS.map(d => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Difficulty</Label>
-                  <Select value={String(formDifficulty)} onValueChange={v => setFormDifficulty(Number(v))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 — Easy</SelectItem>
-                      <SelectItem value="2">2 — Medium</SelectItem>
-                      <SelectItem value="3">3 — Hard</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <Label className="text-xs">Branch Low (score ≤1)</Label>
-                  <Select value={formBranchLow} onValueChange={setFormBranchLow}>
-                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-xs">Branch Mid (score = 2)</Label>
-                  <Select value={formBranchMid} onValueChange={setFormBranchMid}>
-                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-xs">Branch High (score ≥3)</Label>
-                  <Select value={formBranchHigh} onValueChange={setFormBranchHigh}>
-                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {CATEGORIES.map(c => (<SelectItem key={c.level} value={String(c.level)}>L{c.level}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground">Set branching to control which level the engine jumps to based on the user's answer score. Leave empty for sequential flow.</p>
             </div>
           </div>
           <DialogFooter>

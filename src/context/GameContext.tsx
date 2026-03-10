@@ -16,16 +16,6 @@ export interface LevelAnswers {
   [questionIndex: number]: number; // score 1-5
 }
 
-export interface AdaptiveAnswer {
-  questionId: string;
-  level: number;
-  dimension: string;
-  score: number;
-  questionText: string;
-  selectedOption: string;
-  selectedEmoji: string;
-}
-
 export interface GameState {
   step: 'welcome' | 'consent' | 'profile' | 'level' | 'reflection' | 'report';
   profile: PlayerProfile;
@@ -39,9 +29,6 @@ export interface GameState {
   isMuted: boolean;
   campaignId: string | null;
   campaignCode: string | null;
-  assessmentMode: 'fixed' | 'adaptive';
-  adaptiveAnswers: AdaptiveAnswer[];
-  adaptiveDimensionsCovered: number[];
 }
 
 type Action =
@@ -57,10 +44,6 @@ type Action =
   | { type: 'SET_MUTE'; value: boolean }
   | { type: 'SET_CAMPAIGN'; campaignId: string | null }
   | { type: 'SET_CAMPAIGN_CODE'; code: string | null }
-  | { type: 'SET_ASSESSMENT_MODE'; mode: 'fixed' | 'adaptive' }
-  | { type: 'ADD_ADAPTIVE_ANSWER'; answer: AdaptiveAnswer }
-  | { type: 'SET_ADAPTIVE_DIMENSIONS_COVERED'; dimensions: number[] }
-  | { type: 'SET_ADAPTIVE_COMPLETE' }
   | { type: 'RESET' };
 
 const initialState: GameState = {
@@ -76,9 +59,6 @@ const initialState: GameState = {
   isMuted: false,
   campaignId: null,
   campaignCode: null,
-  assessmentMode: 'adaptive',
-  adaptiveAnswers: [],
-  adaptiveDimensionsCovered: [],
 };
 
 function reducer(state: GameState, action: Action): GameState {
@@ -94,6 +74,7 @@ function reducer(state: GameState, action: Action): GameState {
     case 'NEXT_QUESTION': return { ...state, currentQuestion: state.currentQuestion + 1 };
     case 'COMPLETE_LEVEL': {
       const newCompleted = [...new Set([...state.completedLevels, action.level])];
+      // Auto-advance: if level < 6, start next level; if level === 6, go to reflection
       if (action.level < 6) {
         return {
           ...state,
@@ -114,14 +95,6 @@ function reducer(state: GameState, action: Action): GameState {
     case 'SET_MUTE': return { ...state, isMuted: action.value };
     case 'SET_CAMPAIGN': return { ...state, campaignId: action.campaignId };
     case 'SET_CAMPAIGN_CODE': return { ...state, campaignCode: action.code };
-    case 'SET_ASSESSMENT_MODE': return { ...state, assessmentMode: action.mode };
-    case 'ADD_ADAPTIVE_ANSWER': {
-      const newAnswers = [...state.adaptiveAnswers, action.answer];
-      const coveredDims = [...new Set(newAnswers.map(a => a.level))];
-      return { ...state, adaptiveAnswers: newAnswers, adaptiveDimensionsCovered: coveredDims };
-    }
-    case 'SET_ADAPTIVE_DIMENSIONS_COVERED': return { ...state, adaptiveDimensionsCovered: action.dimensions };
-    case 'SET_ADAPTIVE_COMPLETE': return { ...state, step: 'reflection' };
     case 'RESET': return { ...initialState, campaignId: state.campaignId, campaignCode: state.campaignCode };
     default: return state;
   }

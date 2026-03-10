@@ -104,6 +104,7 @@ export type Database = {
           player_state: string | null
           player_status: string | null
           primary_archetype: string | null
+          profile_code: string | null
           reflection_answer: string | null
           secondary_archetype: string | null
         }
@@ -125,6 +126,7 @@ export type Database = {
           player_state?: string | null
           player_status?: string | null
           primary_archetype?: string | null
+          profile_code?: string | null
           reflection_answer?: string | null
           secondary_archetype?: string | null
         }
@@ -146,6 +148,7 @@ export type Database = {
           player_state?: string | null
           player_status?: string | null
           primary_archetype?: string | null
+          profile_code?: string | null
           reflection_answer?: string | null
           secondary_archetype?: string | null
         }
@@ -197,54 +200,66 @@ export type Database = {
       }
       questions: {
         Row: {
-          age_groups: string[]
-          branch_high: number | null
-          branch_low: number | null
-          branch_mid: number | null
           category: string
           created_at: string
-          difficulty: number | null
           dimension: string | null
           id: string
           is_active: boolean
-          level: number
-          options: Json
+          option_1: string
+          option_2: string
+          option_3: string
+          option_4: string
+          option_5: string
+          profile_code: string
+          question_no: number
           question_text: string
-          sort_order: number
+          score_1: number
+          score_2: number
+          score_3: number
+          score_4: number
+          score_5: number
           updated_at: string
         }
         Insert: {
-          age_groups?: string[]
-          branch_high?: number | null
-          branch_low?: number | null
-          branch_mid?: number | null
           category: string
           created_at?: string
-          difficulty?: number | null
           dimension?: string | null
           id?: string
           is_active?: boolean
-          level: number
-          options?: Json
+          option_1?: string
+          option_2?: string
+          option_3?: string
+          option_4?: string
+          option_5?: string
+          profile_code?: string
+          question_no?: number
           question_text: string
-          sort_order?: number
+          score_1?: number
+          score_2?: number
+          score_3?: number
+          score_4?: number
+          score_5?: number
           updated_at?: string
         }
         Update: {
-          age_groups?: string[]
-          branch_high?: number | null
-          branch_low?: number | null
-          branch_mid?: number | null
           category?: string
           created_at?: string
-          difficulty?: number | null
           dimension?: string | null
           id?: string
           is_active?: boolean
-          level?: number
-          options?: Json
+          option_1?: string
+          option_2?: string
+          option_3?: string
+          option_4?: string
+          option_5?: string
+          profile_code?: string
+          question_no?: number
           question_text?: string
-          sort_order?: number
+          score_1?: number
+          score_2?: number
+          score_3?: number
+          score_4?: number
+          score_5?: number
           updated_at?: string
         }
         Relationships: []

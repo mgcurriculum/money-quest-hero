@@ -380,6 +380,16 @@ const Questions = () => {
         summary={importSummary}
         onClose={() => setImportSummary(null)}
       />
+
+      {/* Google Sheets Import Dialog */}
+      <GoogleSheetImportDialog
+        open={gsheetOpen}
+        onOpenChange={setGsheetOpen}
+        onImportComplete={(summary) => {
+          setImportSummary(summary);
+          fetchQuestions();
+        }}
+      />
     </div>
   );
 };

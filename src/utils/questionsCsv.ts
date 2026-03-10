@@ -77,30 +77,79 @@ function parseCsvLine(line: string): string[] {
   return result;
 }
 
+// Normalize header names to our internal field names
+function normalizeHeader(h: string): string | null {
+  const s = h.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  const map: Record<string, string> = {
+    'profilecode': 'profile_code',
+    'profile': 'profile_code',
+    'qno': 'question_no',
+    'questionno': 'question_no',
+    'no': 'question_no',
+    'sno': 'question_no',
+    'dimension': 'dimension',
+    'category': 'category',
+    'question': 'question_text',
+    'questiontext': 'question_text',
+    'option1': 'option_1',
+    'option2': 'option_2',
+    'option3': 'option_3',
+    'option4': 'option_4',
+    'option5': 'option_5',
+    'score1': 'score_1',
+    'score2': 'score_2',
+    'score3': 'score_3',
+    'score4': 'score_4',
+    'score5': 'score_5',
+    'isactive': 'is_active',
+    'active': 'is_active',
+  };
+  return map[s] || null;
+}
+
 export function parseCsvToQuestions(csv: string, defaultProfileCode?: string): QuestionRow[] {
   const lines = csv.split(/\r?\n/).filter(l => l.trim());
   if (lines.length < 2) return [];
+
+  // Parse header row and build column index map
+  const headerCols = parseCsvLine(lines[0]);
+  const colMap: Record<string, number> = {};
+  headerCols.forEach((h, idx) => {
+    const field = normalizeHeader(h);
+    if (field && !(field in colMap)) {
+      colMap[field] = idx;
+    }
+  });
+
+  const get = (cols: string[], field: string): string => {
+    const idx = colMap[field];
+    return idx !== undefined ? (cols[idx]?.trim() || '') : '';
+  };
+
   const questions: QuestionRow[] = [];
   for (let i = 1; i < lines.length; i++) {
     const cols = parseCsvLine(lines[i]);
-    if (cols.length < 5) continue;
+    
+    const questionText = get(cols, 'question_text');
+    if (!questionText) continue; // skip empty rows
+
     questions.push({
-      profile_code: cols[0]?.trim() || defaultProfileCode || '',
-      question_no: parseInt(cols[1]) || (i),
-      dimension: cols[2]?.trim() || '',
-      category: cols[3]?.trim() || '',
-      question_text: cols[4]?.trim() || '',
-      option_1: cols[5]?.trim() || '',
-      option_2: cols[6]?.trim() || '',
-      option_3: cols[7]?.trim() || '',
-      option_4: cols[8]?.trim() || '',
-      option_5: cols[9]?.trim() || '',
-      score_1: parseInt(cols[10]) || 10,
-      score_2: parseInt(cols[11]) || 20,
-      score_3: parseInt(cols[12]) || 30,
-      score_4: parseInt(cols[13]) || 40,
-      score_5: parseInt(cols[14]) || 50,
-      is_active: cols[15]?.toLowerCase() !== 'false',
+      profile_code: get(cols, 'profile_code') || defaultProfileCode || '',
+      question_no: parseInt(get(cols, 'question_no')) || i,
+      dimension: get(cols, 'dimension'),
+      category: get(cols, 'category'),
+      question_text: questionText,
+      option_1: get(cols, 'option_1'),
+      option_2: get(cols, 'option_2'),
+      option_3: get(cols, 'option_3'),
+      option_4: get(cols, 'option_4'),
+      option_5: get(cols, 'option_5'),
+      score_1: parseInt(get(cols, 'score_1')) || 10,
+      score_2: parseInt(get(cols, 'score_2')) || 20,
+      score_3: parseInt(get(cols, 'score_3')) || 30,
+      score_4: parseInt(get(cols, 'score_4')) || 40,
+      score_5: parseInt(get(cols, 'score_5')) || 50,
+      is_active: get(cols, 'is_active').toLowerCase() !== 'false',
     });
   }
   return questions;

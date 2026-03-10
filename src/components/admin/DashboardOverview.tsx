@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Users, Trophy } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Tables } from '@/integrations/supabase/types';
+import { MAX_SCORE } from '@/data/questions';
 
 type Session = Tables<'game_sessions'>;
 
@@ -28,7 +29,6 @@ const DashboardOverview = ({ sessions, onSelectSession }: Props) => {
 
   return (
     <div className="space-y-6">
-      {/* Stats */}
       <div className="grid grid-cols-2 gap-4">
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
@@ -44,13 +44,12 @@ const DashboardOverview = ({ sessions, onSelectSession }: Props) => {
             <Trophy className="h-8 w-8 text-primary" />
             <div>
               <p className="text-sm text-muted-foreground">Average FQ Score</p>
-              <p className="text-2xl font-bold text-foreground">{avgScore}</p>
+              <p className="text-2xl font-bold text-foreground">{avgScore}/{MAX_SCORE}</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Band Chart */}
       {bandDistribution.length > 0 && (
         <Card>
           <CardHeader><CardTitle className="text-base">Score Band Distribution</CardTitle></CardHeader>
@@ -68,20 +67,17 @@ const DashboardOverview = ({ sessions, onSelectSession }: Props) => {
         </Card>
       )}
 
-      {/* Sessions Table */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Sessions ({sessions.length})</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle className="text-base">Sessions ({sessions.length})</CardTitle></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Age</TableHead>
+                <TableHead>Profile</TableHead>
                 <TableHead>FQ Score</TableHead>
                 <TableHead>Band</TableHead>
-                <TableHead>Primary</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -90,9 +86,9 @@ const DashboardOverview = ({ sessions, onSelectSession }: Props) => {
                 <TableRow key={s.id} className="cursor-pointer hover:bg-accent/50" onClick={() => onSelectSession(s)}>
                   <TableCell className="font-medium">{s.player_name}</TableCell>
                   <TableCell>{s.player_age}</TableCell>
-                  <TableCell>{s.fq_score}</TableCell>
+                  <TableCell>{(s as any).profile_code || '-'}</TableCell>
+                  <TableCell>{s.fq_score}/{MAX_SCORE}</TableCell>
                   <TableCell>{s.band_level}</TableCell>
-                  <TableCell>{s.primary_archetype}</TableCell>
                   <TableCell>{new Date(s.created_at).toLocaleDateString()}</TableCell>
                 </TableRow>
               ))}

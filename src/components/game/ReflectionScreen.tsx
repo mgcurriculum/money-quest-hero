@@ -6,11 +6,11 @@ import MuteButton from './MuteButton';
 import { reflectionOptions } from '@/data/questions';
 
 const interestOptions = [
-  { text: "Not interested", emoji: "❌" },
-  { text: "Slightly curious", emoji: "🤷" },
-  { text: "Somewhat interested", emoji: "🤔" },
-  { text: "Interested in learning more", emoji: "📚" },
-  { text: "Actively learning about money", emoji: "🚀" },
+  { text: 'Not interested', emoji: '❌' },
+  { text: 'Slightly curious', emoji: '🤷' },
+  { text: 'Somewhat interested', emoji: '🤔' },
+  { text: 'Interested in learning more', emoji: '📚' },
+  { text: 'Actively learning about money', emoji: '🚀' },
 ];
 
 const REFLECTION_TEXT_0 = "We're almost done! I'm curious — how interested are you in actually getting better with finances? Be honest!";

@@ -2,28 +2,23 @@ import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 
 export interface PlayerProfile {
   name: string;
-  age: string;
+  ageGroup: string; // '18-25', '26-39', '40-59', '60+'
   gender: string;
   phone: string;
   country: string;
   state: string;
   district: string;
-  status: string;
-  incomeType: string;
-}
-
-export interface LevelAnswers {
-  [questionIndex: number]: number; // score 1-5
+  role: string; // 'SAL', 'STU', etc.
+  roleLabel: string;
+  profileCode: string; // 'A1_SAL', etc.
 }
 
 export interface GameState {
-  step: 'welcome' | 'consent' | 'profile' | 'level' | 'reflection' | 'report';
+  step: 'welcome' | 'consent' | 'profile' | 'quiz' | 'reflection' | 'report';
   profile: PlayerProfile;
   consentGiven: boolean;
-  currentLevel: number; // 0-6
-  currentQuestion: number; // 0-6 for level 0, 0-2 for levels 1-6
-  answers: { [level: number]: LevelAnswers };
-  completedLevels: number[];
+  currentQuestion: number; // 0-17
+  answers: { [questionIndex: number]: number }; // question index -> score (10-50)
   reflectionAnswer: string;
   language: 'en' | 'ml';
   isMuted: boolean;
@@ -35,10 +30,9 @@ type Action =
   | { type: 'SET_STEP'; step: GameState['step'] }
   | { type: 'SET_PROFILE'; profile: PlayerProfile }
   | { type: 'SET_CONSENT'; value: boolean }
-  | { type: 'START_LEVEL'; level: number }
-  | { type: 'ANSWER_QUESTION'; level: number; question: number; score: number }
+  | { type: 'START_QUIZ' }
+  | { type: 'ANSWER_QUESTION'; question: number; score: number }
   | { type: 'NEXT_QUESTION' }
-  | { type: 'COMPLETE_LEVEL'; level: number }
   | { type: 'SET_REFLECTION'; answer: string }
   | { type: 'SET_LANGUAGE'; lang: 'en' | 'ml' }
   | { type: 'SET_MUTE'; value: boolean }
@@ -46,14 +40,18 @@ type Action =
   | { type: 'SET_CAMPAIGN_CODE'; code: string | null }
   | { type: 'RESET' };
 
+const initialProfile: PlayerProfile = {
+  name: '', ageGroup: '', gender: '', phone: '',
+  country: 'India', state: '', district: '',
+  role: '', roleLabel: '', profileCode: '',
+};
+
 const initialState: GameState = {
   step: 'welcome',
-  profile: { name: '', age: '', gender: '', phone: '', country: 'India', state: '', district: '', status: '', incomeType: '' },
+  profile: { ...initialProfile },
   consentGiven: false,
-  currentLevel: 0,
   currentQuestion: 0,
   answers: {},
-  completedLevels: [],
   reflectionAnswer: '',
   language: 'en',
   isMuted: false,
@@ -66,30 +64,11 @@ function reducer(state: GameState, action: Action): GameState {
     case 'SET_STEP': return { ...state, step: action.step };
     case 'SET_PROFILE': return { ...state, profile: action.profile };
     case 'SET_CONSENT': return { ...state, consentGiven: action.value };
-    case 'START_LEVEL': return { ...state, currentLevel: action.level, currentQuestion: 0, step: 'level' };
+    case 'START_QUIZ': return { ...state, currentQuestion: 0, answers: {}, step: 'quiz' };
     case 'ANSWER_QUESTION': {
-      const levelAnswers = { ...state.answers[action.level], [action.question]: action.score };
-      return { ...state, answers: { ...state.answers, [action.level]: levelAnswers } };
+      return { ...state, answers: { ...state.answers, [action.question]: action.score } };
     }
     case 'NEXT_QUESTION': return { ...state, currentQuestion: state.currentQuestion + 1 };
-    case 'COMPLETE_LEVEL': {
-      const newCompleted = [...new Set([...state.completedLevels, action.level])];
-      // Auto-advance: if level < 6, start next level; if level === 6, go to reflection
-      if (action.level < 6) {
-        return {
-          ...state,
-          completedLevels: newCompleted,
-          currentLevel: action.level + 1,
-          currentQuestion: 0,
-          step: 'level',
-        };
-      }
-      return {
-        ...state,
-        completedLevels: newCompleted,
-        step: 'reflection',
-      };
-    }
     case 'SET_REFLECTION': return { ...state, reflectionAnswer: action.answer };
     case 'SET_LANGUAGE': return { ...state, language: action.lang };
     case 'SET_MUTE': return { ...state, isMuted: action.value };

@@ -10,9 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Loader2, Download, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Download, Upload, AlertTriangle, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { exportQuestionsToCsv, parseCsvToQuestions, downloadCsv } from '@/utils/questionsCsv';
 import { getAllProfileCodes, getProfileLabel, dimensions } from '@/data/questions';
+import QuestionEditDialog from '@/components/admin/QuestionEditDialog';
+import ImportSummaryDialog from '@/components/admin/ImportSummaryDialog';
 
 interface Question {
   id: string;
@@ -36,6 +38,14 @@ interface Question {
   updated_at: string;
 }
 
+export interface ImportSummary {
+  created: number;
+  updated: number;
+  errors: { row: number; message: string }[];
+  skippedProfiles: string[];
+  totalParsed: number;
+}
+
 const PROFILE_CODES = getAllProfileCodes();
 
 const Questions = () => {
@@ -44,6 +54,9 @@ const Questions = () => {
   const [selectedProfile, setSelectedProfile] = useState(PROFILE_CODES[0]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Question | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [importSummary, setImportSummary] = useState<ImportSummary | null>(null);
   const { toast } = useToast();
 
   // Form state
@@ -55,7 +68,6 @@ const Questions = () => {
   const [formScores, setFormScores] = useState([10, 20, 30, 40, 50]);
   const [formActive, setFormActive] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [importing, setImporting] = useState(false);
 
   useEffect(() => { fetchQuestions(); }, [selectedProfile]);
 
@@ -135,6 +147,16 @@ const Questions = () => {
     toast({ title: 'Question deleted' }); fetchQuestions();
   };
 
+  const handleClearAll = async () => {
+    if (!confirm(`Clear ALL ${questions.length} questions for profile ${selectedProfile}? This cannot be undone.`)) return;
+    setClearing(true);
+    const { error } = await supabase.from('questions').delete().eq('profile_code', selectedProfile);
+    if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    else toast({ title: 'Cleared', description: `All questions for ${selectedProfile} deleted.` });
+    setClearing(false);
+    fetchQuestions();
+  };
+
   const toggleActive = async (q: Question) => {
     await supabase.from('questions').update({ is_active: !q.is_active, updated_at: new Date().toISOString() } as any).eq('id', q.id);
     fetchQuestions();
@@ -157,36 +179,91 @@ const Questions = () => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
       setImporting(true);
+      const summary: ImportSummary = { created: 0, updated: 0, errors: [], skippedProfiles: [], totalParsed: 0 };
+
       try {
         const text = await file.text();
         const parsed = parseCsvToQuestions(text, selectedProfile);
+        summary.totalParsed = parsed.length;
+
         if (parsed.length === 0) {
-          toast({ title: 'Import failed', description: 'No valid questions found.', variant: 'destructive' });
+          toast({ title: 'Import failed', description: 'No valid questions found in CSV.', variant: 'destructive' });
           setImporting(false); return;
         }
-        const rows = parsed.map(q => ({
-          profile_code: q.profile_code || selectedProfile,
-          question_no: q.question_no,
-          dimension: q.dimension || null,
-          category: q.category,
-          question_text: q.question_text,
-          option_1: q.option_1,
-          option_2: q.option_2,
-          option_3: q.option_3,
-          option_4: q.option_4,
-          option_5: q.option_5,
-          score_1: q.score_1,
-          score_2: q.score_2,
-          score_3: q.score_3,
-          score_4: q.score_4,
-          score_5: q.score_5,
-          is_active: q.is_active,
-          updated_at: new Date().toISOString(),
-        }));
-        const { error } = await supabase.from('questions').insert(rows as any);
-        if (error) toast({ title: 'Import error', description: error.message, variant: 'destructive' });
-        else { toast({ title: 'Imported', description: `${rows.length} questions imported.` }); fetchQuestions(); }
-      } catch { toast({ title: 'Import failed', description: 'Could not read CSV file.', variant: 'destructive' }); }
+
+        // Separate valid profile rows from invalid/skipped ones
+        const validProfileSet = new Set(PROFILE_CODES);
+        const validRows: typeof parsed = [];
+        const skippedProfileSet = new Set<string>();
+
+        for (const q of parsed) {
+          const pc = q.profile_code || selectedProfile;
+          if (validProfileSet.has(pc)) {
+            validRows.push({ ...q, profile_code: pc });
+          } else {
+            skippedProfileSet.add(pc);
+          }
+        }
+        summary.skippedProfiles = Array.from(skippedProfileSet);
+
+        if (validRows.length === 0) {
+          summary.errors.push({ row: 0, message: 'No rows matched a valid profile code.' });
+          setImportSummary(summary);
+          setImporting(false);
+          return;
+        }
+
+        // Fetch existing questions for relevant profiles to detect updates
+        const profileCodes = [...new Set(validRows.map(r => r.profile_code))];
+        const { data: existingData } = await supabase
+          .from('questions')
+          .select('id, profile_code, question_no')
+          .in('profile_code', profileCodes);
+        const existingMap = new Map<string, string>();
+        (existingData || []).forEach((eq: any) => {
+          existingMap.set(`${eq.profile_code}_${eq.question_no}`, eq.id);
+        });
+
+        // Process each row: upsert (update if exists, insert if new)
+        for (let i = 0; i < validRows.length; i++) {
+          const q = validRows[i];
+          const row = {
+            profile_code: q.profile_code,
+            question_no: q.question_no,
+            dimension: q.dimension || null,
+            category: q.category,
+            question_text: q.question_text,
+            option_1: q.option_1,
+            option_2: q.option_2,
+            option_3: q.option_3,
+            option_4: q.option_4,
+            option_5: q.option_5,
+            score_1: q.score_1,
+            score_2: q.score_2,
+            score_3: q.score_3,
+            score_4: q.score_4,
+            score_5: q.score_5,
+            is_active: q.is_active,
+            updated_at: new Date().toISOString(),
+          };
+
+          const existingId = existingMap.get(`${q.profile_code}_${q.question_no}`);
+          if (existingId) {
+            const { error } = await supabase.from('questions').update(row as any).eq('id', existingId);
+            if (error) summary.errors.push({ row: i + 2, message: error.message });
+            else summary.updated++;
+          } else {
+            const { error } = await supabase.from('questions').insert(row as any);
+            if (error) summary.errors.push({ row: i + 2, message: error.message });
+            else summary.created++;
+          }
+        }
+
+        setImportSummary(summary);
+        fetchQuestions();
+      } catch {
+        toast({ title: 'Import failed', description: 'Could not read CSV file.', variant: 'destructive' });
+      }
       setImporting(false);
     };
     input.click();
@@ -212,7 +289,7 @@ const Questions = () => {
       {/* Profile Selector */}
       <Card>
         <CardContent className="p-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <Label className="shrink-0">Profile Code</Label>
             <Select value={selectedProfile} onValueChange={setSelectedProfile}>
               <SelectTrigger className="w-[300px]"><SelectValue /></SelectTrigger>
@@ -223,6 +300,12 @@ const Questions = () => {
               </SelectContent>
             </Select>
             <Badge variant="secondary">{questions.length} / 18 questions</Badge>
+            {questions.length > 0 && (
+              <Button variant="destructive" size="sm" onClick={handleClearAll} disabled={clearing}>
+                {clearing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
+                Clear All
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -265,55 +348,33 @@ const Questions = () => {
       </Card>
 
       {/* Question Edit/Create Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>{editing ? 'Edit Question' : 'New Question'}</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label>Question No</Label>
-                <Input type="number" min={1} max={18} value={formQuestionNo} onChange={e => setFormQuestionNo(Number(e.target.value))} />
-              </div>
-              <div>
-                <Label>Dimension</Label>
-                <Select value={formDimension} onValueChange={setFormDimension}>
-                  <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
-                  <SelectContent>
-                    {dimensions.map(d => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div><Label>Category</Label><Input value={formCategory} onChange={e => setFormCategory(e.target.value)} placeholder="e.g. Part-time Work" /></div>
-            </div>
-            <div><Label>Question Text</Label><Textarea value={formText} onChange={e => setFormText(e.target.value)} rows={3} /></div>
-            <div>
-              <Label>Options & Scores</Label>
-              <div className="space-y-2 mt-1">
-                {formOptions.map((opt, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground w-4">{idx + 1}</span>
-                    <Input value={opt} onChange={e => {
-                      const next = [...formOptions]; next[idx] = e.target.value; setFormOptions(next);
-                    }} placeholder={`Option ${idx + 1}`} className="flex-1" />
-                    <Input type="number" value={formScores[idx]} onChange={e => {
-                      const next = [...formScores]; next[idx] = Number(e.target.value); setFormScores(next);
-                    }} className="w-20" min={0} max={50} step={10} />
-                    <span className="text-xs text-muted-foreground">pts</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Switch checked={formActive} onCheckedChange={setFormActive} />
-              <Label>Active</Label>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : editing ? 'Update' : 'Create'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <QuestionEditDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        editing={!!editing}
+        formText={formText}
+        setFormText={setFormText}
+        formCategory={formCategory}
+        setFormCategory={setFormCategory}
+        formDimension={formDimension}
+        setFormDimension={setFormDimension}
+        formQuestionNo={formQuestionNo}
+        setFormQuestionNo={setFormQuestionNo}
+        formOptions={formOptions}
+        setFormOptions={setFormOptions}
+        formScores={formScores}
+        setFormScores={setFormScores}
+        formActive={formActive}
+        setFormActive={setFormActive}
+        saving={saving}
+        onSave={handleSave}
+      />
+
+      {/* Import Summary Dialog */}
+      <ImportSummaryDialog
+        summary={importSummary}
+        onClose={() => setImportSummary(null)}
+      />
     </div>
   );
 };

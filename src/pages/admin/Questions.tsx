@@ -284,6 +284,9 @@ const Questions = () => {
           <Button variant="outline" size="sm" onClick={handleImport} disabled={importing}>
             {importing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}Import CSV
           </Button>
+          <Button variant="outline" size="sm" onClick={() => setGsheetOpen(true)}>
+            <FileSpreadsheet className="h-4 w-4 mr-2" />Google Sheets
+          </Button>
           <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" /> Add Question</Button>
         </div>
       </div>

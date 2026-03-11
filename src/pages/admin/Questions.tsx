@@ -59,6 +59,8 @@ const Questions = () => {
   const [importing, setImporting] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [clearAllConfirmOpen, setClearAllConfirmOpen] = useState(false);
+  const [clearAllConfirmText, setClearAllConfirmText] = useState('');
   const [clearConfirmText, setClearConfirmText] = useState('');
   const [importSummary, setImportSummary] = useState<ImportSummary | null>(null);
   const [gsheetOpen, setGsheetOpen] = useState(false);

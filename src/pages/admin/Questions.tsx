@@ -152,8 +152,14 @@ const Questions = () => {
     toast({ title: 'Question deleted' }); fetchQuestions();
   };
 
+  const openClearConfirm = () => {
+    setClearConfirmText('');
+    setClearConfirmOpen(true);
+  };
+
   const handleClearAll = async () => {
-    if (!confirm(`Clear ALL ${questions.length} questions for profile ${selectedProfile}? This cannot be undone.`)) return;
+    if (clearConfirmText !== 'clear') return;
+    setClearConfirmOpen(false);
     setClearing(true);
     const { error } = await supabase.from('questions').delete().eq('profile_code', selectedProfile);
     if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });

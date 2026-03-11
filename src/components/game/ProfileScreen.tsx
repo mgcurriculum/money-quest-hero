@@ -7,10 +7,17 @@ import { AGE_GROUPS, ROLE_EMOJIS, buildProfileCode } from '@/data/questions';
 import MuteButton from './MuteButton';
 
 const NARRATION_TEXTS = [
-  "Let's get to know you a bit! Just fill in your name. This helps us personalize your results.",
-  "Great! Now tell me — which age group do you belong to?",
+  "Let's get to know you a bit! Fill in your details to personalize your results.",
   "Almost there! What best describes your current role?",
 ];
+
+function getAgeGroup(age: number): string | null {
+  if (age >= 18 && age <= 25) return '18-25';
+  if (age >= 26 && age <= 39) return '26-39';
+  if (age >= 40 && age <= 59) return '40-59';
+  if (age >= 60) return '60+';
+  return null;
+}
 
 const ProfileScreen = () => {
   const { state, dispatch } = useGame();
@@ -18,6 +25,7 @@ const ProfileScreen = () => {
   const hasNarrated = useRef<number>(-1);
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
+  const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
   const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
@@ -33,7 +41,9 @@ const ProfileScreen = () => {
     }
   }, [state.isMuted, speak, step]);
 
-  const canProceedStep0 = name.trim().length > 0;
+  const ageNum = parseInt(age, 10);
+  const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;
+  const canProceedStep0 = name.trim().length > 0 && isValidAge;
 
   const handleStep0Next = async () => {
     stop();
@@ -54,13 +64,10 @@ const ProfileScreen = () => {
       dispatch({ type: 'SET_CAMPAIGN', campaignId: data.id });
       dispatch({ type: 'SET_CAMPAIGN_CODE', code: data.campaign_code });
     }
-    setStep(1);
-  };
-
-  const handleAgeGroupSelect = (ageGroup: string) => {
-    stop();
+    const ageGroup = getAgeGroup(ageNum);
+    if (!ageGroup) return;
     setSelectedAgeGroup(ageGroup);
-    setStep(2);
+    setStep(1);
   };
 
   const handleRoleSelect = (roleCode: string, roleLabel: string) => {
@@ -99,12 +106,12 @@ const ProfileScreen = () => {
         className="max-w-md w-full"
       >
         <div className="text-center mb-8">
-          <span className="text-5xl mb-4 block">{step === 0 ? '🧑‍🎮' : step === 1 ? '📅' : '🎯'}</span>
+          <span className="text-5xl mb-4 block">{step === 0 ? '🧑‍🎮' : '🎯'}</span>
           <h2 className="text-3xl font-display font-bold text-game-text mb-2">
-            {step === 0 ? 'Create Your Profile' : step === 1 ? 'Your Age Group' : 'Your Role'}
+            {step === 0 ? 'Create Your Profile' : 'Your Role'}
           </h2>
           <div className="flex justify-center gap-2 mt-4">
-            {[0, 1, 2].map(i => (
+            {[0, 1].map(i => (
               <div key={i} className={`h-1.5 w-10 rounded-full transition-all ${i <= step ? 'gold-gradient' : 'bg-game-card'}`} />
             ))}
           </div>
@@ -121,6 +128,19 @@ const ProfileScreen = () => {
                 placeholder="Enter your name"
                 className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
               />
+            </div>
+            <div>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Age</label>
+              <input
+                type="number"
+                value={age}
+                onChange={e => setAge(e.target.value)}
+                placeholder="e.g. 25"
+                min={18}
+                max={120}
+                className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+              />
+              {age && !isValidAge && <p className="text-red-400 text-xs mt-1">Please enter a valid age (18+)</p>}
             </div>
             <div>
               <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Gender (optional)</label>
@@ -161,24 +181,7 @@ const ProfileScreen = () => {
           </div>
         )}
 
-        {step === 1 && (
-          <div>
-            <p className="text-game-muted text-sm font-body text-center mb-4">Select your age group</p>
-            <div className="space-y-2.5">
-              {AGE_GROUPS.map(ag => (
-                <button
-                  key={ag.ageGroup}
-                  onClick={() => handleAgeGroupSelect(ag.ageGroup)}
-                  className="w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all text-game-text hover:border-game-gold/30 hover:scale-[1.01] active:scale-[0.99]"
-                >
-                  📅 {ag.ageGroup} years
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === 2 && selectedAgeConfig && (
+        {step === 1 && selectedAgeConfig && (
           <div>
             <p className="text-game-muted text-sm font-body text-center mb-4">What best describes your current role?</p>
             <div className="space-y-2.5">

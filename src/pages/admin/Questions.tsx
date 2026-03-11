@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Loader2, Download, Upload, FileSpreadsheet, AlertTriangle, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { exportQuestionsToCsv, parseCsvToQuestions, downloadCsv } from '@/utils/questionsCsv';
-import { getAllProfileCodes, getProfileLabel, dimensions } from '@/data/questions';
+import { getAllProfileCodes, getProfileLabel, getProfileNumber, dimensions } from '@/data/questions';
 import QuestionEditDialog from '@/components/admin/QuestionEditDialog';
 import ImportSummaryDialog from '@/components/admin/ImportSummaryDialog';
 import GoogleSheetImportDialog from '@/components/admin/GoogleSheetImportDialog';

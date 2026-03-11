@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -57,6 +58,8 @@ const Questions = () => {
   const [editing, setEditing] = useState<Question | null>(null);
   const [importing, setImporting] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [clearConfirmText, setClearConfirmText] = useState('');
   const [importSummary, setImportSummary] = useState<ImportSummary | null>(null);
   const [gsheetOpen, setGsheetOpen] = useState(false);
   const { toast } = useToast();
@@ -149,8 +152,14 @@ const Questions = () => {
     toast({ title: 'Question deleted' }); fetchQuestions();
   };
 
+  const openClearConfirm = () => {
+    setClearConfirmText('');
+    setClearConfirmOpen(true);
+  };
+
   const handleClearAll = async () => {
-    if (!confirm(`Clear ALL ${questions.length} questions for profile ${selectedProfile}? This cannot be undone.`)) return;
+    if (clearConfirmText !== 'clear') return;
+    setClearConfirmOpen(false);
     setClearing(true);
     const { error } = await supabase.from('questions').delete().eq('profile_code', selectedProfile);
     if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
@@ -306,7 +315,7 @@ const Questions = () => {
             </Select>
             <Badge variant="secondary">{questions.length} / 18 questions</Badge>
             {questions.length > 0 && (
-              <Button variant="destructive" size="sm" onClick={handleClearAll} disabled={clearing}>
+              <Button variant="destructive" size="sm" onClick={openClearConfirm} disabled={clearing}>
                 {clearing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
                 Clear All
               </Button>
@@ -382,6 +391,42 @@ const Questions = () => {
       />
 
       {/* Google Sheets Import Dialog */}
+      {/* Clear All Confirmation Dialog */}
+      <AlertDialog open={clearConfirmOpen} onOpenChange={setClearConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Clear All Questions
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>This will permanently delete all <strong>{questions.length}</strong> questions for profile <strong>{selectedProfile}</strong>. This action cannot be undone.</p>
+              <div>
+                <Label htmlFor="clear-confirm" className="text-sm text-muted-foreground">Type <strong>clear</strong> to confirm</Label>
+                <Input
+                  id="clear-confirm"
+                  value={clearConfirmText}
+                  onChange={(e) => setClearConfirmText(e.target.value)}
+                  placeholder="Type clear"
+                  className="mt-1"
+                  autoComplete="off"
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleClearAll}
+              disabled={clearConfirmText !== 'clear'}
+            >
+              Clear All
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <GoogleSheetImportDialog
         open={gsheetOpen}
         onOpenChange={setGsheetOpen}

@@ -179,7 +179,7 @@ const Questions = () => {
     if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
     else toast({ title: 'Cleared', description: `All questions for ${selectedProfile} deleted.` });
     setClearing(false);
-    fetchQuestions();
+    fetchQuestions(); fetchProfileCounts();
   };
 
   const toggleActive = async (q: Question) => {

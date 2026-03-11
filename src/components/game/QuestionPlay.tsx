@@ -55,7 +55,7 @@ const QuestionPlay = () => {
       } else {
         dispatch({ type: 'SET_STEP', step: 'reflection' });
       }
-    }, 1200);
+    }, 800);
   };
 
   if (loading) {

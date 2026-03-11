@@ -1,33 +1,19 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+### Task: Insert 18 Questions for Profile A4_SELF
 
-### Changes
+This is a data insertion task — no schema or code changes needed. I'll use the database insert tool to add all 18 questions to the `questions` table with `profile_code = 'A4_SELF'`, scores 10-50 for options 1-5, and the dimensions/categories as provided.
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+**Data to insert** (all rows: `is_active = true`, scores = 10/20/30/40/50):
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+| Q# | Dimension | Category | Question (truncated) |
+|----|-----------|----------|---------------------|
+| 1-3 | Earning | Work Continuity, Experience Sharing, Flexible Income |
+| 4-6 | Spending | Lifestyle Adjustment, Family Support, Medical Costs |
+| 7-9 | Saving | Accumulated Savings, Financial Awareness, Emergency Preparedness |
+| 10-12 | Borrowing | Late-Life Borrowing, Helping Others Borrow, Instant Loan Offers |
+| 13-15 | Investing | Retirement Investments, Stock Market Advice, Income Diversification |
+| 16-18 | Protecting | Fraud Awareness, Insurance Planning, Digital Financial Safety |
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
-
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
-
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
-
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
-
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
-
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+**Approach:** Single SQL INSERT with 18 rows into `questions` table. No migration needed — this is data, not schema.
 

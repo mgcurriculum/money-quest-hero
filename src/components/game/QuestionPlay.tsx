@@ -44,8 +44,7 @@ const QuestionPlay = () => {
     setSelectedOption(optIndex);
     dispatch({ type: 'ANSWER_QUESTION', question: state.currentQuestion, score });
 
-    const feedbackText = feedbackData[optIndex % feedbackData.length].text.replace(/[^\w\s!?]/g, '');
-    if (!state.isMuted) speak(feedbackText);
+    // No spoken feedback for neutral messages
 
     setShowFeedback(true);
     setTimeout(() => {

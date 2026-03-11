@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Share2, MessageCircle, Facebook, Instagram, Download, Mail, RefreshCw } from 'lucide-react';
 
 // Map short DB dimension names to full display names
 const dimensionKeyMap: Record<string, string> = {
@@ -259,16 +260,16 @@ const ReportScreen = () => {
 
         {/* Social Sharing */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="glass-card rounded-2xl p-4 mb-5 text-center print:hidden">
-          <p className="text-game-text font-display font-semibold text-sm mb-3">📢 Share Your Results</p>
+          <p className="text-game-text font-display font-semibold text-sm mb-3 flex items-center justify-center gap-1.5"><Share2 size={14} /> Share Your Results</p>
           <div className="flex justify-center gap-3">
             {[
-              { name: 'whatsapp', emoji: '💬', label: 'WhatsApp', color: 'bg-green-600' },
-              { name: 'facebook', emoji: '📘', label: 'Facebook', color: 'bg-blue-600' },
-              { name: 'instagram', emoji: '📸', label: 'Instagram', color: 'bg-pink-600' },
+              { name: 'whatsapp', icon: <MessageCircle size={14} />, label: 'WhatsApp', color: 'bg-green-600' },
+              { name: 'facebook', icon: <Facebook size={14} />, label: 'Facebook', color: 'bg-blue-600' },
+              { name: 'instagram', icon: <Instagram size={14} />, label: 'Instagram', color: 'bg-pink-600' },
             ].map(p => (
               <button key={p.name} onClick={() => handleShare(p.name)}
                 className={`${p.color} text-white px-4 py-2 rounded-xl font-body text-xs font-semibold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-transform`}>
-                <span>{p.emoji}</span> {p.label}
+                {p.icon} {p.label}
               </button>
             ))}
           </div>
@@ -277,16 +278,16 @@ const ReportScreen = () => {
         {/* Download PDF & Send Email */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="grid grid-cols-2 gap-3 mb-5 print:hidden">
           <button onClick={handleDownloadPDF} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
-            📥 Download PDF
+            <Download size={16} /> Download PDF
           </button>
           <button onClick={() => setEmailOpen(true)} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
-            📧 Send to Email
+            <Mail size={16} /> Send to Email
           </button>
         </motion.div>
 
         <div className="pb-8 print:hidden">
-          <button onClick={() => dispatch({ type: 'RESET' })} className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform">
-            Take Test Again 🔄
+          <button onClick={() => dispatch({ type: 'RESET' })} className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
+            Take Test Again <RefreshCw size={16} />
           </button>
         </div>
       </div>

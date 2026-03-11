@@ -480,7 +480,7 @@ const Questions = () => {
         onOpenChange={setGsheetOpen}
         onImportComplete={(summary) => {
           setImportSummary(summary);
-          fetchQuestions();
+          fetchQuestions(); fetchProfileCounts();
         }}
       />
     </div>

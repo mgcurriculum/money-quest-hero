@@ -92,11 +92,8 @@ const QuestionPlay = () => {
       <div className="max-w-md mx-auto relative z-10">
         <div className="flex items-center justify-between mb-4">
           <MuteButton isPlaying={isPlaying} isLoading={narrationLoading} className="p-2" />
-          <motion.div className="glass-card rounded-full px-4 py-1.5 flex items-center gap-2">
+          <motion.div className="glass-card rounded-full px-4 py-1.5 flex items-center">
             <span className="gold-text font-display font-bold text-xs">FQ Test</span>
-            {question.dimension && (
-              <span className="text-game-muted text-[10px] font-body">{question.dimension}</span>
-            )}
           </motion.div>
           <div className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1">
             <Zap size={14} className="text-game-gold" />

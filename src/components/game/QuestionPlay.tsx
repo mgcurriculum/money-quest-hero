@@ -149,25 +149,6 @@ const QuestionPlay = () => {
               ))}
             </div>
 
-            <AnimatePresence>
-              {showFeedback && selectedOption !== null && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.5, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.5, y: -20 }}
-                  className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
-                >
-                  <div className="glass-card rounded-2xl px-8 py-6 text-center game-shadow">
-                    <motion.div animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }} transition={{ duration: 0.6 }}>
-                      {feedbackData[selectedOption % feedbackData.length].icon}
-                    </motion.div>
-                    <p className="text-game-gold font-display font-bold text-xl mt-2">
-                      {feedbackData[selectedOption % feedbackData.length].text}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </motion.div>
         </AnimatePresence>
       </div>

@@ -391,6 +391,42 @@ const Questions = () => {
       />
 
       {/* Google Sheets Import Dialog */}
+      {/* Clear All Confirmation Dialog */}
+      <AlertDialog open={clearConfirmOpen} onOpenChange={setClearConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Clear All Questions
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>This will permanently delete all <strong>{questions.length}</strong> questions for profile <strong>{selectedProfile}</strong>. This action cannot be undone.</p>
+              <div>
+                <Label htmlFor="clear-confirm" className="text-sm text-muted-foreground">Type <strong>clear</strong> to confirm</Label>
+                <Input
+                  id="clear-confirm"
+                  value={clearConfirmText}
+                  onChange={(e) => setClearConfirmText(e.target.value)}
+                  placeholder="Type clear"
+                  className="mt-1"
+                  autoComplete="off"
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleClearAll}
+              disabled={clearConfirmText !== 'clear'}
+            >
+              Clear All
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <GoogleSheetImportDialog
         open={gsheetOpen}
         onOpenChange={setGsheetOpen}

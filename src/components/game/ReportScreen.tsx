@@ -20,10 +20,21 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+// Map short DB dimension names to full display names
+const dimensionKeyMap: Record<string, string> = {
+  'Earning': 'Earning Mindset',
+  'Spending': 'Spending Behaviour',
+  'Saving': 'Saving Behaviour',
+  'Borrowing': 'Debt Awareness',
+  'Investing': 'Investment Awareness',
+  'Protecting': 'Financial Safety',
+};
+
 function computeDimensionScores(questions: QuestionItem[], answers: { [idx: number]: number }) {
   const dimMap: Record<string, { total: number; count: number }> = {};
   questions.forEach((q, idx) => {
-    const dim = q.dimension || 'Other';
+    const rawDim = q.dimension || 'Other';
+    const dim = dimensionKeyMap[rawDim] || rawDim;
     if (!dimMap[dim]) dimMap[dim] = { total: 0, count: 0 };
     const score = answers[idx] || 0;
     dimMap[dim].total += score;

@@ -62,6 +62,7 @@ const Questions = () => {
   const [clearConfirmText, setClearConfirmText] = useState('');
   const [importSummary, setImportSummary] = useState<ImportSummary | null>(null);
   const [gsheetOpen, setGsheetOpen] = useState(false);
+  const [profileCounts, setProfileCounts] = useState<Record<string, number>>({});
   const { toast } = useToast();
 
   // Form state
@@ -75,6 +76,19 @@ const Questions = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => { fetchQuestions(); }, [selectedProfile]);
+  useEffect(() => { fetchProfileCounts(); }, []);
+
+  const fetchProfileCounts = async () => {
+    const { data } = await supabase
+      .from('questions')
+      .select('profile_code');
+    const counts: Record<string, number> = {};
+    PROFILE_CODES.forEach(c => counts[c] = 0);
+    (data || []).forEach((row: any) => {
+      if (counts[row.profile_code] !== undefined) counts[row.profile_code]++;
+    });
+    setProfileCounts(counts);
+  };
 
   const fetchQuestions = async () => {
     setLoading(true);

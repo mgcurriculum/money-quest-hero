@@ -314,16 +314,50 @@ const Questions = () => {
         </div>
       </div>
 
+      {/* Profile Overview Grid */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Profile Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+            {PROFILE_CODES.map(code => {
+              const num = getProfileNumber(code);
+              const count = profileCounts[code] ?? 0;
+              const isSelected = code === selectedProfile;
+              const statusClass = count === 18
+                ? 'text-green-600 bg-green-50 border-green-200 dark:text-green-400 dark:bg-green-950 dark:border-green-800'
+                : count > 0
+                  ? 'text-yellow-600 bg-yellow-50 border-yellow-200 dark:text-yellow-400 dark:bg-yellow-950 dark:border-yellow-800'
+                  : 'text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950 dark:border-red-800';
+              return (
+                <button
+                  key={code}
+                  onClick={() => setSelectedProfile(code)}
+                  className={`flex items-center gap-2 p-2 rounded-md border text-left text-xs transition-all ${isSelected ? 'ring-2 ring-primary border-primary' : 'hover:border-muted-foreground/30'}`}
+                >
+                  <span className="font-mono font-bold text-muted-foreground w-5 shrink-0">#{num}</span>
+                  <span className="flex-1 truncate font-medium text-foreground">{code}</span>
+                  <Badge variant="outline" className={`text-[10px] px-1.5 py-0 shrink-0 ${statusClass}`}>
+                    {count === 18 ? '✓ 18/18' : count > 0 ? `⚠ ${count}/18` : '✗ 0/18'}
+                  </Badge>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Profile Selector */}
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-4 flex-wrap">
             <Label className="shrink-0">Profile Code</Label>
             <Select value={selectedProfile} onValueChange={setSelectedProfile}>
-              <SelectTrigger className="w-[300px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-[340px]"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {PROFILE_CODES.map(code => (
-                  <SelectItem key={code} value={code}>{code} — {getProfileLabel(code)}</SelectItem>
+                  <SelectItem key={code} value={code}>#{getProfileNumber(code)} {code} — {getProfileLabel(code)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

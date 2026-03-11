@@ -1,19 +1,19 @@
 
 
-### Task: Insert 18 Questions for Profile A4_SELF
+### Task: Add "Clear All Questions" Button
 
-This is a data insertion task — no schema or code changes needed. I'll use the database insert tool to add all 18 questions to the `questions` table with `profile_code = 'A4_SELF'`, scores 10-50 for options 1-5, and the dimensions/categories as provided.
+**File:** `src/pages/admin/Questions.tsx`
 
-**Data to insert** (all rows: `is_active = true`, scores = 10/20/30/40/50):
+**Changes:**
 
-| Q# | Dimension | Category | Question (truncated) |
-|----|-----------|----------|---------------------|
-| 1-3 | Earning | Work Continuity, Experience Sharing, Flexible Income |
-| 4-6 | Spending | Lifestyle Adjustment, Family Support, Medical Costs |
-| 7-9 | Saving | Accumulated Savings, Financial Awareness, Emergency Preparedness |
-| 10-12 | Borrowing | Late-Life Borrowing, Helping Others Borrow, Instant Loan Offers |
-| 13-15 | Investing | Retirement Investments, Stock Market Advice, Income Diversification |
-| 16-18 | Protecting | Fraud Awareness, Insurance Planning, Digital Financial Safety |
+1. Add a **"Clear All Questions"** button in the top action bar (next to Export/Import buttons)
+2. On click, open a confirmation dialog requiring the user to type **"clear all"** to proceed
+3. Execute `DELETE FROM questions` (no profile filter) to remove all questions across all 19 profiles
+4. Refresh both the question list and profile counts after clearing
 
-**Approach:** Single SQL INSERT with 18 rows into `questions` table. No migration needed — this is data, not schema.
+**Implementation details:**
+- Add new state: `clearAllConfirmOpen`, `clearAllConfirmText`
+- Add a new `AlertDialog` similar to the existing per-profile clear dialog but with stronger warning text mentioning "all 19 profiles"
+- The delete call: `supabase.from('questions').delete().neq('id', '')` (deletes all rows)
+- Button styled as `variant="destructive"` with `Trash2` icon, labeled "Clear All Questions"
 

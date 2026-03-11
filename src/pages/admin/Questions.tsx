@@ -488,6 +488,51 @@ const Questions = () => {
           fetchQuestions(); fetchProfileCounts();
         }}
       />
+
+      {/* Clear All Questions (all profiles) Confirmation Dialog */}
+      <AlertDialog open={clearAllConfirmOpen} onOpenChange={setClearAllConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Clear All Questions (All Profiles)
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>This will permanently delete <strong>all questions across all 19 profiles</strong>. This action cannot be undone.</p>
+              <div>
+                <Label htmlFor="clear-all-confirm" className="text-sm text-muted-foreground">Type <strong>clear all</strong> to confirm</Label>
+                <Input
+                  id="clear-all-confirm"
+                  value={clearAllConfirmText}
+                  onChange={(e) => setClearAllConfirmText(e.target.value)}
+                  placeholder="Type clear all"
+                  className="mt-1"
+                  autoComplete="off"
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (clearAllConfirmText !== 'clear all') return;
+                setClearAllConfirmOpen(false);
+                setClearing(true);
+                const { error } = await supabase.from('questions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
+                else toast({ title: 'Cleared', description: 'All questions across all profiles deleted.' });
+                setClearing(false);
+                fetchQuestions(); fetchProfileCounts();
+              }}
+              disabled={clearAllConfirmText !== 'clear all'}
+            >
+              Clear All
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

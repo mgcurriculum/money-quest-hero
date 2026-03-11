@@ -315,7 +315,7 @@ const Questions = () => {
             </Select>
             <Badge variant="secondary">{questions.length} / 18 questions</Badge>
             {questions.length > 0 && (
-              <Button variant="destructive" size="sm" onClick={handleClearAll} disabled={clearing}>
+              <Button variant="destructive" size="sm" onClick={openClearConfirm} disabled={clearing}>
                 {clearing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
                 Clear All
               </Button>

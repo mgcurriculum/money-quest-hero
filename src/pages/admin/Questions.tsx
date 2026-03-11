@@ -157,7 +157,7 @@ const Questions = () => {
       if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
       else toast({ title: 'Question created' });
     }
-    setSaving(false); setDialogOpen(false); fetchQuestions();
+    setSaving(false); setDialogOpen(false); fetchQuestions(); fetchProfileCounts();
   };
 
   const handleDelete = async (id: string) => {

@@ -1,33 +1,23 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+### Task: Replace emojis with real icons in Report Screen
 
-### Changes
+**File:** `src/components/game/ReportScreen.tsx`
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+**Changes:**
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+1. **Import Lucide icons** — add `Share2, MessageCircle, Facebook, Instagram, Download, Mail, RefreshCw` from `lucide-react`
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+2. **Share section (lines 260-275)** — replace emoji icons with SVG icons:
+   - WhatsApp: `<MessageCircle size={14} />` 
+   - Facebook: `<Facebook size={14} />`
+   - Instagram: `<Instagram size={14} />`
+   - Section title: `<Share2 size={14} />` instead of 📢
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+3. **Download/Email buttons (lines 278-285)**:
+   - Download PDF: `<Download size={16} />` instead of 📥
+   - Send to Email: `<Mail size={16} />` instead of 📧
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
-
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
-
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
-
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+4. **Take Test Again button (line 289)**:
+   - `<RefreshCw size={16} />` instead of 🔄
 

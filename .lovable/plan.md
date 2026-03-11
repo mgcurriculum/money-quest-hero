@@ -1,33 +1,23 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+### Task: Add Profile Numbers (1-19) and Completion Status Indicators
 
-### Changes
+**Files to change:**
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+#### 1. `src/data/questions.ts`
+- Add a `getProfileNumber(profileCode)` function that returns the 1-based index from the ordered list of all 19 profile codes.
+- Add a `getProfileWithNumber(profileCode)` helper returning `{ number, code, label }`.
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+#### 2. `src/pages/admin/Questions.tsx`
+- **Profile selector dropdown**: Show profile number before each entry, e.g. `#1 A1_SAL — Salaried (18-25)`
+- **Add a Profile Overview grid** above the question list: fetch question counts for ALL 19 profiles in one query, then display a compact grid/table showing:
+  - `#` (1-19)
+  - Profile Code
+  - Age Group + Role
+  - Question count (e.g. `18/18`)
+  - Status badge: green `✓ Complete` if 18, yellow `⚠ Incomplete` if 1-17, red `✗ Missing` if 0
+  - Clicking a row selects that profile
+- The overview query: `supabase.from('questions').select('profile_code').then group/count client-side`
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
-
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
-
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
-
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
-
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
-
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+This gives admins a quick at-a-glance view of which profiles are ready and which need attention.
 

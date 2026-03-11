@@ -163,7 +163,7 @@ const Questions = () => {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this question?')) return;
     await supabase.from('questions').delete().eq('id', id);
-    toast({ title: 'Question deleted' }); fetchQuestions();
+    toast({ title: 'Question deleted' }); fetchQuestions(); fetchProfileCounts();
   };
 
   const openClearConfirm = () => {

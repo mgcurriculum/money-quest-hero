@@ -72,7 +72,7 @@ export function getProfileLabel(profileCode: string): string {
   return `${role?.label || roleCode} (${ageGroup?.ageGroup || ageCode})`;
 }
 
-// All 19 profile codes
+// All 19 profile codes (ordered 1-19)
 export function getAllProfileCodes(): string[] {
   const codes: string[] = [];
   for (const ag of AGE_GROUPS) {
@@ -81,6 +81,20 @@ export function getAllProfileCodes(): string[] {
     }
   }
   return codes;
+}
+
+// Returns 1-based profile number (1-19)
+export function getProfileNumber(profileCode: string): number {
+  return getAllProfileCodes().indexOf(profileCode) + 1;
+}
+
+// Returns profile info with number
+export function getProfileWithNumber(profileCode: string): { number: number; code: string; label: string } {
+  return {
+    number: getProfileNumber(profileCode),
+    code: profileCode,
+    label: getProfileLabel(profileCode),
+  };
 }
 
 // 6 Financial Dimensions

@@ -9,11 +9,11 @@ import MuteButton from './MuteButton';
 import QuizProgressBar from './QuizProgressBar';
 
 const feedbackData = [
-  { text: "Noted! 📝", icon: <Zap className="text-game-gold" size={28} /> },
-  { text: "Interesting! 🧐", icon: <Star className="text-game-gold" size={28} /> },
-  { text: "Bold move! 💪", icon: <Sparkles className="text-game-gold" size={28} /> },
-  { text: "Smart thinking! 🧠", icon: <Trophy className="text-game-gold" size={28} /> },
-  { text: "Power play! 🌟", icon: <Shield className="text-game-gold" size={28} /> },
+  { text: "Got it! ✅" },
+  { text: "Recorded! 📝" },
+  { text: "Moving on! ➡️" },
+  { text: "Saved! 💾" },
+  { text: "Next up! 🔄" },
 ];
 
 const QuestionPlay = () => {

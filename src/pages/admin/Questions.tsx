@@ -312,6 +312,9 @@ const Questions = () => {
           <Button variant="outline" size="sm" onClick={() => setGsheetOpen(true)}>
             <FileSpreadsheet className="h-4 w-4 mr-2" />Google Sheets
           </Button>
+          <Button variant="destructive" size="sm" onClick={() => { setClearAllConfirmText(''); setClearAllConfirmOpen(true); }}>
+            <Trash2 className="h-4 w-4 mr-2" />Clear All Questions
+          </Button>
           <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" /> Add Question</Button>
         </div>
       </div>

@@ -1,27 +1,33 @@
 
 
-### Bug: A4_SELF Missing from Edge Function Fallback List
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
-**Root cause:** In `supabase/functions/import-google-sheet/index.ts` (~line 148), when HTML-based sheet discovery fails, the function uses a hardcoded fallback list of profile codes. This list is missing `A4_SELF`:
+### Changes
 
-```
-Current: 'A4_SAL', 'A4_HOM', 'A4_BUS', 'A4_RET'
-Should be: 'A4_SAL', 'A4_HOM', 'A4_BUS', 'A4_SELF', 'A4_RET'
-```
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-The edge function logs confirm this — the "Sheets to fetch" list shows 19 entries but `A4_SELF` is absent.
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-**Fix:** Update the hardcoded fallback array in `supabase/functions/import-google-sheet/index.ts` to include `A4_SELF`, making the complete list match all 19 profile codes from `data/questions.ts`.
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-Also add `A3_STU` if it's currently missing (the A3 group in `data/questions.ts` doesn't have STU, but the logs show it was fetched — this is harmless but worth aligning).
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
 
-**File:** `supabase/functions/import-google-sheet/index.ts` — update the fallback array (~line 148) to:
-```
-'A1_SAL', 'A1_STU', 'A1_HOM', 'A1_BUS', 'A1_SELF',
-'A2_SAL', 'A2_STU', 'A2_HOM', 'A2_BUS', 'A2_SELF',
-'A3_SAL', 'A3_HOM', 'A3_BUS', 'A3_SELF',
-'A4_SAL', 'A4_HOM', 'A4_BUS', 'A4_SELF', 'A4_RET',
-```
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
 
-Single-line fix, no other changes needed.
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

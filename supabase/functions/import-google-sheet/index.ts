@@ -150,8 +150,8 @@ Deno.serve(async (req) => {
           sheetNames = [
             'A1_SAL', 'A1_STU', 'A1_HOM', 'A1_BUS', 'A1_SELF',
             'A2_SAL', 'A2_STU', 'A2_HOM', 'A2_BUS', 'A2_SELF',
-            'A3_SAL', 'A3_STU', 'A3_HOM', 'A3_BUS', 'A3_SELF',
-            'A4_SAL', 'A4_HOM', 'A4_BUS', 'A4_RET',
+            'A3_SAL', 'A3_HOM', 'A3_BUS', 'A3_SELF',
+            'A4_SAL', 'A4_HOM', 'A4_BUS', 'A4_SELF', 'A4_RET',
           ];
           break;
         } catch {

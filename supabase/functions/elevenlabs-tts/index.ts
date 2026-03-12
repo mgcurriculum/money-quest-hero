@@ -23,7 +23,7 @@ serve(async (req) => {
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       response = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId || 'Txmsc1sMMJjB3YTRQgpO'}?output_format=mp3_22050_32`,
+        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId || 'Ih3XRGwQe2qczi6DzW48'}?output_format=mp3_22050_32`,
         {
           method: 'POST',
           headers: {

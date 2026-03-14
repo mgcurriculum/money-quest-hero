@@ -35,6 +35,10 @@ export function useNarration(externalMuted?: boolean) {
     }
   }, [isMuted, stop]);
 
+  useEffect(() => {
+    quotaExceededRef.current = sessionStorage.getItem('tts_quota_exceeded') === '1';
+  }, []);
+
   const speak = useCallback(async (text: string) => {
     if (isMuted) return;
     stop();

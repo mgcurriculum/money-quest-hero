@@ -184,7 +184,7 @@ const PhoneVerificationScreen = () => {
           )}
 
           {error && (
-            <p className="text-red-400 text-xs text-center">{error}</p>
+            <p className="text-destructive text-xs text-center">{error}</p>
           )}
         </div>
 

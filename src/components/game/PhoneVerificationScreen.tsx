@@ -225,12 +225,6 @@ const PhoneVerificationScreen = () => {
             </button>
           )}
           <button
-            onClick={handleSkip}
-            className="w-full py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"
-          >
-            Skip verification →
-          </button>
-          <button
             onClick={() => dispatch({ type: 'SET_STEP', step: 'profile' })}
             className="w-full py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"
           >

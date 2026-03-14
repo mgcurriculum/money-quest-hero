@@ -156,7 +156,7 @@ const ProfileScreen = () => {
               </select>
             </div>
             <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Phone (optional)</label>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Phone <span className="text-game-gold">*</span></label>
               <input
                 type="tel"
                 value={phone}

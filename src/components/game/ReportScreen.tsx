@@ -20,6 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Share2, MessageCircle, Facebook, Instagram, Download, Mail, RefreshCw } from 'lucide-react';
+import SessionHistory from './SessionHistory';
 
 // Map short DB dimension names to full display names
 const dimensionKeyMap: Record<string, string> = {

@@ -14,7 +14,8 @@ export interface PlayerProfile {
 }
 
 export interface GameState {
-  step: 'welcome' | 'consent' | 'profile' | 'quiz' | 'reflection' | 'report';
+  step: 'welcome' | 'consent' | 'profile' | 'phone-verify' | 'quiz' | 'reflection' | 'report';
+  phoneVerified: boolean;
   profile: PlayerProfile;
   consentGiven: boolean;
   currentQuestion: number; // 0-17

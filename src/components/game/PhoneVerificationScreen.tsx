@@ -80,8 +80,14 @@ const PhoneVerificationScreen = () => {
         body: { phone, otp },
       });
 
-      if (fnError || data?.error) {
-        throw new Error(data?.error || fnError?.message || 'Invalid OTP');
+      if (fnError) {
+        // Parse error body if available
+        const errMsg = data?.error || 'Verification failed. Please try again.';
+        throw new Error(errMsg);
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
       }
 
       if (data?.verified) {

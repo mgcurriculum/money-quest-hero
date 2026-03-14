@@ -47,7 +47,7 @@ const PhoneVerificationScreen = () => {
         throw new Error(data?.error || fnError?.message || 'Failed to send OTP');
       }
 
-      setPhone(formattedPhone);
+      setStep('otp');
       setStep('otp');
       startResendTimer();
     } catch (err: any) {

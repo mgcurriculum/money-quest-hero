@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 
 export interface PlayerProfile {
   name: string;
+  age: number; // actual age entered
   ageGroup: string; // '18-25', '26-39', '40-59', '60+'
   gender: string;
   phone: string;

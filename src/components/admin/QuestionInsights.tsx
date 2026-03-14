@@ -98,7 +98,7 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
                       </div>
                       <div className="flex items-center gap-3 shrink-0 mr-2">
                         <span className="text-xs text-muted-foreground">{q.totalResponses} resp</span>
-                        <span className={`text-xs font-semibold ${scoreColor(q.avgScore)}`}>{q.avgScore}/50</span>
+                        <span className={`text-xs font-semibold ${scoreColor(q.avgScore)}`}>{q.avgScore}/45</span>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>

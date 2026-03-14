@@ -30,6 +30,7 @@ const ProfileScreen = () => {
   const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
   const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
   const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
   const [campaignCodeError, setCampaignCodeError] = useState('');
   const [validatingCode, setValidatingCode] = useState(false);

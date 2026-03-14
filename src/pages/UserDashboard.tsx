@@ -14,6 +14,7 @@ interface SessionData {
   id: string;
   player_name: string;
   player_age: string | null;
+  player_age_number: number | null;
   player_gender: string | null;
   player_phone: string | null;
   player_country: string | null;

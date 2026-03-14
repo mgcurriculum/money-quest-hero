@@ -68,7 +68,12 @@ export function useNarration(externalMuted?: boolean) {
       );
 
       if (!response.ok) {
-        // Silently skip narration on API errors (e.g. quota exceeded)
+        const errorText = await response.text();
+        if (errorText.includes('quota_exceeded')) {
+          quotaExceededRef.current = true;
+          sessionStorage.setItem('tts_quota_exceeded', '1');
+          console.warn('TTS quota exceeded. Narration disabled for this session.');
+        }
         setIsLoading(false);
         return;
       }

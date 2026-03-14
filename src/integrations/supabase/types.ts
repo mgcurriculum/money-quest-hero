@@ -94,6 +94,7 @@ export type Database = {
           fq_score: number | null
           id: string
           player_age: string | null
+          player_age_number: number | null
           player_country: string | null
           player_district: string | null
           player_email: string | null
@@ -116,6 +117,7 @@ export type Database = {
           fq_score?: number | null
           id?: string
           player_age?: string | null
+          player_age_number?: number | null
           player_country?: string | null
           player_district?: string | null
           player_email?: string | null
@@ -138,6 +140,7 @@ export type Database = {
           fq_score?: number | null
           id?: string
           player_age?: string | null
+          player_age_number?: number | null
           player_country?: string | null
           player_district?: string | null
           player_email?: string | null

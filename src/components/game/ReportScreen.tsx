@@ -289,6 +289,9 @@ const ReportScreen = () => {
           </button>
         </motion.div>
 
+        {/* Session History */}
+        <SessionHistory phone={state.profile.phone} currentSessionScore={totalScore} />
+
         <div className="pb-8 print:hidden">
           <button onClick={() => dispatch({ type: 'RESET' })} className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
             Take Test Again <RefreshCw size={16} />

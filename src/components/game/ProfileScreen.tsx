@@ -5,6 +5,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { supabase } from '@/integrations/supabase/client';
 import { AGE_GROUPS, ROLE_EMOJIS, buildProfileCode } from '@/data/questions';
 import MuteButton from './MuteButton';
+import CountryCodePicker, { COUNTRIES, Country } from './CountryCodePicker';
 
 const NARRATION_TEXTS = [
   "Let's get to know you a bit! Fill in your details to personalize your results.",
@@ -29,6 +30,7 @@ const ProfileScreen = () => {
   const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
   const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
   const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
   const [campaignCodeError, setCampaignCodeError] = useState('');
   const [validatingCode, setValidatingCode] = useState(false);
@@ -80,8 +82,8 @@ const ProfileScreen = () => {
       name: name.trim(),
       ageGroup: selectedAgeGroup,
       gender,
-      phone,
-      country: 'India',
+      phone: selectedCountry.dial + phone,
+      country: selectedCountry.name,
       state: '',
       district: '',
       role: roleCode,
@@ -157,13 +159,16 @@ const ProfileScreen = () => {
             </div>
             <div>
               <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Phone <span className="text-game-gold">*</span></label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                placeholder="+91"
-                className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
-              />
+              <div className="flex gap-2">
+                <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
+                  placeholder="9876543210"
+                  className="flex-1 bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+                />
+              </div>
             </div>
             <div>
               <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Campaign Code (optional)</label>

@@ -30,19 +30,9 @@ const PhoneVerificationScreen = () => {
     }, 1000);
   };
 
-  const formatPhone = (value: string) => {
-    // Ensure +91 prefix for Indian numbers
-    let cleaned = value.replace(/[^\d+]/g, '');
-    if (!cleaned.startsWith('+')) {
-      cleaned = '+91' + cleaned;
-    }
-    return cleaned;
-  };
-
   const handleSendOTP = async () => {
     setError('');
-    const formattedPhone = formatPhone(phone);
-    if (formattedPhone.length < 12) {
+    if (phone.length < 10) {
       setError('Please enter a valid phone number');
       return;
     }
@@ -50,14 +40,14 @@ const PhoneVerificationScreen = () => {
     setSending(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
-        body: { phone: formattedPhone },
+        body: { phone },
       });
 
       if (fnError || data?.error) {
         throw new Error(data?.error || fnError?.message || 'Failed to send OTP');
       }
 
-      setPhone(formattedPhone);
+      setStep('otp');
       setStep('otp');
       startResendTimer();
     } catch (err: any) {
@@ -139,24 +129,16 @@ const PhoneVerificationScreen = () => {
           </h2>
           <p className="text-game-muted text-sm font-body">
             {step === 'phone'
-              ? 'Enter your phone number to receive a verification code'
+              ? `We'll send a verification code to ${phone}`
               : `We sent a 6-digit code to ${phone}`}
           </p>
         </div>
 
         <div className="glass-card rounded-2xl p-6 space-y-4">
           {step === 'phone' ? (
-            <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={e => { setPhone(e.target.value); setError(''); }}
-                placeholder="+91 9876543210"
-                className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-lg tracking-wider"
-              />
+            <div className="text-center">
+              <p className="text-game-text text-lg font-body tracking-wider">{phone}</p>
+              <p className="text-game-muted text-xs mt-1">Tap Send OTP to receive your code</p>
             </div>
           ) : (
             <div>

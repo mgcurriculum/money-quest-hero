@@ -123,9 +123,6 @@ const PhoneVerificationScreen = () => {
     }
   };
 
-  const handleSkip = () => {
-    dispatch({ type: 'START_QUIZ' });
-  };
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">

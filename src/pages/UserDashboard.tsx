@@ -14,6 +14,7 @@ interface SessionData {
   id: string;
   player_name: string;
   player_age: string | null;
+  player_age_number: number | null;
   player_gender: string | null;
   player_phone: string | null;
   player_country: string | null;
@@ -42,7 +43,7 @@ const UserDashboard = () => {
 
     const { data } = await supabase
       .from('game_sessions')
-      .select('id, player_name, player_age, player_gender, player_phone, player_country, profile_code, fq_score, band_level, created_at, answers, reflection_answer')
+      .select('id, player_name, player_age, player_age_number, player_gender, player_phone, player_country, profile_code, fq_score, band_level, created_at, answers, reflection_answer')
       .eq('player_phone', fullPhone)
       .order('created_at', { ascending: false });
 
@@ -53,7 +54,8 @@ const UserDashboard = () => {
   const latestSession = sessions[0];
   const profile = latestSession ? {
     name: latestSession.player_name,
-    age: latestSession.player_age,
+    age: latestSession.player_age_number || null,
+    ageGroup: latestSession.player_age,
     gender: latestSession.player_gender,
     country: latestSession.player_country,
     profileCode: latestSession.profile_code,
@@ -175,7 +177,7 @@ const UserDashboard = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Age Group', value: profile.age || '-' },
+                  { label: 'Age', value: profile.age ? `${profile.age} years` : (profile.ageGroup || '-') },
                   { label: 'Gender', value: profile.gender ? profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1) : '-' },
                   { label: 'Country', value: profile.country || '-' },
                   { label: 'Tests Taken', value: sessions.length },

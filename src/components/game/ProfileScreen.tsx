@@ -91,6 +91,7 @@ const ProfileScreen = () => {
 
     const profile: PlayerProfile = {
       name: name.trim(),
+      age: ageNum,
       ageGroup: selectedAgeGroup,
       gender,
       phone: selectedCountry.dial + phone,

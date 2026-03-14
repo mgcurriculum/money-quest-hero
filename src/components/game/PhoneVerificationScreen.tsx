@@ -123,9 +123,6 @@ const PhoneVerificationScreen = () => {
     }
   };
 
-  const handleSkip = () => {
-    dispatch({ type: 'START_QUIZ' });
-  };
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
@@ -224,12 +221,6 @@ const PhoneVerificationScreen = () => {
               {verifying ? 'Verifying...' : 'Verify & Continue →'}
             </button>
           )}
-          <button
-            onClick={handleSkip}
-            className="w-full py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"
-          >
-            Skip verification →
-          </button>
           <button
             onClick={() => dispatch({ type: 'SET_STEP', step: 'profile' })}
             className="w-full py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"

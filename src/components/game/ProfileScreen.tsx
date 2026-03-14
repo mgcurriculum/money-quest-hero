@@ -43,7 +43,7 @@ const ProfileScreen = () => {
 
   const ageNum = parseInt(age, 10);
   const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;
-  const canProceedStep0 = name.trim().length > 0 && isValidAge;
+  const canProceedStep0 = name.trim().length > 0 && isValidAge && phone.replace(/[^\d]/g, '').length >= 10;
 
   const handleStep0Next = async () => {
     stop();
@@ -156,7 +156,7 @@ const ProfileScreen = () => {
               </select>
             </div>
             <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Phone (optional)</label>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Phone <span className="text-game-gold">*</span></label>
               <input
                 type="tel"
                 value={phone}

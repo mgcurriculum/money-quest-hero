@@ -43,7 +43,7 @@ const UserDashboard = () => {
 
     const { data } = await supabase
       .from('game_sessions')
-      .select('id, player_name, player_age, player_gender, player_phone, player_country, profile_code, fq_score, band_level, created_at, answers, reflection_answer')
+      .select('id, player_name, player_age, player_age_number, player_gender, player_phone, player_country, profile_code, fq_score, band_level, created_at, answers, reflection_answer')
       .eq('player_phone', fullPhone)
       .order('created_at', { ascending: false });
 

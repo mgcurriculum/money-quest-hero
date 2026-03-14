@@ -44,7 +44,7 @@ type Action =
   | { type: 'RESET' };
 
 const initialProfile: PlayerProfile = {
-  name: '', ageGroup: '', gender: '', phone: '',
+  name: '', age: 0, ageGroup: '', gender: '', phone: '',
   country: 'India', state: '', district: '',
   role: '', roleLabel: '', profileCode: '',
 };

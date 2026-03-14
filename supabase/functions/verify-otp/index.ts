@@ -26,19 +26,33 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Find latest non-expired, non-verified OTP for this phone
-    const { data, error } = await supabase
+    const { data: otpRecords, error: queryError } = await supabase
       .from('phone_otps')
       .select('*')
       .eq('phone', phone)
-      .eq('otp_code', otp)
       .eq('verified', false)
       .gte('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
 
-    if (error || !data) {
-      return new Response(JSON.stringify({ error: 'Invalid or expired OTP' }), {
+    if (queryError) {
+      console.error('DB query error:', queryError);
+      return new Response(JSON.stringify({ error: 'Verification service error' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!otpRecords || otpRecords.length === 0) {
+      return new Response(JSON.stringify({ error: 'No active OTP found. Please request a new one.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const record = otpRecords[0];
+    if (record.otp_code !== otp) {
+      return new Response(JSON.stringify({ error: 'Incorrect OTP. Please try again.' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -48,7 +62,7 @@ serve(async (req) => {
     await supabase
       .from('phone_otps')
       .update({ verified: true })
-      .eq('id', data.id);
+      .eq('id', record.id);
 
     return new Response(JSON.stringify({ success: true, verified: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

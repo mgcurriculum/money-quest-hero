@@ -81,19 +81,23 @@ const PhoneVerificationScreen = () => {
       });
 
       if (fnError) {
-        // Parse error body if available
-        const errMsg = data?.error || 'Verification failed. Please try again.';
-        throw new Error(errMsg);
-      }
-
-      if (data?.error) {
-        throw new Error(data.error);
+        let errMsg = 'Verification failed. Please try again.';
+        const maybeContext = (fnError as any)?.context;
+        if (maybeContext instanceof Response) {
+          const body = await maybeContext.json().catch(() => null);
+          errMsg = body?.error || errMsg;
+        }
+        setError(errMsg);
+        return;
       }
 
       if (data?.verified) {
         dispatch({ type: 'SET_PHONE_VERIFIED', verified: true });
         dispatch({ type: 'START_QUIZ' });
+        return;
       }
+
+      setError(data?.error || 'Incorrect OTP. Please try again.');
     } catch (err: any) {
       setError(err.message || 'Verification failed');
     } finally {

@@ -68,6 +68,7 @@ function reducer(state: GameState, action: Action): GameState {
     case 'SET_PROFILE': return { ...state, profile: action.profile };
     case 'SET_CONSENT': return { ...state, consentGiven: action.value };
     case 'START_QUIZ': return { ...state, currentQuestion: 0, answers: {}, step: 'quiz' };
+    case 'SET_PHONE_VERIFIED': return { ...state, phoneVerified: action.verified };
     case 'ANSWER_QUESTION': {
       return { ...state, answers: { ...state.answers, [action.question]: action.score } };
     }

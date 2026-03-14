@@ -46,19 +46,53 @@ serve(async (req) => {
 
       if (response.ok) break;
 
-      if (response.status === 409 && attempt < maxRetries - 1) {
+      // Retry transient conflicts / limits
+      if ((response.status === 409 || response.status === 429) && attempt < maxRetries - 1) {
         const delay = 1000 * (attempt + 1);
-        console.log(`409 conflict, retrying in ${delay}ms (attempt ${attempt + 1})`);
+        console.log(`${response.status} received, retrying in ${delay}ms (attempt ${attempt + 1})`);
         await new Promise(r => setTimeout(r, delay));
         continue;
       }
 
       const errorText = await response.text();
-      throw new Error(`ElevenLabs API error [${response.status}]: ${errorText}`);
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(errorText);
+      } catch {
+        parsed = null;
+      }
+
+      const detailStatus = parsed?.detail?.status;
+      const detailMessage = parsed?.detail?.message || errorText;
+
+      // Graceful quota handling (don't throw runtime errors)
+      if (detailStatus === 'quota_exceeded') {
+        return new Response(
+          JSON.stringify({ error: 'quota_exceeded', message: detailMessage }),
+          {
+            status: 402,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ error: `ElevenLabs API error [${response.status}]`, message: detailMessage }),
+        {
+          status: response.status,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     if (!response || !response.ok) {
-      throw new Error('Failed after retries');
+      return new Response(
+        JSON.stringify({ error: 'TTS request failed after retries' }),
+        {
+          status: 503,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const audioBuffer = await response.arrayBuffer();

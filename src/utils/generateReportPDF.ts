@@ -160,11 +160,20 @@ export async function downloadReportAsFile(html: string, filename: string) {
   const html2pdf = (await import('html2pdf.js')).default;
   const container = document.createElement('div');
   container.innerHTML = html;
+  // Must be visible for html2canvas to render, but hidden from user view
   container.style.position = 'fixed';
-  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.width = '600px';
+  container.style.zIndex = '-9999';
+  container.style.opacity = '0';
+  container.style.pointerEvents = 'none';
   document.body.appendChild(container);
 
   const pdfFilename = filename.replace(/\.html$/i, '.pdf');
+
+  // Allow images and layout to render
+  await new Promise(r => setTimeout(r, 500));
 
   try {
     await html2pdf()
@@ -172,7 +181,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
         margin: [4, 2, 4, 2],
         filename: pdfFilename,
         image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
+        html2canvas: { scale: 2, useCORS: true, logging: false, width: 600, windowWidth: 600 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'div'] },
       })

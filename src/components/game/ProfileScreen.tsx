@@ -5,6 +5,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { supabase } from '@/integrations/supabase/client';
 import { AGE_GROUPS, ROLE_EMOJIS, buildProfileCode } from '@/data/questions';
 import MuteButton from './MuteButton';
+import CountryCodePicker, { COUNTRIES, Country } from './CountryCodePicker';
 
 const NARRATION_TEXTS = [
   "Let's get to know you a bit! Fill in your details to personalize your results.",

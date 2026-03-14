@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
+import { useNavigate } from 'react-router-dom';
 import MuteButton from './MuteButton';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 
@@ -9,6 +10,7 @@ const WELCOME_TEXT = "Hey there! I'm your financial guide. This is a quick quiz 
 
 const WelcomeScreen = () => {
   const { state, dispatch } = useGame();
+  const navigate = useNavigate();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef(false);
 
@@ -66,6 +68,9 @@ const WelcomeScreen = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="space-y-3">
           <button onClick={handleStart} className="w-full py-4 px-8 rounded-2xl font-display font-semibold text-lg gold-gradient text-game-bg game-shadow pulse-glow transition-transform hover:scale-105 active:scale-95">
             Start My FQ Test 🚀
+          </button>
+          <button onClick={() => navigate('/profile')} className="w-full py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform">
+            📋 View My Profile & History
           </button>
         </motion.div>
 

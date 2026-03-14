@@ -13,6 +13,7 @@ import Settings from "./pages/admin/Settings";
 import Campaigns from "./pages/admin/Campaigns";
 import CampaignDashboard from "./pages/admin/CampaignDashboard";
 import CampaignLanding from "./pages/CampaignLanding";
+import UserDashboard from "./pages/UserDashboard";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/profile" element={<UserDashboard />} />
           <Route path="/c/:slug" element={<CampaignLanding />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>

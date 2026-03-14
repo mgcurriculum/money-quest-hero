@@ -129,24 +129,16 @@ const PhoneVerificationScreen = () => {
           </h2>
           <p className="text-game-muted text-sm font-body">
             {step === 'phone'
-              ? 'Enter your phone number to receive a verification code'
+              ? `We'll send a verification code to ${phone}`
               : `We sent a 6-digit code to ${phone}`}
           </p>
         </div>
 
         <div className="glass-card rounded-2xl p-6 space-y-4">
           {step === 'phone' ? (
-            <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={e => { setPhone(e.target.value); setError(''); }}
-                placeholder="+91 9876543210"
-                className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-lg tracking-wider"
-              />
+            <div className="text-center">
+              <p className="text-game-text text-lg font-body tracking-wider">{phone}</p>
+              <p className="text-game-muted text-xs mt-1">Tap Send OTP to receive your code</p>
             </div>
           ) : (
             <div>

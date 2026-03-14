@@ -32,6 +32,7 @@ type Action =
   | { type: 'SET_PROFILE'; profile: PlayerProfile }
   | { type: 'SET_CONSENT'; value: boolean }
   | { type: 'START_QUIZ' }
+  | { type: 'SET_PHONE_VERIFIED'; verified: boolean }
   | { type: 'ANSWER_QUESTION'; question: number; score: number }
   | { type: 'NEXT_QUESTION' }
   | { type: 'SET_REFLECTION'; answer: string }

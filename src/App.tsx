@@ -13,6 +13,7 @@ import Settings from "./pages/admin/Settings";
 import Campaigns from "./pages/admin/Campaigns";
 import CampaignDashboard from "./pages/admin/CampaignDashboard";
 import CampaignLanding from "./pages/CampaignLanding";
+import UserDashboard from "./pages/UserDashboard";
 
 const queryClient = new QueryClient();
 

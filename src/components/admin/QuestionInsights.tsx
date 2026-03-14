@@ -10,8 +10,8 @@ import { computeQuestionStats } from '@/utils/dashboardAnalytics';
 type Session = Tables<'game_sessions'>;
 
 const scoreColor = (score: number) => {
-  if (score >= 40) return 'text-green-600';
-  if (score >= 25) return 'text-yellow-600';
+  if (score >= 36) return 'text-green-600';
+  if (score >= 22) return 'text-yellow-600';
   return 'text-red-600';
 };
 

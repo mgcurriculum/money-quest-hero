@@ -40,7 +40,7 @@ export function useNarration(externalMuted?: boolean) {
   }, []);
 
   const speak = useCallback(async (text: string) => {
-    if (isMuted) return;
+    if (isMuted || quotaExceededRef.current) return;
     stop();
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {

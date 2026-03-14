@@ -55,8 +55,12 @@ const WelcomeScreen = () => {
           Your Financial Journey{' '}<span className="gold-text">Starts Here</span>
         </motion.h1>
 
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-game-muted text-lg font-body mb-8 leading-relaxed">
-          Discover how smart you are with money through real-life scenarios. Discover how smart you are with money through real-life scenarios. Takes only 3 minutes!
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-game-muted text-lg font-body mb-4 leading-relaxed">
+          Discover how smart you are with money through real-life scenarios. Takes only 3 minutes!
+        </motion.p>
+
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }} className="text-game-gold/80 text-sm font-body mb-8 italic">
+          Please answer honestly for the most accurate results.
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="space-y-3">

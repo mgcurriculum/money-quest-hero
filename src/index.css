@@ -39,9 +39,9 @@
     --success: 145 60% 45%;
     --warning: 38 95% 55%;
     --info: 200 92% 64%;
-    --game-bg: 263 58% 16%;
-    --game-surface: 263 45% 22%;
-    --game-card: 263 40% 28%;
+    --game-bg: 263 57% 16%;
+    --game-surface: 263 55% 17%;
+    --game-card: 263 50% 22%;
     --game-text: 260 20% 95%;
     --game-muted: 260 20% 60%;
     --game-gold: 200 92% 64%;
@@ -110,7 +110,7 @@
 
 @layer utilities {
   .game-gradient {
-    background: linear-gradient(135deg, hsl(var(--game-bg)), hsl(var(--game-surface)));
+    background: hsl(var(--game-bg));
   }
   .gold-gradient {
     background: linear-gradient(135deg, hsl(var(--game-gold)), hsl(var(--game-purple)));

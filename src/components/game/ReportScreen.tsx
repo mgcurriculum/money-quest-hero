@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useQuestions, type QuestionItem } from '@/hooks/useQuestions';
-import { dimensions, dimensionIcons, fqBands, MAX_SCORE, getProfileLabel } from '@/data/questions';
+import { dimensions, dimensionIcons, fqBands, MAX_SCORE, MAX_SCORE_PER_QUESTION, getProfileLabel } from '@/data/questions';
 import {
   extractQuestionsAndAnswers,
   getFinancialTips,
   generateReportHTML,
-  openPrintableReport,
+  downloadReportAsFile,
 } from '@/utils/generateReportPDF';
 import {
   RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer,
@@ -44,7 +44,7 @@ function computeDimensionScores(questions: QuestionItem[], answers: { [idx: numb
   return dimensions.map((dim, i) => {
     const d = dimMap[dim];
     if (!d || d.count === 0) return { dimension: dim, icon: dimensionIcons[i], score: 0, maxScore: 0, percentage: 0 };
-    const maxScore = d.count * 50;
+    const maxScore = d.count * MAX_SCORE_PER_QUESTION;
     return {
       dimension: dim,
       icon: dimensionIcons[i],
@@ -69,7 +69,7 @@ const ReportScreen = () => {
   const dimScores = computeDimensionScores(questions, state.answers);
 
   const radarData = dimScores.map(ds => ({
-    dimension: `${ds.icon} ${ds.dimension}`,
+    dimension: ds.dimension,
     score: ds.percentage,
     fullMark: 100,
   }));
@@ -133,7 +133,7 @@ const ReportScreen = () => {
       tips,
       reflectionAnswer: state.reflectionAnswer,
     });
-    openPrintableReport(html);
+    downloadReportAsFile(html, `FQ-Test-Report-${state.profile.name}.html`);
   };
 
   const handleSendEmail = async () => {
@@ -170,21 +170,23 @@ const ReportScreen = () => {
     }
   };
 
-  const shareText = `My FQ Test Score is ${totalScore}/${MAX_SCORE}! 🏆\nWhat's your Financial Superpower?\n\nTake the FQ Test: ${window.location.origin}`;
+  const appUrl = window.location.origin;
+  const scorePercent = Math.round((totalScore / MAX_SCORE) * 100);
+
+  const whatsappText = `🏆 *My FQ Test Results*\n\n📊 Score: ${totalScore}/${MAX_SCORE} (${scorePercent}%)\n🎖️ Level: ${band.emoji} ${band.level}\n\n📈 *Dimension Scores:*\n${dimScores.map(ds => `${ds.icon} ${ds.dimension}: ${ds.percentage}%`).join('\n')}\n\n💡 ${band.meaning}\n\n🔗 Take your FQ Test now:\n${appUrl}\n\n_Powered by FinQuo Versity_`;
+
+  const fbText = `🏆 I just took the FQ Test by FinQuo Versity!\n\n📊 My Score: ${totalScore}/${MAX_SCORE} (${scorePercent}%)\n🎖️ Level: ${band.emoji} ${band.level}\n\n${band.meaning}\n\nDiscover your Financial Quotient — Take the free FQ Test!\n${appUrl}`;
 
   const handleShare = (platform: string) => {
-    const encoded = encodeURIComponent(shareText);
-    const urls: Record<string, string> = {
-      whatsapp: `https://wa.me/?text=${encoded}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin)}&quote=${encoded}`,
-      instagram: '',
-    };
-    if (platform === 'instagram') {
-      navigator.clipboard.writeText(shareText);
-      alert('Score copied to clipboard! Paste it on your Instagram Story 📸');
-      return;
+    if (platform === 'whatsapp') {
+      window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
+    } else if (platform === 'facebook') {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(fbText)}`, '_blank');
+    } else if (platform === 'instagram') {
+      const instaText = `🏆 My FQ Test Score: ${totalScore}/${MAX_SCORE} (${scorePercent}%)\n🎖️ ${band.emoji} ${band.level}\n\n${dimScores.map(ds => `${ds.icon} ${ds.dimension}: ${ds.percentage}%`).join('\n')}\n\n${band.meaning}\n\nTake your FQ Test: ${appUrl}\n\n#FQTest #FinQuoVersity #FinancialLiteracy #MoneySmarts`;
+      navigator.clipboard.writeText(instaText);
+      alert('Detailed score copied to clipboard! Paste it on your Instagram Story 📸');
     }
-    window.open(urls[platform], '_blank');
   };
 
   return (
@@ -227,18 +229,19 @@ const ReportScreen = () => {
               <span className="text-game-muted text-xs font-body">/{MAX_SCORE}</span>
             </div>
           </div>
-          <p className="text-game-gold font-display font-semibold text-lg">{band.level}</p>
+          <p className="text-game-text font-body text-sm mb-1">You are</p>
+          <p className="text-game-gold font-display font-semibold text-lg">{band.emoji} {band.level}</p>
           <p className="text-game-muted font-body text-xs mt-1">{band.meaning}</p>
         </motion.div>
 
         {/* Radar Chart */}
         <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }} className="glass-card rounded-2xl p-4 mb-5">
           <p className="text-game-muted text-xs font-body uppercase tracking-wider text-center mb-2">Dimension Breakdown</p>
-          <div className="w-full h-56">
+          <div className="w-full h-72 sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="70%">
+              <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="65%">
                 <PolarGrid stroke="hsl(var(--game-muted) / 0.2)" />
-                <PolarAngleAxis dataKey="dimension" tick={{ fill: 'hsl(var(--game-muted))', fontSize: 9 }} />
+                <PolarAngleAxis dataKey="dimension" tick={{ fill: 'hsl(var(--game-muted))', fontSize: 10 }} />
                 <Radar name="Score" dataKey="score" stroke="hsl(var(--game-gold))" fill="hsl(var(--game-gold))" fillOpacity={0.25} strokeWidth={2} />
               </RadarChart>
             </ResponsiveContainer>
@@ -275,10 +278,10 @@ const ReportScreen = () => {
           </div>
         </motion.div>
 
-        {/* Download PDF & Send Email */}
+        {/* Download & Send Email */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="grid grid-cols-2 gap-3 mb-5 print:hidden">
           <button onClick={handleDownloadPDF} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <Download size={16} /> Download PDF
+            <Download size={16} /> Download Report
           </button>
           <button onClick={() => setEmailOpen(true)} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
             <Mail size={16} /> Send to Email

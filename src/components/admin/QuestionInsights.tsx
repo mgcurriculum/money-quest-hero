@@ -56,7 +56,7 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
             <div className="mt-4 space-y-4">
               <div className="flex gap-4 text-sm">
                 <span className="text-muted-foreground">Responses: <strong className="text-foreground">{selectedStat.totalResponses}</strong></span>
-                <span className="text-muted-foreground">Avg Score: <strong className={scoreColor(selectedStat.avgScore)}>{selectedStat.avgScore}/50</strong></span>
+                <span className="text-muted-foreground">Avg Score: <strong className={scoreColor(selectedStat.avgScore)}>{selectedStat.avgScore}/45</strong></span>
               </div>
               {distributionData.length > 0 && (
                 <ResponsiveContainer width="100%" height={200}>

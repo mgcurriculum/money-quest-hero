@@ -43,7 +43,7 @@ const ProfileScreen = () => {
 
   const ageNum = parseInt(age, 10);
   const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;
-  const canProceedStep0 = name.trim().length > 0 && isValidAge;
+  const canProceedStep0 = name.trim().length > 0 && isValidAge && phone.replace(/[^\d]/g, '').length >= 10;
 
   const handleStep0Next = async () => {
     stop();

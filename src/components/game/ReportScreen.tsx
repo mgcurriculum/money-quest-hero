@@ -20,6 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Share2, MessageCircle, Facebook, Instagram, Download, Mail, RefreshCw } from 'lucide-react';
+import SessionHistory from './SessionHistory';
 
 // Map short DB dimension names to full display names
 const dimensionKeyMap: Record<string, string> = {
@@ -287,6 +288,9 @@ const ReportScreen = () => {
             <Mail size={16} /> Send to Email
           </button>
         </motion.div>
+
+        {/* Session History */}
+        <SessionHistory phone={state.profile.phone} currentSessionScore={totalScore} />
 
         <div className="pb-8 print:hidden">
           <button onClick={() => dispatch({ type: 'RESET' })} className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">

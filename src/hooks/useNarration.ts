@@ -8,6 +8,7 @@ export function useNarration(externalMuted?: boolean) {
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const quotaExceededRef = useRef(false);
 
   // Use external muted state if provided
   const isMuted = externalMuted ?? false;

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
+import { useNavigate } from 'react-router-dom';
 import MuteButton from './MuteButton';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 

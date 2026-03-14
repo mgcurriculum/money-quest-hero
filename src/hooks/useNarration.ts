@@ -8,6 +8,7 @@ export function useNarration(externalMuted?: boolean) {
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const quotaExceededRef = useRef(false);
 
   // Use external muted state if provided
   const isMuted = externalMuted ?? false;
@@ -34,8 +35,12 @@ export function useNarration(externalMuted?: boolean) {
     }
   }, [isMuted, stop]);
 
+  useEffect(() => {
+    quotaExceededRef.current = sessionStorage.getItem('tts_quota_exceeded') === '1';
+  }, []);
+
   const speak = useCallback(async (text: string) => {
-    if (isMuted) return;
+    if (isMuted || quotaExceededRef.current) return;
     stop();
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
@@ -63,7 +68,12 @@ export function useNarration(externalMuted?: boolean) {
       );
 
       if (!response.ok) {
-        // Silently skip narration on API errors (e.g. quota exceeded)
+        const errorText = await response.text();
+        if (errorText.includes('quota_exceeded')) {
+          quotaExceededRef.current = true;
+          sessionStorage.setItem('tts_quota_exceeded', '1');
+          console.warn('TTS quota exceeded. Narration disabled for this session.');
+        }
         setIsLoading(false);
         return;
       }

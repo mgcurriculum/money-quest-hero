@@ -14,7 +14,8 @@ export interface PlayerProfile {
 }
 
 export interface GameState {
-  step: 'welcome' | 'consent' | 'profile' | 'quiz' | 'reflection' | 'report';
+  step: 'welcome' | 'consent' | 'profile' | 'phone-verify' | 'quiz' | 'reflection' | 'report';
+  phoneVerified: boolean;
   profile: PlayerProfile;
   consentGiven: boolean;
   currentQuestion: number; // 0-17
@@ -31,6 +32,7 @@ type Action =
   | { type: 'SET_PROFILE'; profile: PlayerProfile }
   | { type: 'SET_CONSENT'; value: boolean }
   | { type: 'START_QUIZ' }
+  | { type: 'SET_PHONE_VERIFIED'; verified: boolean }
   | { type: 'ANSWER_QUESTION'; question: number; score: number }
   | { type: 'NEXT_QUESTION' }
   | { type: 'SET_REFLECTION'; answer: string }
@@ -50,6 +52,7 @@ const initialState: GameState = {
   step: 'welcome',
   profile: { ...initialProfile },
   consentGiven: false,
+  phoneVerified: false,
   currentQuestion: 0,
   answers: {},
   reflectionAnswer: '',
@@ -65,6 +68,7 @@ function reducer(state: GameState, action: Action): GameState {
     case 'SET_PROFILE': return { ...state, profile: action.profile };
     case 'SET_CONSENT': return { ...state, consentGiven: action.value };
     case 'START_QUIZ': return { ...state, currentQuestion: 0, answers: {}, step: 'quiz' };
+    case 'SET_PHONE_VERIFIED': return { ...state, phoneVerified: action.verified };
     case 'ANSWER_QUESTION': {
       return { ...state, answers: { ...state.answers, [action.question]: action.score } };
     }

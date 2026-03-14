@@ -10,8 +10,8 @@ import { computeQuestionStats } from '@/utils/dashboardAnalytics';
 type Session = Tables<'game_sessions'>;
 
 const scoreColor = (score: number) => {
-  if (score >= 40) return 'text-green-600';
-  if (score >= 25) return 'text-yellow-600';
+  if (score >= 36) return 'text-green-600';
+  if (score >= 22) return 'text-yellow-600';
   return 'text-red-600';
 };
 
@@ -56,7 +56,7 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
             <div className="mt-4 space-y-4">
               <div className="flex gap-4 text-sm">
                 <span className="text-muted-foreground">Responses: <strong className="text-foreground">{selectedStat.totalResponses}</strong></span>
-                <span className="text-muted-foreground">Avg Score: <strong className={scoreColor(selectedStat.avgScore)}>{selectedStat.avgScore}/50</strong></span>
+                <span className="text-muted-foreground">Avg Score: <strong className={scoreColor(selectedStat.avgScore)}>{selectedStat.avgScore}/45</strong></span>
               </div>
               {distributionData.length > 0 && (
                 <ResponsiveContainer width="100%" height={200}>
@@ -98,7 +98,7 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
                       </div>
                       <div className="flex items-center gap-3 shrink-0 mr-2">
                         <span className="text-xs text-muted-foreground">{q.totalResponses} resp</span>
-                        <span className={`text-xs font-semibold ${scoreColor(q.avgScore)}`}>{q.avgScore}/50</span>
+                        <span className={`text-xs font-semibold ${scoreColor(q.avgScore)}`}>{q.avgScore}/45</span>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>

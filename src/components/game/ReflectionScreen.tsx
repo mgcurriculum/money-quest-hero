@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
+import { BookOpen, Lightbulb } from 'lucide-react';
 import MuteButton from './MuteButton';
 import { reflectionOptions } from '@/data/questions';
+import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const interestOptions = [
   { text: 'Not interested', emoji: '❌' },
@@ -46,11 +48,14 @@ const ReflectionScreen = () => {
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
       <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
       <motion.div key={step} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full text-center">
+        <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto mx-auto mb-4" />
         <p className="gold-text font-display font-bold text-lg mb-2">FQ Test</p>
 
         {step === 0 && (
           <>
-            <span className="text-5xl mb-4 block">📚</span>
+            <div className="w-12 h-12 rounded-full bg-game-gold/20 flex items-center justify-center mx-auto mb-3">
+              <BookOpen size={24} className="text-game-gold" />
+            </div>
             <h2 className="text-3xl font-display font-bold text-game-text mb-2">Financial Mindset</h2>
             <p className="text-game-muted font-body mb-8">How interested are you in improving your financial knowledge?</p>
             <div className="space-y-2">
@@ -61,7 +66,7 @@ const ReflectionScreen = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.06 }}
                   onClick={() => handleInterestSelect(opt.text)}
-                  className="w-full glass-card rounded-xl px-5 py-4 text-game-text font-body text-left hover:border-game-gold/50 hover:scale-[1.01] active:scale-[0.99] transition-all"
+                  className="w-full glass-card rounded-xl px-5 py-4 text-game-text font-body text-left active:border-game-gold/50 active:scale-[0.99] transition-all"
                 >
                   <span className="mr-2">{opt.emoji}</span> {opt.text}
                 </motion.button>
@@ -72,7 +77,9 @@ const ReflectionScreen = () => {
 
         {step === 1 && (
           <>
-            <span className="text-5xl mb-4 block">🪞</span>
+            <div className="w-12 h-12 rounded-full bg-game-gold/20 flex items-center justify-center mx-auto mb-3">
+              <Lightbulb size={24} className="text-game-gold" />
+            </div>
             <h2 className="text-3xl font-display font-bold text-game-text mb-2">Final Reflection</h2>
             <p className="text-game-muted font-body mb-8">If you could improve one financial skill this year, what would it be?</p>
             <div className="space-y-2">
@@ -83,7 +90,7 @@ const ReflectionScreen = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.06 }}
                   onClick={() => handleReflectionSelect(opt)}
-                  className="w-full glass-card rounded-xl px-5 py-4 text-game-text font-body text-left hover:border-game-gold/50 hover:scale-[1.01] active:scale-[0.99] transition-all"
+                  className="w-full glass-card rounded-xl px-5 py-4 text-game-text font-body text-left active:border-game-gold/50 active:scale-[0.99] transition-all"
                 >
                   {opt}
                 </motion.button>

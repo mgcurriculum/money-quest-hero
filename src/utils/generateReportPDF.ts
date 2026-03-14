@@ -1,5 +1,5 @@
 import type { QuestionItem } from '@/hooks/useQuestions';
-import { dimensions, dimensionIcons } from '@/data/questions';
+import { dimensions, dimensionIcons, MAX_SCORE_PER_QUESTION } from '@/data/questions';
 
 export interface QAEntry {
   questionNo: number;
@@ -98,7 +98,7 @@ export function generateReportHTML(params: {
       ${qas.map((qa, idx) => `
         <div style="padding:10px 12px;border-left:3px solid #4FC3F7;margin-bottom:8px;background:#fafafa;border-radius:0 8px 8px 0;">
           <p style="font-size:13px;color:#555;margin:0 0 6px;line-height:1.4;">Q${qa.questionNo}. ${qa.question}</p>
-          <p style="font-size:13px;font-weight:600;color:#2D1B69;margin:0;">${qa.selectedOption} <span style="color:#4FC3F7;font-size:11px;margin-left:8px;">(Score: ${qa.score}/50)</span></p>
+          <p style="font-size:13px;font-weight:600;color:#2D1B69;margin:0;">${qa.selectedOption} <span style="color:#4FC3F7;font-size:11px;margin-left:8px;">(Score: ${qa.score}/${MAX_SCORE_PER_QUESTION})</span></p>
         </div>
       `).join('')}
     </div>
@@ -123,7 +123,7 @@ export function generateReportHTML(params: {
 </head>
 <body>
   <div style="max-width:600px;margin:0 auto;padding:24px;">
-    <div style="text-align:center;padding:28px 24px;background:linear-gradient(135deg,#2D1B69,#1a103f);border-radius:16px;color:#fff;margin-bottom:20px;">
+    <div style="text-align:center;padding:28px 24px;background:linear-gradient(135deg,#23113f,#1a103f);border-radius:16px;color:#fff;margin-bottom:20px;">
       ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:100px;height:auto;margin:0 auto 12px;display:block;" />` : ''}
       <h1 style="margin:0 0 4px;font-size:24px;">FQ Test Report</h1>
       <p style="margin:0;opacity:0.7;font-size:13px;">${playerName} • ${profileLabel}</p>
@@ -131,7 +131,8 @@ export function generateReportHTML(params: {
     <div style="text-align:center;padding:24px;background:#f8f6ff;border-radius:16px;margin-bottom:20px;border:1px solid #e8e0f0;">
       <div style="font-size:52px;margin-bottom:4px;">${bandEmoji}</div>
       <div style="font-size:48px;font-weight:800;color:#2D1B69;">${totalScore}<span style="font-size:18px;color:#999;font-weight:400;">/${maxScore}</span></div>
-      <div style="font-size:18px;font-weight:700;color:#4FC3F7;margin-top:4px;">${bandLevel}</div>
+      <div style="font-size:14px;color:#888;margin-top:4px;">You are</div>
+      <div style="font-size:18px;font-weight:700;color:#4FC3F7;margin-top:4px;">${bandEmoji} ${bandLevel}</div>
       <div style="font-size:12px;color:#888;margin-top:4px;">${bandMeaning}</div>
     </div>
     <div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:20px;border:1px solid #e8e0f0;">
@@ -155,10 +156,19 @@ export function generateReportHTML(params: {
 </html>`;
 }
 
+export function downloadReportAsFile(html: string, filename: string) {
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Legacy export for backward compat
 export function openPrintableReport(html: string) {
-  const win = window.open('', '_blank');
-  if (!win) { alert('Please allow popups to download your report.'); return; }
-  win.document.write(html);
-  win.document.close();
-  setTimeout(() => win.print(), 500);
+  downloadReportAsFile(html, 'FQ-Test-Report.html');
 }

@@ -2,8 +2,10 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { supabase } from '@/integrations/supabase/client';
+import { Smartphone } from 'lucide-react';
 import MuteButton from './MuteButton';
 import { useNarration } from '@/hooks/useNarration';
+import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const PhoneVerificationScreen = () => {
   const { state, dispatch } = useGame();
@@ -47,7 +49,6 @@ const PhoneVerificationScreen = () => {
         throw new Error(data?.error || fnError?.message || 'Failed to send OTP');
       }
 
-      setStep('otp');
       setStep('otp');
       startResendTimer();
     } catch (err: any) {
@@ -113,7 +114,6 @@ const PhoneVerificationScreen = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
       <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
@@ -123,7 +123,10 @@ const PhoneVerificationScreen = () => {
         className="max-w-md w-full"
       >
         <div className="text-center mb-8">
-          <span className="text-5xl mb-4 block">📱</span>
+          <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full bg-game-gold/20 flex items-center justify-center mx-auto mb-3">
+            <Smartphone size={24} className="text-game-gold" />
+          </div>
           <h2 className="text-3xl font-display font-bold text-game-text mb-2">
             Verify Your Phone
           </h2>

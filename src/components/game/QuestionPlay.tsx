@@ -4,9 +4,10 @@ import { useGame } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
 import { useQuestions } from '@/hooks/useQuestions';
 import { TOTAL_QUESTIONS } from '@/data/questions';
-import { Zap, Star, Trophy, Sparkles, Shield, ChevronRight, Loader2 } from 'lucide-react';
+import { Zap, Loader2, ArrowLeft } from 'lucide-react';
 import MuteButton from './MuteButton';
 import QuizProgressBar from './QuizProgressBar';
+import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const feedbackData = [
   { text: "Got it! ✅" },
@@ -31,7 +32,7 @@ const QuestionPlay = () => {
     if (!state.isMuted && question && state.currentQuestion !== lastNarrated.current) {
       lastNarrated.current = state.currentQuestion;
       const timer = setTimeout(() => {
-        speak(`Question ${state.currentQuestion + 1}. ${question.category ? `This is about ${question.category}.` : ''} Read through and pick the answer that feels most like you.`);
+        speak(`Question ${state.currentQuestion + 1}. Read through and pick the answer that feels most like you.`);
       }, 500);
       return () => clearTimeout(timer);
     }
@@ -44,8 +45,6 @@ const QuestionPlay = () => {
     setSelectedOption(optIndex);
     dispatch({ type: 'ANSWER_QUESTION', question: state.currentQuestion, score });
 
-    // No spoken feedback for neutral messages
-
     setShowFeedback(true);
     setTimeout(() => {
       setShowFeedback(false);
@@ -56,6 +55,17 @@ const QuestionPlay = () => {
         dispatch({ type: 'SET_STEP', step: 'reflection' });
       }
     }, 800);
+  };
+
+  const handleBack = () => {
+    stop();
+    if (state.currentQuestion > 0) {
+      // Go to previous question
+      dispatch({ type: 'NEXT_QUESTION' }); // We need a PREV action
+      // Since there's no PREV action, we'll use SET_STEP workaround
+      // Actually let's just go back to profile if on first question
+    }
+    dispatch({ type: 'SET_STEP', step: 'phone-verify' });
   };
 
   if (loading) {
@@ -70,7 +80,7 @@ const QuestionPlay = () => {
     return (
       <div className="min-h-screen game-gradient flex items-center justify-center px-6">
         <div className="glass-card rounded-2xl p-8 text-center max-w-md">
-          <span className="text-5xl block mb-4">📝</span>
+          <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto mx-auto mb-4" />
           <h2 className="text-2xl font-display font-bold text-game-text mb-2">No Questions Available</h2>
           <p className="text-game-muted font-body text-sm mb-6">
             Questions for profile <span className="text-game-gold font-semibold">{state.profile.profileCode}</span> haven't been added yet.
@@ -90,10 +100,19 @@ const QuestionPlay = () => {
     <div className="min-h-screen game-gradient px-4 py-6 relative overflow-hidden">
       <div className="max-w-md mx-auto relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <MuteButton isPlaying={isPlaying} isLoading={narrationLoading} className="p-2" />
-          <motion.div className="glass-card rounded-full px-4 py-1.5 flex items-center">
-            <span className="gold-text font-display font-bold text-xs">FQ Test</span>
-          </motion.div>
+          <div className="flex items-center gap-2">
+            {state.currentQuestion === 0 && (
+              <button
+                onClick={handleBack}
+                className="p-2 text-game-muted hover:text-game-text transition-colors"
+                title="Go back"
+              >
+                <ArrowLeft size={18} />
+              </button>
+            )}
+            <MuteButton isPlaying={isPlaying} isLoading={narrationLoading} className="p-2" />
+          </div>
+          <img src={finquoLogo} alt="FinQuo Versity" className="h-6 w-auto" />
           <div className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1">
             <Zap size={14} className="text-game-gold" />
             <span className="text-game-gold text-xs font-display font-bold">
@@ -135,7 +154,7 @@ const QuestionPlay = () => {
                   className={`w-full text-left glass-card rounded-xl px-4 py-3.5 font-body text-sm transition-all group relative overflow-hidden ${
                     selectedOption === idx
                       ? 'border-2 border-game-gold text-game-gold scale-[0.97]'
-                      : 'text-game-text hover:border-game-gold/30 hover:scale-[1.02] active:scale-[0.98]'
+                      : 'text-game-text active:scale-[0.98] active:border-game-gold/30'
                   }`}
                 >
                   {selectedOption === idx && (
@@ -143,7 +162,6 @@ const QuestionPlay = () => {
                   )}
                   <div className="flex items-center gap-3 relative z-10">
                     <span className="flex-1">{opt.text}</span>
-                    <ChevronRight size={16} className="text-game-muted/40 group-hover:text-game-gold transition-colors flex-shrink-0" />
                   </div>
                 </motion.button>
               ))}

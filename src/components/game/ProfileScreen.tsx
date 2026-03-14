@@ -3,14 +3,25 @@ import { motion } from 'framer-motion';
 import { useGame, PlayerProfile } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
 import { supabase } from '@/integrations/supabase/client';
-import { AGE_GROUPS, ROLE_EMOJIS, buildProfileCode } from '@/data/questions';
+import { AGE_GROUPS, buildProfileCode } from '@/data/questions';
+import { User, Briefcase, GraduationCap, Home, Rocket, Laptop, Palmtree } from 'lucide-react';
 import MuteButton from './MuteButton';
 import CountryCodePicker, { COUNTRIES, Country } from './CountryCodePicker';
+import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const NARRATION_TEXTS = [
   "Let's get to know you a bit! Fill in your details to personalize your results.",
   "Almost there! What best describes your current role?",
 ];
+
+const ROLE_ICONS: Record<string, React.ReactNode> = {
+  SAL: <Briefcase size={18} />,
+  STU: <GraduationCap size={18} />,
+  HOM: <Home size={18} />,
+  BUS: <Rocket size={18} />,
+  SELF: <Laptop size={18} />,
+  RET: <Palmtree size={18} />,
+};
 
 function getAgeGroup(age: number): string | null {
   if (age >= 18 && age <= 25) return '18-25';
@@ -108,7 +119,10 @@ const ProfileScreen = () => {
         className="max-w-md w-full"
       >
         <div className="text-center mb-8">
-          <span className="text-5xl mb-4 block">{step === 0 ? '🧑‍🎮' : '🎯'}</span>
+          <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full bg-game-gold/20 flex items-center justify-center mx-auto mb-3">
+            {step === 0 ? <User size={24} className="text-game-gold" /> : <Briefcase size={24} className="text-game-gold" />}
+          </div>
           <h2 className="text-3xl font-display font-bold text-game-text mb-2">
             {step === 0 ? 'Create Your Profile' : 'Your Role'}
           </h2>
@@ -122,7 +136,7 @@ const ProfileScreen = () => {
         {step === 0 && (
           <div className="glass-card rounded-2xl p-6 space-y-4">
             <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Name</label>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Name <span className="text-game-gold">*</span></label>
               <input
                 type="text"
                 value={name}
@@ -132,7 +146,7 @@ const ProfileScreen = () => {
               />
             </div>
             <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Age</label>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Age <span className="text-game-gold">*</span></label>
               <input
                 type="number"
                 value={age}
@@ -158,7 +172,7 @@ const ProfileScreen = () => {
               </select>
             </div>
             <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Phone <span className="text-game-gold">*</span></label>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Phone Number <span className="text-game-gold">*</span></label>
               <div className="flex gap-2">
                 <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
                 <input
@@ -194,9 +208,10 @@ const ProfileScreen = () => {
                 <button
                   key={role.code}
                   onClick={() => handleRoleSelect(role.code, role.label)}
-                  className="w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all text-game-text hover:border-game-gold/30 hover:scale-[1.01] active:scale-[0.99]"
+                  className="w-full glass-card rounded-xl px-5 py-4 text-sm font-body text-left transition-all text-game-text active:border-game-gold/30 active:scale-[0.99] flex items-center gap-3"
                 >
-                  {ROLE_EMOJIS[role.code] || '👤'} {role.label}
+                  <span className="text-game-gold">{ROLE_ICONS[role.code] || <User size={18} />}</span>
+                  {role.label}
                 </button>
               ))}
             </div>

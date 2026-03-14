@@ -10,6 +10,7 @@ const GlobalProgressBar = () => {
       case 'welcome': return 0;
       case 'consent': return 3;
       case 'profile': return 7;
+      case 'phone-verify': return 9;
       case 'quiz': {
         const qProgress = state.currentQuestion / TOTAL_QUESTIONS;
         return 10 + qProgress * 78;

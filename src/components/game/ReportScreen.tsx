@@ -98,6 +98,7 @@ const ReportScreen = () => {
         await supabase.from('game_sessions').insert({
           player_name: state.profile.name,
           player_age: state.profile.ageGroup,
+          player_age_number: state.profile.age,
           player_gender: state.profile.gender,
           player_phone: state.profile.phone,
           player_country: state.profile.country,

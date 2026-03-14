@@ -40,7 +40,7 @@ const PhoneVerificationScreen = () => {
     setSending(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
-        body: { phone: formattedPhone },
+        body: { phone },
       });
 
       if (fnError || data?.error) {

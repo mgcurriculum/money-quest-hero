@@ -54,7 +54,8 @@ const UserDashboard = () => {
   const latestSession = sessions[0];
   const profile = latestSession ? {
     name: latestSession.player_name,
-    age: latestSession.player_age,
+    age: latestSession.player_age_number || null,
+    ageGroup: latestSession.player_age,
     gender: latestSession.player_gender,
     country: latestSession.player_country,
     profileCode: latestSession.profile_code,

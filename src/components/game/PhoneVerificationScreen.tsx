@@ -30,19 +30,9 @@ const PhoneVerificationScreen = () => {
     }, 1000);
   };
 
-  const formatPhone = (value: string) => {
-    // Ensure +91 prefix for Indian numbers
-    let cleaned = value.replace(/[^\d+]/g, '');
-    if (!cleaned.startsWith('+')) {
-      cleaned = '+91' + cleaned;
-    }
-    return cleaned;
-  };
-
   const handleSendOTP = async () => {
     setError('');
-    const formattedPhone = formatPhone(phone);
-    if (formattedPhone.length < 12) {
+    if (phone.length < 10) {
       setError('Please enter a valid phone number');
       return;
     }

@@ -10,6 +10,7 @@ const WELCOME_TEXT = "Hey there! I'm your financial guide. This is a quick quiz 
 
 const WelcomeScreen = () => {
   const { state, dispatch } = useGame();
+  const navigate = useNavigate();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef(false);
 

@@ -177,7 +177,7 @@ const UserDashboard = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Age Group', value: profile.age || '-' },
+                  { label: 'Age', value: profile.age ? `${profile.age} years` : (profile.ageGroup || '-') },
                   { label: 'Gender', value: profile.gender ? profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1) : '-' },
                   { label: 'Country', value: profile.country || '-' },
                   { label: 'Tests Taken', value: sessions.length },

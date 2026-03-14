@@ -90,7 +90,7 @@ const ProfileScreen = () => {
     };
 
     dispatch({ type: 'SET_PROFILE', profile });
-    dispatch({ type: 'START_QUIZ' });
+    dispatch({ type: 'SET_STEP', step: 'phone-verify' });
   };
 
   const selectedAgeConfig = AGE_GROUPS.find(a => a.ageGroup === selectedAgeGroup);

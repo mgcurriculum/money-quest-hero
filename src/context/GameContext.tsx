@@ -52,6 +52,7 @@ const initialState: GameState = {
   step: 'welcome',
   profile: { ...initialProfile },
   consentGiven: false,
+  phoneVerified: false,
   currentQuestion: 0,
   answers: {},
   reflectionAnswer: '',

@@ -118,7 +118,7 @@ const ReportScreen = () => {
     saveSession();
   }, [questions.length]);
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const html = generateReportHTML({
       logoUrl: window.location.origin + finquoLogo,
       playerName: state.profile.name,
@@ -133,7 +133,7 @@ const ReportScreen = () => {
       tips,
       reflectionAnswer: state.reflectionAnswer,
     });
-    downloadReportAsFile(html, `FQ-Test-Report-${state.profile.name}.html`);
+    await downloadReportAsFile(html, `FQ-Test-Report-${state.profile.name}.pdf`);
   };
 
   const handleSendEmail = async () => {

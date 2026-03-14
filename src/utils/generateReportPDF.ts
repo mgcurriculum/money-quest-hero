@@ -156,19 +156,34 @@ export function generateReportHTML(params: {
 </html>`;
 }
 
-export function downloadReportAsFile(html: string, filename: string) {
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+export async function downloadReportAsFile(html: string, filename: string) {
+  const html2pdf = (await import('html2pdf.js')).default;
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  document.body.appendChild(container);
+
+  const pdfFilename = filename.replace(/\.html$/i, '.pdf');
+
+  try {
+    await html2pdf()
+      .set({
+        margin: [4, 2, 4, 2],
+        filename: pdfFilename,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'div'] },
+      })
+      .from(container.firstElementChild || container)
+      .save();
+  } finally {
+    document.body.removeChild(container);
+  }
 }
 
 // Legacy export for backward compat
 export function openPrintableReport(html: string) {
-  downloadReportAsFile(html, 'FQ-Test-Report.html');
+  downloadReportAsFile(html, 'FQ-Test-Report.pdf');
 }

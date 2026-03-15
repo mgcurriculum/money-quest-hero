@@ -1,33 +1,30 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Analysis
 
-### Changes
+The defensive guard added in the last fix (`if (!d.dimension || !d.question) return;`) is correct but insufficient. The Question Insights tab renders blank/broken, suggesting a **runtime crash** in the component. Based on code review, the likely causes are:
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+1. **Duplicate `SelectItem` values**: `q.question.substring(0, 60)` is used as both `key` and `value` for Radix UI's `Select`. If two different questions share the same first 60 characters, this creates duplicate values which crashes the Radix Select component silently.
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+2. **Potential `undefined` in `selectedOption`**: If any `d.selectedOption` is null/undefined (rather than missing), it becomes the string `"undefined"` as a distribution key — not a crash, but corrupts data.
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+3. **No error boundary**: If `computeQuestionStats` or the rendering throws for any reason, the entire tab goes blank with no fallback.
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+## Plan
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+### 1. Fix duplicate key/value issue in QuestionInsights (primary fix)
+- Use a unique identifier (index or combination of dimension + question substring) as the `SelectItem` value instead of just `q.question.substring(0, 60)`
+- Use the index into `questionStats` array as the Select value to guarantee uniqueness
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+### 2. Add try-catch error handling in QuestionInsights
+- Wrap the `useMemo` computation in a try-catch that returns `[]` on error
+- Add `console.error` logging so errors become visible
+- Show a fallback error message in the UI if stats computation fails
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+### 3. Add guard for undefined selectedOption in computeQuestionStats
+- Skip entries where `d.selectedOption` is falsy to prevent "undefined" keys in distribution
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+### Files to edit
+- `src/components/admin/QuestionInsights.tsx` — fix Select values, add error handling
+- `src/utils/dashboardAnalytics.ts` — add selectedOption guard
 

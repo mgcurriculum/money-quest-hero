@@ -6,12 +6,17 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { fqBands as defaultBands, MAX_SCORE } from '@/data/questions';
 import { toast } from 'sonner';
-import { Save, RotateCcw } from 'lucide-react';
+import { Save, RotateCcw, Eye, EyeOff, Key } from 'lucide-react';
 
 const Settings = () => {
   const [bands, setBands] = useState([...defaultBands]);
   const [loading, setLoading] = useState(true);
   const [savingBands, setSavingBands] = useState(false);
+
+  // API Key state
+  const [elevenLabsKey, setElevenLabsKey] = useState('');
+  const [showKey, setShowKey] = useState(false);
+  const [savingKey, setSavingKey] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -19,13 +24,17 @@ const Settings = () => {
         const { data } = await supabase
           .from('admin_settings')
           .select('key, value')
-          .eq('key', 'score_bands');
+          .in('key', ['score_bands', 'elevenlabs_api_key']);
 
         if (data) {
           for (const row of data) {
             if (row.key === 'score_bands') {
               const val = row.value as any;
               if (val?.bands?.length > 0) setBands(val.bands);
+            }
+            if (row.key === 'elevenlabs_api_key') {
+              const val = row.value as any;
+              if (val?.key) setElevenLabsKey(val.key);
             }
           }
         }

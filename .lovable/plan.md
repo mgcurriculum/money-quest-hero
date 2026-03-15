@@ -1,33 +1,32 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Plan: Inline OTP Verification on Profile Screen
+
+### What
+Remove the separate `PhoneVerificationScreen` and instead add inline OTP verification directly in the profile screen's phone number field. After entering the phone number and tapping "Send OTP", a 6-digit OTP input appears below the phone field. Once verified, the phone field shows a green checkmark and the flow proceeds directly to the quiz (skipping the `phone-verify` step entirely).
 
 ### Changes
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+#### 1. `src/components/game/ProfileScreen.tsx`
+- Add OTP state variables: `otp`, `otpStep` (`idle` | `sent` | `verified`), `sending`, `verifying`, `otpError`, `resendTimer`
+- Add a "Send OTP" button next to the phone input (appears when phone has 10+ digits and OTP not yet verified)
+- When OTP is sent, show a 6-digit OTP input field below the phone field with resend/timer
+- On successful verification, show a green checkmark on the phone field, set `otpStep` to `verified`
+- Update `canProceedStep0` to also require `otpStep === 'verified'`
+- In `handleRoleSelect`, skip `phone-verify` step — go directly to `quiz` via `START_QUIZ` dispatch
+- Remove the `phone-verify` step transition entirely
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+#### 2. `src/pages/CampaignLanding.tsx` & `src/pages/Index.tsx` (if used)
+- Remove `PhoneVerificationScreen` import and `phone-verify` case from the flow (optional cleanup)
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+#### 3. No backend changes
+- Reuses existing `send-otp` and `verify-otp` edge functions as-is
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
-
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
-
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
-
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
-
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+### UX Flow
+```text
+Phone Number: [+91] [9876543210] [Send OTP]
+              ──── OTP sent! ────
+Enter OTP:   [• • • • • •]  Resend in 28s
+              ✓ Verified
+```
 

@@ -66,6 +66,7 @@ export function computeQuestionStats(sessions: Session[]): QuestionStat[] {
   sessions.forEach(s => {
     const detailed = getDetailedAnswers(s);
     detailed.forEach(d => {
+      if (!d.dimension || !d.question) return;
       const key = `${d.dimension}-${d.question.substring(0, 60)}`;
       if (!questionMap.has(key)) {
         questionMap.set(key, {

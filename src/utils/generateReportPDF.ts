@@ -231,7 +231,7 @@ export function generateReportHTML(params: {
       <div style="font-size:52px;font-weight:800;color:#2D1B69;line-height:1;">
         ${totalScore}<span style="font-size:18px;color:#aaa;font-weight:400;">/${maxScore}</span>
       </div>
-      <div style="margin:16px auto 0;width:80%;max-width:320px;height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;">
+      <div style="margin:22px auto 0;width:80%;max-width:320px;height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;">
         <div style="height:100%;width:${scorePercent}%;background:linear-gradient(90deg,#6C63FF,#4FC3F7);border-radius:8px;"></div>
       </div>
       <div style="font-size:12px;color:#999;margin-top:8px;">You are</div>
@@ -290,7 +290,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
 
   const parsed = new DOMParser().parseFromString(html, 'text/html');
   const source = document.createElement('div');
-  source.style.width = '768px';
+  source.style.width = '769px';
   source.style.background = '#ffffff';
   source.innerHTML = parsed.body.innerHTML;
 
@@ -313,7 +313,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
         margin: [4, 2, 4, 2],
         filename: pdfFilename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 768 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 769 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'], avoid: ['.qa-card', '.tip-card'] },
       })

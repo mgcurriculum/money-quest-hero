@@ -7,7 +7,7 @@ import ConsentScreen from '@/components/game/ConsentScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
 import QuestionPlay from '@/components/game/QuestionPlay';
 import ReflectionScreen from '@/components/game/ReflectionScreen';
-import PhoneVerificationScreen from '@/components/game/PhoneVerificationScreen';
+
 import ReportScreen from '@/components/game/ReportScreen';
 import GlobalProgressBar from '@/components/game/GlobalProgressBar';
 import { Loader2 } from 'lucide-react';

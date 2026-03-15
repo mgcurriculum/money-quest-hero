@@ -215,7 +215,7 @@ export function generateReportHTML(params: {
   </style>
 </head>
 <body>
-  <div style="max-width:580px;margin:0 auto;padding:32px 24px;">
+  <div style="max-width:100%;margin:0 auto;padding:24px 16px;">
 
     <!-- Header -->
     <div style="text-align:center;padding:32px 16px;background:linear-gradient(135deg,#2D1B69 0%,#1a103f 50%,#0f0a2e 100%);border-radius:20px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;width:100%;box-sizing:border-box;">

@@ -290,18 +290,18 @@ const ProfileScreen = () => {
                   onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
                   placeholder="9876543210"
                   disabled={otpStep === 'verified'}
-                  className="flex-1 bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors disabled:opacity-60"
+                  className="flex-1 min-w-0 bg-game-surface text-game-text rounded-xl px-3 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors disabled:opacity-60"
                 />
-                {isPhoneValid && otpStep === 'idle' && (
-                  <button
-                    onClick={handleSendOTP}
-                    disabled={otpSending}
-                    className="px-4 py-3 rounded-xl text-xs font-display font-semibold gold-gradient text-white whitespace-nowrap hover:scale-105 active:scale-95 transition-all disabled:opacity-60"
-                  >
-                    {otpSending ? 'Sending…' : 'Send OTP'}
-                  </button>
-                )}
               </div>
+              {isPhoneValid && otpStep === 'idle' && (
+                <button
+                  onClick={handleSendOTP}
+                  disabled={otpSending}
+                  className="w-full mt-2 px-4 py-3 rounded-xl text-sm font-display font-semibold gold-gradient text-white hover:scale-105 active:scale-95 transition-all disabled:opacity-60"
+                >
+                  {otpSending ? 'Sending…' : 'Send OTP'}
+                </button>
+              )}
 
               {/* OTP input area */}
               {otpStep === 'sent' && (

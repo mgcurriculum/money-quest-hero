@@ -8,6 +8,7 @@ import { fqBands as defaultBands, MAX_SCORE } from '@/data/questions';
 import { toast } from 'sonner';
 import { Save, RotateCcw, Eye, EyeOff, Key } from 'lucide-react';
 import TTSUsageCard from '@/components/admin/TTSUsageCard';
+import TTSCacheCard from '@/components/admin/TTSCacheCard';
 
 const Settings = () => {
   const [bands, setBands] = useState([...defaultBands]);

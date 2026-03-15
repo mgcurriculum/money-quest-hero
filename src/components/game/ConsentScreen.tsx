@@ -11,6 +11,8 @@ const ConsentScreen = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef(false);
+  const speakRef = useRef(speak);
+  speakRef.current = speak;
   const [consent1, setConsent1] = useState(false);
   const [consent2, setConsent2] = useState(false);
 
@@ -19,10 +21,10 @@ const ConsentScreen = () => {
   useEffect(() => {
     if (!state.isMuted && !hasNarrated.current) {
       hasNarrated.current = true;
-      const timer = setTimeout(() => speak(CONSENT_TEXT), 500);
+      const timer = setTimeout(() => speakRef.current(CONSENT_TEXT), 500);
       return () => clearTimeout(timer);
     }
-  }, [state.isMuted, speak]);
+  }, [state.isMuted]);
 
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">

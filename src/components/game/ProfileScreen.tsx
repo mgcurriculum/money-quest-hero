@@ -64,11 +64,6 @@ const ProfileScreen = () => {
   const [resendTimer, setResendTimer] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
 
-  useEffect(() => {
-    if (!state.phoneVerified) {
-      dispatch({ type: 'SET_PHONE_VERIFIED', verified: true });
-    }
-  }, []);
 
   useEffect(() => {
     if (!state.isMuted && hasNarrated.current !== step) {

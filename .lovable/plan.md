@@ -1,33 +1,40 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Current State
 
-### Changes
+**Data being saved** (in `game_sessions`): Name, age group, exact age, gender, phone, country, state, district, role, income type, profile code, enriched answers JSON (individual question details + dimension scores), FQ score, band level, reflection answer, campaign ID, email.
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+**CSV export currently includes**: Name, Age, Gender, Phone, State, District, Status, Income Type, FQ Score, Band, Primary/Secondary Archetype, Reflection, Date.
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+**What's missing from CSV**: Country, Email, Profile Code, exact age number, campaign info, individual question answers (Q1-Q18 with selected option and score), and dimension-level scores.
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+**Current filters**: Age Group, Band, simple date-from/date-to inputs.
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+---
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+## Plan
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+### 1. Enhance CSV Export to include ALL collected data
+**File**: `src/pages/admin/Dashboard.tsx`
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+- Add these columns to the CSV headers and row mapping:
+  - `Country`, `Email`, `Profile Code`, `Age (exact)`, `Campaign ID`
+  - For each question in the enriched answers JSON: `Q1 Answer`, `Q1 Score`, `Q2 Answer`, `Q2 Score`, ... up to Q18
+  - 6 dimension percentage scores: `Earning %`, `Spending %`, `Saving %`, `Borrowing %`, `Investing %`, `Protecting %`
+- Parse the `answers` JSONB column to extract `detailed` array and `dimensionScores` array per session
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+### 2. Add richer date/time filters
+**File**: `src/pages/admin/Dashboard.tsx`
+
+- Replace the plain date inputs with a filter dropdown offering preset ranges: Today, This Week, This Month, This Year, Custom Range
+- Keep the custom from/to date pickers for the "Custom Range" option
+- Add a quick month/year selector for filtering by specific month
+
+### 3. Add campaign filter
+**File**: `src/pages/admin/Dashboard.tsx`
+
+- Fetch campaigns list and add a campaign filter dropdown alongside existing filters
+- Filter sessions by `campaign_id`
+
+No database changes needed — all data is already being saved. This is purely a dashboard UI enhancement.
 

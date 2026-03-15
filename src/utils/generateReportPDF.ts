@@ -218,12 +218,12 @@ export function generateReportHTML(params: {
   <div style="max-width:580px;margin:0 auto;padding:32px 24px;">
 
     <!-- Header -->
-    <div style="text-align:center;padding:32px 24px;background:linear-gradient(135deg,#2D1B69 0%,#1a103f 50%,#0f0a2e 100%);border-radius:20px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;">
+    <div style="text-align:center;padding:32px 16px;background:linear-gradient(135deg,#2D1B69 0%,#1a103f 50%,#0f0a2e 100%);border-radius:20px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;width:100%;box-sizing:border-box;">
       <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
       <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
       ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:90px;height:auto;margin:0 auto 16px;display:block;opacity:0.95;" />` : ''}
       <h1 style="margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-0.5px;">FQ Test Report</h1>
-      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;">${playerName} | ${profileLabel}</p>
+      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;word-wrap:break-word;overflow-wrap:break-word;">${playerName} | ${profileLabel}</p>
     </div>
 
     <!-- Score Card -->

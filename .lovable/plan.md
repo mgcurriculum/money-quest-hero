@@ -1,33 +1,39 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Plan: Retake Shows Pre-filled Editable Profile + Role Selection
 
-### Changes
+### What Changes
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+**1. `src/context/GameContext.tsx`** — Change `RETAKE` action to go to `profile` instead of `quiz`, keeping all existing profile data and `phoneVerified: true`.
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+```typescript
+case 'RETAKE': return {
+  ...state,
+  currentQuestion: 0,
+  answers: {},
+  reflectionAnswer: '',
+  step: 'profile',  // go to profile, not quiz
+};
+```
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+**2. `src/components/game/ProfileScreen.tsx`** — Initialize local state from existing profile when available (retake scenario):
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+- `name` → `state.profile.name`
+- `age` → `state.profile.age` (if > 0)
+- `gender` → `state.profile.gender`
+- `phone` → extract digits after country code from `state.profile.phone`
+- `selectedCountry` → match from `state.profile.country`
+- `otpStep` → set to `'verified'` if `state.phoneVerified` is true (skip OTP entirely)
+- `campaignCode` → `state.campaignCode`
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+All fields remain editable. If the user changes their phone number, OTP verification resets (existing behavior). The role selection step (step 1) is always shown — user must re-select their current role.
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+### Summary
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+| File | Change |
+|------|--------|
+| `src/context/GameContext.tsx` | RETAKE goes to `profile` step |
+| `src/components/game/ProfileScreen.tsx` | Pre-fill state from existing profile, auto-set OTP as verified if `phoneVerified` |
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+No database changes needed.
 

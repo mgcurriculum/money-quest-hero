@@ -313,7 +313,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
         margin: [6, 3, 6, 3],
         filename: pdfFilename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 700 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 794 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'], avoid: ['.qa-card', '.tip-card'] },
       })

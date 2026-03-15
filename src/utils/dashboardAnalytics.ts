@@ -77,8 +77,10 @@ export function computeQuestionStats(sessions: Session[]): QuestionStat[] {
         });
       }
       const stat = questionMap.get(key)!;
-      stat.scores.push(d.score);
-      stat.optionCounts[d.selectedOption] = (stat.optionCounts[d.selectedOption] || 0) + 1;
+      stat.scores.push(d.score ?? 0);
+      if (d.selectedOption) {
+        stat.optionCounts[d.selectedOption] = (stat.optionCounts[d.selectedOption] || 0) + 1;
+      }
     });
   });
 

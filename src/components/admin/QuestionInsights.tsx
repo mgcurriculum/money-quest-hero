@@ -16,13 +16,26 @@ const scoreColor = (score: number) => {
 };
 
 const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
-  const questionStats = useMemo(() => computeQuestionStats(sessions), [sessions]);
-  const [selectedQuestion, setSelectedQuestion] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+
+  const questionStats = useMemo(() => {
+    try {
+      setError(null);
+      return computeQuestionStats(sessions);
+    } catch (e) {
+      console.error('QuestionInsights: failed to compute stats', e);
+      setError('Failed to compute question analytics.');
+      return [];
+    }
+  }, [sessions]);
+
+  const [selectedIndex, setSelectedIndex] = useState<string>('');
 
   const selectedStat = useMemo(() => {
-    if (!selectedQuestion) return null;
-    return questionStats.find(q => q.question.substring(0, 60) === selectedQuestion) || null;
-  }, [selectedQuestion, questionStats]);
+    if (!selectedIndex) return null;
+    const idx = parseInt(selectedIndex, 10);
+    return questionStats[idx] || null;
+  }, [selectedIndex, questionStats]);
 
   const distributionData = useMemo(() => {
     if (!selectedStat) return [];
@@ -33,18 +46,28 @@ const QuestionInsights = ({ sessions }: { sessions: Session[] }) => {
     }));
   }, [selectedStat]);
 
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <p className="text-center text-destructive">{error}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader><CardTitle className="text-base">Explore a Question</CardTitle></CardHeader>
         <CardContent>
-          <Select value={selectedQuestion} onValueChange={setSelectedQuestion}>
+          <Select value={selectedIndex} onValueChange={setSelectedIndex}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a question to analyze..." />
             </SelectTrigger>
             <SelectContent>
-              {questionStats.map(q => (
-                <SelectItem key={q.question.substring(0, 60)} value={q.question.substring(0, 60)}>
+              {questionStats.map((q, i) => (
+                <SelectItem key={i} value={String(i)}>
                   <span className="text-xs text-muted-foreground mr-2">{q.dimension}</span>
                   {q.question.substring(0, 80)}{q.question.length > 80 ? '…' : ''}
                 </SelectItem>

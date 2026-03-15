@@ -107,6 +107,49 @@ const Settings = () => {
         </CardContent>
       </Card>
 
+      {/* API Keys */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Key className="h-4 w-4 text-primary" />
+            <div>
+              <CardTitle className="text-base">API Keys</CardTitle>
+              <CardDescription>Manage third-party API keys used by the application</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1.5 block">ElevenLabs API Key</label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  type={showKey ? 'text' : 'password'}
+                  value={showKey ? elevenLabsKey : (elevenLabsKey ? maskKey(elevenLabsKey) : '')}
+                  onChange={e => { setShowKey(true); setElevenLabsKey(e.target.value); }}
+                  placeholder="sk_..."
+                  className="h-9 text-sm pr-9 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowKey(!showKey)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <Button size="sm" onClick={saveApiKey} disabled={savingKey} className="h-9">
+                <Save className="h-3.5 w-3.5 mr-1" /> {savingKey ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1.5">
+              Used for text-to-speech narration. Get your key from{' '}
+              <a href="https://elevenlabs.io" target="_blank" rel="noopener noreferrer" className="text-primary underline">elevenlabs.io</a>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Score Bands */}
       <Card>
         <CardHeader className="pb-3">

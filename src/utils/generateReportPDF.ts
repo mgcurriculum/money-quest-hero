@@ -242,7 +242,14 @@ export function generateReportHTML(params: {
     <!-- Dimension Breakdown -->
     <div style="background:#fff;border-radius:20px;padding:20px;margin-bottom:24px;border:2px solid #f0ebff;box-shadow:0 4px 24px rgba(45,27,105,0.06);">
       <h2 style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;text-align:center;margin:0 0 16px;font-weight:600;">Dimension Breakdown</h2>
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">${dimensionRows}</table>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <colgroup>
+          <col style="width:40%;" />
+          <col style="width:38%;" />
+          <col style="width:22%;" />
+        </colgroup>
+        ${dimensionRows}
+      </table>
     </div>
 
     <!-- Your Answers -->

@@ -73,12 +73,27 @@ function padQNo(n: number | undefined): string {
   return `Q${n.toString().padStart(2, '0')}`;
 }
 
+const SHORT_TO_FULL: Record<string, string> = {
+  'Earning': 'Earning Mindset',
+  'Spending': 'Spending Behaviour',
+  'Saving': 'Saving Behaviour',
+  'Borrowing': 'Debt Awareness',
+  'Investing': 'Investment Awareness',
+  'Protecting': 'Financial Safety',
+};
+
 function normalizeDimension(dim: string): string {
-  const lower = dim.toLowerCase().trim();
+  const trimmed = dim.trim();
+  // Check short-name map first
+  for (const [short, full] of Object.entries(SHORT_TO_FULL)) {
+    if (trimmed.toLowerCase() === short.toLowerCase()) return full;
+  }
+  // Then check canonical full names
+  const lower = trimmed.toLowerCase();
   for (const canonical of DIMENSION_ORDER) {
     if (canonical.toLowerCase() === lower) return canonical;
   }
-  return dim;
+  return trimmed;
 }
 
 export function generateReportHTML(params: {
@@ -145,7 +160,7 @@ export function generateReportHTML(params: {
 
   const qaHTML = Object.entries(qaByDim).map(([dim, qas]) => `
     <div class="qa-section" style="margin-bottom:20px;">
-      <div style="font-size:13px;font-weight:700;color:#2D1B69;padding:10px 16px;background:linear-gradient(135deg,#f0ebff,#e8e0f0);border-radius:10px;margin-bottom:10px;letter-spacing:0.3px;">
+      <div class="section-title" style="font-size:13px;font-weight:700;color:#2D1B69;padding:10px 16px;background:linear-gradient(135deg,#f0ebff,#e8e0f0);border-radius:10px;margin-bottom:10px;letter-spacing:0.3px;page-break-after:avoid;">
         ${dim}
       </div>
       ${qas.map(qa => {
@@ -195,6 +210,7 @@ export function generateReportHTML(params: {
     body { margin:0; padding:0; background:#fff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color:#333; line-height:1.5; }
     .qa-card, .tip-card { page-break-inside: avoid; }
     .qa-section { page-break-inside: auto; }
+    .section-title { page-break-after: avoid; }
     .section-break { page-break-before: always; }
   </style>
 </head>
@@ -212,7 +228,6 @@ export function generateReportHTML(params: {
 
     <!-- Score Card -->
     <div style="text-align:center;padding:28px 24px;background:#fff;border-radius:20px;margin-bottom:24px;border:2px solid #f0ebff;box-shadow:0 4px 24px rgba(45,27,105,0.06);">
-      <div style="font-size:56px;margin-bottom:8px;line-height:1;">${bandEmoji}</div>
       <div style="font-size:52px;font-weight:800;color:#2D1B69;line-height:1;">
         ${totalScore}<span style="font-size:18px;color:#aaa;font-weight:400;">/${maxScore}</span>
       </div>
@@ -220,7 +235,7 @@ export function generateReportHTML(params: {
         <div style="height:100%;width:${scorePercent}%;background:linear-gradient(90deg,#6C63FF,#4FC3F7);border-radius:8px;"></div>
       </div>
       <div style="font-size:12px;color:#999;margin-top:8px;">You are</div>
-      <div style="font-size:20px;font-weight:700;color:#6C63FF;margin-top:4px;">${bandEmoji} ${bandLevel}</div>
+      <div style="font-size:20px;font-weight:700;color:#6C63FF;margin-top:4px;">${bandLevel}</div>
       <div style="font-size:12px;color:#888;margin-top:6px;max-width:300px;margin-left:auto;margin-right:auto;">${bandMeaning}</div>
     </div>
 

@@ -1,35 +1,33 @@
 
 
-## Fix PDF Report Formatting Issues
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
-**Root cause**: The PDF utility's `normalizeDimension()` only matches full dimension names (e.g., "Financial Safety"), but the database stores short names (e.g., "Protecting"). So Q&A sections display raw short names and don't group/sort correctly.
+### Changes
 
-### Changes in `src/utils/generateReportPDF.ts`
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-1. **Add short-to-full dimension mapping** (same as `dimensionKeyMap` in ReportScreen):
-```typescript
-const SHORT_TO_FULL: Record<string, string> = {
-  'Earning': 'Earning Mindset',
-  'Spending': 'Spending Behaviour',
-  'Saving': 'Saving Behaviour',
-  'Borrowing': 'Debt Awareness',
-  'Investing': 'Investment Awareness',
-  'Protecting': 'Financial Safety',
-};
-```
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-2. **Update `normalizeDimension()`** to first check the short-name map, then fall back to existing logic.
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-3. **Fix page-break splitting** — wrap each dimension section header + its questions so they don't split across pages. Add `page-break-inside: avoid` on section headers with their first question.
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
 
-4. **Remove emoji from score card** (`bandEmoji`) that renders as a loading artifact in PDF — replace with text-only rendering, or keep only in the "You are" line (not as a standalone large glyph).
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
 
-| What | Fix |
-|------|-----|
-| "Protecting" instead of "Financial Safety" | Add short→full name map to normalizeDimension |
-| Questions not grouped properly | Normalization fix resolves grouping automatically |
-| Page break splits header from questions | CSS `page-break-after: avoid` on section headers |
-| Large emoji renders as loading icon | Remove standalone 56px emoji div from score card |
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
 
-Only file changed: `src/utils/generateReportPDF.ts`
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

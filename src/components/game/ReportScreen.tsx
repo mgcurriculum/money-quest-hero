@@ -82,6 +82,16 @@ const ReportScreen = () => {
   const tips = getFinancialTips(dimScores);
 
   useEffect(() => {
+    if (!hasNarrated.current && !state.isMuted) {
+      hasNarrated.current = true;
+      const timer = setTimeout(() => {
+        speak("Here's your FQ Test report! Your overall score shows how financially aware you are. Check out the radar chart to see how you performed across six key dimensions like Earning, Spending, Saving, and more. You can download your report, share it with friends, or even take the test again to improve your score!");
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [state.isMuted, speak]);
+
+  useEffect(() => {
     if (hasSaved.current || questions.length === 0) return;
     hasSaved.current = true;
 

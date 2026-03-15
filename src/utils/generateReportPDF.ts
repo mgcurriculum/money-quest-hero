@@ -218,12 +218,12 @@ export function generateReportHTML(params: {
   <div style="max-width:580px;margin:0 auto;padding:32px 24px;">
 
     <!-- Header -->
-    <div style="text-align:center;padding:32px 24px;background:linear-gradient(135deg,#2D1B69 0%,#1a103f 50%,#0f0a2e 100%);border-radius:20px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;">
+    <div style="text-align:center;padding:32px 16px;background:linear-gradient(135deg,#2D1B69 0%,#1a103f 50%,#0f0a2e 100%);border-radius:20px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;width:100%;box-sizing:border-box;">
       <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
       <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
       ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:90px;height:auto;margin:0 auto 16px;display:block;opacity:0.95;" />` : ''}
       <h1 style="margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-0.5px;">FQ Test Report</h1>
-      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;">${playerName} | ${profileLabel}</p>
+      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;word-wrap:break-word;overflow-wrap:break-word;">${playerName} | ${profileLabel}</p>
     </div>
 
     <!-- Score Card -->
@@ -231,7 +231,7 @@ export function generateReportHTML(params: {
       <div style="font-size:52px;font-weight:800;color:#2D1B69;line-height:1;">
         ${totalScore}<span style="font-size:18px;color:#aaa;font-weight:400;">/${maxScore}</span>
       </div>
-      <div style="margin:12px auto;width:200px;height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;">
+      <div style="margin:12px auto;width:80%;max-width:320px;height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;">
         <div style="height:100%;width:${scorePercent}%;background:linear-gradient(90deg,#6C63FF,#4FC3F7);border-radius:8px;"></div>
       </div>
       <div style="font-size:12px;color:#999;margin-top:8px;">You are</div>

@@ -21,9 +21,14 @@ const NARRATION_TEXTS = [
   "Last question! If you could level up just one financial skill this year, which would it be? Pick the one that matters most to you.",
 ];
 
-// Add question narrations (1-18)
-for (let i = 1; i <= 18; i++) {
-  NARRATION_TEXTS.push(`Question ${i}. Read through and pick the answer that feels most like you.`);
+// Report page narration
+NARRATION_TEXTS.push("Here's your FQ Test report! Your overall score shows how financially aware you are. Check out the radar chart to see how you performed across six key dimensions like Earning, Spending, Saving, and more. You can download your report, share it with friends, or even take the test again to improve your score!");
+
+// Question 1 with full instructions
+NARRATION_TEXTS.push(`Question 1. Read through and pick the answer that feels most like you.`);
+// Questions 2-18 short
+for (let i = 2; i <= 18; i++) {
+  NARRATION_TEXTS.push(`Question ${i}`);
 }
 
 const DEFAULT_VOICE_ID = 'Ih3XRGwQe2qczi6DzW48';

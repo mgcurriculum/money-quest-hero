@@ -32,7 +32,10 @@ const QuestionPlay = () => {
     if (!state.isMuted && question && state.currentQuestion !== lastNarrated.current) {
       lastNarrated.current = state.currentQuestion;
       const timer = setTimeout(() => {
-        speak(`Question ${state.currentQuestion + 1}. Read through and pick the answer that feels most like you.`);
+      const narrationText = state.currentQuestion === 0
+          ? `Question 1. Read through and pick the answer that feels most like you.`
+          : `Question ${state.currentQuestion + 1}`;
+        speak(narrationText);
       }, 500);
       return () => clearTimeout(timer);
     }

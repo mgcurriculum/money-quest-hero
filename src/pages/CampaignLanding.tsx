@@ -35,7 +35,7 @@ const CampaignGameFlow = () => {
     case 'welcome': return <WelcomeScreen />;
     case 'consent': return <ConsentScreen />;
     case 'profile': return <ProfileScreen />;
-    case 'phone-verify': return <PhoneVerificationScreen />;
+    
     case 'quiz': return <QuestionPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;

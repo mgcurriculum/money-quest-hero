@@ -91,7 +91,7 @@ const ProfileScreen = () => {
   const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;
   const phoneDigits = phone.replace(/[^\d]/g, '');
   const isPhoneValid = phoneDigits.length >= 10;
-  const canProceedStep0 = name.trim().length > 0 && isValidAge && isPhoneValid && otpStep === 'verified';
+  const canProceedStep0 = name.trim().length > 0 && isValidAge && otpStep === 'verified';
 
   const fullPhone = selectedCountry.dial + phone;
 
@@ -301,7 +301,7 @@ const ProfileScreen = () => {
                   value={phone}
                   onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
                   placeholder="9876543210"
-                  disabled={otpStep === 'verified'}
+                  disabled={false}
                   className="flex-1 min-w-0 bg-game-surface text-game-text rounded-xl px-3 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors disabled:opacity-60"
                 />
               </div>

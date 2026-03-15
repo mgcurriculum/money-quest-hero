@@ -118,7 +118,17 @@ const UserDashboard = () => {
             <ArrowLeft size={20} />
           </button>
           <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto" />
-          <div className="w-5" />
+          {searched && sessions.length > 0 ? (
+            <button
+              onClick={() => { setSessions([]); setSearched(false); setPhone(''); navigate('/'); }}
+              className="text-game-muted hover:text-red-400 transition-colors"
+              title="Logout"
+            >
+              <LogOut size={20} />
+            </button>
+          ) : (
+            <div className="w-5" />
+          )}
         </div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">

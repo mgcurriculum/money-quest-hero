@@ -38,6 +38,17 @@ const WelcomeScreen = () => {
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
       <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
 
+      {autoplayBlocked && !state.isMuted && !isPlaying && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onClick={handleTapToListen}
+          className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-2 rounded-xl glass-card border border-game-gold/30 text-game-gold text-xs font-display font-semibold hover:scale-105 active:scale-95 transition-transform"
+        >
+          🔊 Tap to listen
+        </motion.button>
+      )}
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 text-5xl float-animation opacity-30">💰</div>
         <div className="absolute top-40 right-8 text-4xl float-animation opacity-20" style={{ animationDelay: '1s' }}>📈</div>

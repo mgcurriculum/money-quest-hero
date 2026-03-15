@@ -137,5 +137,5 @@ export function useNarration(externalMuted?: boolean) {
     return () => stop();
   }, [stop]);
 
-  return { isMuted, isPlaying, isLoading, speak, stop };
+  return { isMuted, isPlaying, isLoading, autoplayBlocked, speak, stop };
 }

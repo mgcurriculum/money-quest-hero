@@ -22,16 +22,18 @@ const ReflectionScreen = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef<number>(-1);
+  const speakRef = useRef(speak);
+  speakRef.current = speak;
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     if (!state.isMuted && hasNarrated.current !== step) {
       hasNarrated.current = step;
       const text = step === 0 ? REFLECTION_TEXT_0 : REFLECTION_TEXT_1;
-      const timer = setTimeout(() => speak(text), 500);
+      const timer = setTimeout(() => speakRef.current(text), 500);
       return () => clearTimeout(timer);
     }
-  }, [state.isMuted, speak, step]);
+  }, [state.isMuted, step]);
 
   const handleInterestSelect = (_option: string) => {
     stop();

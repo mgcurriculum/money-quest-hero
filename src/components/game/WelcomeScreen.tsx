@@ -13,14 +13,16 @@ const WelcomeScreen = () => {
   const navigate = useNavigate();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef(false);
+  const speakRef = useRef(speak);
+  speakRef.current = speak;
 
   useEffect(() => {
     if (!state.isMuted && !hasNarrated.current) {
       hasNarrated.current = true;
-      const timer = setTimeout(() => speak(WELCOME_TEXT), 600);
+      const timer = setTimeout(() => speakRef.current(WELCOME_TEXT), 600);
       return () => clearTimeout(timer);
     }
-  }, [state.isMuted, speak]);
+  }, [state.isMuted]);
 
   const handleStart = () => {
     stop();

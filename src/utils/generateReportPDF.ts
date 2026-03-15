@@ -53,6 +53,18 @@ export function getFinancialTips(dimScores: DimensionScore[]): string[] {
   return tips;
 }
 
+function getScoreColor(percentage: number): string {
+  if (percentage >= 75) return '#2e7d32';
+  if (percentage >= 50) return '#f57c00';
+  return '#c62828';
+}
+
+function getScoreBg(percentage: number): string {
+  if (percentage >= 75) return '#e8f5e9';
+  if (percentage >= 50) return '#fff3e0';
+  return '#ffebee';
+}
+
 export function generateReportHTML(params: {
   logoUrl?: string;
   playerName: string;
@@ -72,15 +84,21 @@ export function generateReportHTML(params: {
     bandLevel, bandEmoji, bandMeaning, dimensionScores, questionsAndAnswers, tips, reflectionAnswer,
   } = params;
 
+  const scorePercent = Math.round((totalScore / maxScore) * 100);
+
   const dimensionRows = dimensionScores.map(ds => `
     <tr>
-      <td style="padding:10px 12px;border-bottom:1px solid #e8e0f0;font-size:14px;color:#333;">${ds.icon} ${ds.dimension}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e8e0f0;width:55%;">
-        <div style="background:#e8e0f0;border-radius:8px;height:12px;overflow:hidden;">
-          <div style="height:100%;border-radius:8px;background:linear-gradient(90deg,#4FC3F7,#7C4DFF);width:${ds.percentage}%;"></div>
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:13px;color:#333;white-space:nowrap;vertical-align:middle;">
+        <span style="font-size:16px;margin-right:6px;">${ds.icon}</span>${ds.dimension}
+      </td>
+      <td style="padding:12px 8px;border-bottom:1px solid #eee;width:45%;vertical-align:middle;">
+        <div style="background:#f0f0f0;border-radius:10px;height:14px;overflow:hidden;position:relative;">
+          <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${ds.percentage}%;min-width:${ds.percentage > 0 ? '8px' : '0'};transition:width 0.3s;"></div>
         </div>
       </td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e8e0f0;font-size:14px;font-weight:700;color:#2D1B69;text-align:right;">${ds.percentage}%</td>
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:right;vertical-align:middle;white-space:nowrap;">
+        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};padding:3px 10px;border-radius:12px;font-size:12px;">${ds.percentage}%</span>
+      </td>
     </tr>
   `).join('');
 
@@ -93,19 +111,28 @@ export function generateReportHTML(params: {
   });
 
   const qaHTML = Object.entries(qaByDim).map(([dim, qas]) => `
-    <div style="margin-bottom:16px;">
-      <h3 style="font-size:15px;color:#2D1B69;margin:0 0 8px;padding:8px 12px;background:#f0ebff;border-radius:8px;">${dim}</h3>
-      ${qas.map((qa, idx) => `
-        <div style="padding:10px 12px;border-left:3px solid #4FC3F7;margin-bottom:8px;background:#fafafa;border-radius:0 8px 8px 0;">
-          <p style="font-size:13px;color:#555;margin:0 0 6px;line-height:1.4;">Q${qa.questionNo}. ${qa.question}</p>
-          <p style="font-size:13px;font-weight:600;color:#2D1B69;margin:0;">${qa.selectedOption} <span style="color:#4FC3F7;font-size:11px;margin-left:8px;">(Score: ${qa.score}/${MAX_SCORE_PER_QUESTION})</span></p>
-        </div>
-      `).join('')}
+    <div style="margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:700;color:#2D1B69;padding:10px 16px;background:linear-gradient(135deg,#f0ebff,#e8e0f0);border-radius:10px;margin-bottom:10px;letter-spacing:0.3px;">
+        ${dim}
+      </div>
+      ${qas.map(qa => {
+        const scoreColor = getScoreColor((qa.score / MAX_SCORE_PER_QUESTION) * 100);
+        return `
+        <div style="padding:12px 16px;border-left:4px solid #6C63FF;margin-bottom:8px;background:#fafbfc;border-radius:0 10px 10px 0;">
+          <p style="font-size:12px;color:#555;margin:0 0 8px;line-height:1.5;">
+            <span style="font-weight:700;color:#333;">Q${qa.questionNo}.</span> ${qa.question}
+          </p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <p style="font-size:12px;font-weight:600;color:#2D1B69;margin:0;flex:1;">✓ ${qa.selectedOption}</p>
+            <span style="font-size:11px;font-weight:700;color:${scoreColor};background:${getScoreBg((qa.score / MAX_SCORE_PER_QUESTION) * 100)};padding:2px 8px;border-radius:8px;white-space:nowrap;margin-left:8px;">${qa.score}/${MAX_SCORE_PER_QUESTION}</span>
+          </div>
+        </div>`;
+      }).join('')}
     </div>
   `).join('');
 
   const tipsHTML = tips.map(t => `
-    <div style="padding:10px 14px;background:#f8f6ff;border-radius:8px;margin-bottom:6px;font-size:13px;color:#333;line-height:1.5;">${t}</div>
+    <div style="padding:12px 16px;background:#f8f6ff;border-radius:10px;margin-bottom:8px;font-size:12px;color:#333;line-height:1.6;border-left:4px solid #6C63FF;">${t}</div>
   `).join('');
 
   return `<!DOCTYPE html>
@@ -118,38 +145,71 @@ export function generateReportHTML(params: {
       body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       .page-break { page-break-before: always; }
     }
-    body { margin:0; padding:0; background:#fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color:#333; }
+    * { box-sizing: border-box; }
+    body { margin:0; padding:0; background:#fff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color:#333; line-height:1.5; }
   </style>
 </head>
 <body>
-  <div style="max-width:600px;margin:0 auto;padding:24px;">
-    <div style="text-align:center;padding:28px 24px;background:linear-gradient(135deg,#23113f,#1a103f);border-radius:16px;color:#fff;margin-bottom:20px;">
-      ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:100px;height:auto;margin:0 auto 12px;display:block;" />` : ''}
-      <h1 style="margin:0 0 4px;font-size:24px;">FQ Test Report</h1>
-      <p style="margin:0;opacity:0.7;font-size:13px;">${playerName} • ${profileLabel}</p>
+  <div style="max-width:580px;margin:0 auto;padding:32px 24px;">
+
+    <!-- Header -->
+    <div style="text-align:center;padding:32px 24px;background:linear-gradient(135deg,#2D1B69 0%,#1a103f 50%,#0f0a2e 100%);border-radius:20px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
+      <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
+      ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:90px;height:auto;margin:0 auto 16px;display:block;opacity:0.95;" />` : ''}
+      <h1 style="margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-0.5px;">FQ Test Report</h1>
+      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;">${playerName} • ${profileLabel}</p>
     </div>
-    <div style="text-align:center;padding:24px;background:#f8f6ff;border-radius:16px;margin-bottom:20px;border:1px solid #e8e0f0;">
-      <div style="font-size:52px;margin-bottom:4px;">${bandEmoji}</div>
-      <div style="font-size:48px;font-weight:800;color:#2D1B69;">${totalScore}<span style="font-size:18px;color:#999;font-weight:400;">/${maxScore}</span></div>
-      <div style="font-size:14px;color:#888;margin-top:4px;">You are</div>
-      <div style="font-size:18px;font-weight:700;color:#4FC3F7;margin-top:4px;">${bandEmoji} ${bandLevel}</div>
-      <div style="font-size:12px;color:#888;margin-top:4px;">${bandMeaning}</div>
+
+    <!-- Score Card -->
+    <div style="text-align:center;padding:28px 24px;background:#fff;border-radius:20px;margin-bottom:24px;border:2px solid #f0ebff;box-shadow:0 4px 24px rgba(45,27,105,0.06);">
+      <div style="font-size:56px;margin-bottom:8px;line-height:1;">${bandEmoji}</div>
+      <div style="font-size:52px;font-weight:800;color:#2D1B69;line-height:1;">
+        ${totalScore}<span style="font-size:18px;color:#aaa;font-weight:400;">/${maxScore}</span>
+      </div>
+      <div style="margin:12px auto;width:200px;height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;">
+        <div style="height:100%;width:${scorePercent}%;background:linear-gradient(90deg,#6C63FF,#4FC3F7);border-radius:8px;"></div>
+      </div>
+      <div style="font-size:12px;color:#999;margin-top:8px;">You are</div>
+      <div style="font-size:20px;font-weight:700;color:#6C63FF;margin-top:4px;">${bandEmoji} ${bandLevel}</div>
+      <div style="font-size:12px;color:#888;margin-top:6px;max-width:300px;margin-left:auto;margin-right:auto;">${bandMeaning}</div>
     </div>
-    <div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:20px;border:1px solid #e8e0f0;">
-      <h2 style="font-size:14px;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:center;margin:0 0 12px;">Dimension Breakdown</h2>
+
+    <!-- Dimension Breakdown -->
+    <div style="background:#fff;border-radius:20px;padding:20px;margin-bottom:24px;border:2px solid #f0ebff;box-shadow:0 4px 24px rgba(45,27,105,0.06);">
+      <h2 style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;text-align:center;margin:0 0 16px;font-weight:600;">Dimension Breakdown</h2>
       <table style="width:100%;border-collapse:collapse;">${dimensionRows}</table>
     </div>
-    <div class="page-break" style="margin-bottom:20px;">
-      <h2 style="font-size:16px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">📝 Your Answers</h2>
+
+    <!-- Your Answers -->
+    <div class="page-break" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #6C63FF;">
+        <span style="font-size:18px;">📝</span>
+        <h2 style="font-size:16px;color:#2D1B69;margin:0;font-weight:700;">Your Answers</h2>
+      </div>
       ${qaHTML}
     </div>
-    <div class="page-break" style="margin-bottom:20px;">
-      <h2 style="font-size:16px;color:#2D1B69;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #4FC3F7;">🎯 Financial Tips</h2>
+
+    <!-- Financial Tips -->
+    <div class="page-break" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #6C63FF;">
+        <span style="font-size:18px;">🎯</span>
+        <h2 style="font-size:16px;color:#2D1B69;margin:0;font-weight:700;">Financial Tips</h2>
+      </div>
       ${tipsHTML}
     </div>
-    ${reflectionAnswer ? `<div style="margin-bottom:20px;padding:16px;background:#f0f7ff;border-radius:12px;border:1px solid #e0e8f0;"><p style="font-size:12px;color:#888;margin:0 0 4px;">Reflection</p><p style="font-size:14px;color:#333;margin:0;">${reflectionAnswer}</p></div>` : ''}
-    <div style="text-align:center;padding:16px;margin-top:12px;">
-      <p style="font-size:11px;color:#aaa;margin:0;">Powered by FinQuo Versity • Take the test at fqtest.finquo.com</p>
+
+    <!-- Reflection -->
+    ${reflectionAnswer ? `
+    <div style="margin-bottom:24px;padding:20px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border-radius:16px;border:1px solid #d0e0f0;">
+      <p style="font-size:11px;color:#888;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">💭 Your Reflection</p>
+      <p style="font-size:14px;color:#333;margin:0;line-height:1.6;">${reflectionAnswer}</p>
+    </div>` : ''}
+
+    <!-- Footer -->
+    <div style="text-align:center;padding:20px 16px;margin-top:8px;border-top:1px solid #eee;">
+      <p style="font-size:11px;color:#bbb;margin:0 0 4px;">Powered by <strong style="color:#999;">FinQuo Versity</strong></p>
+      <p style="font-size:10px;color:#ccc;margin:0;">Take the test at fqtest.finquo.com</p>
     </div>
   </div>
 </body>
@@ -176,18 +236,17 @@ export async function downloadReportAsFile(html: string, filename: string) {
 
   const pdfFilename = filename.replace(/\.html$/i, '.pdf');
 
-  // Give DOM/images one paint cycle before capture
-  await new Promise(r => setTimeout(r, 300));
+  await new Promise(r => setTimeout(r, 400));
 
   try {
     await html2pdf()
       .set({
-        margin: [4, 2, 4, 2],
+        margin: [8, 4, 8, 4],
         filename: pdfFilename,
-        image: { type: 'jpeg', quality: 0.95 },
+        image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 600 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] },
+        pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'div'] },
       })
       .from(source)
       .save();

@@ -315,7 +315,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
   try {
     await html2pdf()
       .set({
-        margin: [4, 2, 4, 2],
+        margin: [4, 6, 4, 6],
         filename: pdfFilename,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 769 },

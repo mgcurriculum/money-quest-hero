@@ -311,7 +311,7 @@ const ProfileScreen = () => {
                   className="mt-3 space-y-2"
                 >
                   <label className="text-game-muted text-xs font-body uppercase tracking-wider block">Enter OTP</label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2">
                     <input
                       type="text"
                       inputMode="numeric"
@@ -319,18 +319,18 @@ const ProfileScreen = () => {
                       value={otp}
                       onChange={e => { setOtp(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
                       placeholder="• • • • • •"
-                      className="flex-1 bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-xl tracking-[0.4em] text-center font-mono"
+                      className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-xl tracking-[0.4em] text-center font-mono"
                     />
                     <button
                       onClick={handleVerifyOTP}
                       disabled={otp.length !== 6 || otpVerifying}
-                      className={`px-4 py-3 rounded-xl text-xs font-display font-semibold whitespace-nowrap transition-all ${
+                      className={`w-full px-4 py-3 rounded-xl text-sm font-display font-semibold transition-all ${
                         otp.length === 6
                           ? 'gold-gradient text-white hover:scale-105 active:scale-95'
                           : 'bg-game-card text-game-muted cursor-not-allowed'
                       }`}
                     >
-                      {otpVerifying ? 'Verifying…' : 'Verify'}
+                      {otpVerifying ? 'Verifying…' : 'Verify OTP'}
                     </button>
                   </div>
                   <div className="flex justify-between items-center">

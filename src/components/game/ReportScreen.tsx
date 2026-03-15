@@ -162,6 +162,7 @@ const ReportScreen = () => {
         body: {
           email,
           playerName: state.profile.name,
+          profileLabel: getProfileLabel(state.profile.profileCode),
           fqScore: totalScore,
           maxScore: MAX_SCORE,
           bandLevel: band.level,

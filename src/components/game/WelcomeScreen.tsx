@@ -11,7 +11,7 @@ const WELCOME_TEXT = "Hey there! I'm your financial guide. This is a quick quiz 
 const WelcomeScreen = () => {
   const { state, dispatch } = useGame();
   const navigate = useNavigate();
-  const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
+  const { isPlaying, isLoading, autoplayBlocked, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef(false);
   const speakRef = useRef(speak);
   speakRef.current = speak;
@@ -23,6 +23,11 @@ const WelcomeScreen = () => {
       return () => clearTimeout(timer);
     }
   }, [state.isMuted]);
+
+  const handleTapToListen = () => {
+    hasNarrated.current = true;
+    speak(WELCOME_TEXT);
+  };
 
   const handleStart = () => {
     stop();

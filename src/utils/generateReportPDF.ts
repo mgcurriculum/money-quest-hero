@@ -160,7 +160,7 @@ export function generateReportHTML(params: {
 
   const qaHTML = Object.entries(qaByDim).map(([dim, qas]) => `
     <div class="qa-section" style="margin-bottom:20px;">
-      <div style="font-size:13px;font-weight:700;color:#2D1B69;padding:10px 16px;background:linear-gradient(135deg,#f0ebff,#e8e0f0);border-radius:10px;margin-bottom:10px;letter-spacing:0.3px;">
+      <div class="section-title" style="font-size:13px;font-weight:700;color:#2D1B69;padding:10px 16px;background:linear-gradient(135deg,#f0ebff,#e8e0f0);border-radius:10px;margin-bottom:10px;letter-spacing:0.3px;page-break-after:avoid;">
         ${dim}
       </div>
       ${qas.map(qa => {

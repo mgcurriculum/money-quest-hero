@@ -227,7 +227,6 @@ export function generateReportHTML(params: {
 
     <!-- Score Card -->
     <div style="text-align:center;padding:28px 24px;background:#fff;border-radius:20px;margin-bottom:24px;border:2px solid #f0ebff;box-shadow:0 4px 24px rgba(45,27,105,0.06);">
-      <div style="font-size:56px;margin-bottom:8px;line-height:1;">${bandEmoji}</div>
       <div style="font-size:52px;font-weight:800;color:#2D1B69;line-height:1;">
         ${totalScore}<span style="font-size:18px;color:#aaa;font-weight:400;">/${maxScore}</span>
       </div>
@@ -235,7 +234,7 @@ export function generateReportHTML(params: {
         <div style="height:100%;width:${scorePercent}%;background:linear-gradient(90deg,#6C63FF,#4FC3F7);border-radius:8px;"></div>
       </div>
       <div style="font-size:12px;color:#999;margin-top:8px;">You are</div>
-      <div style="font-size:20px;font-weight:700;color:#6C63FF;margin-top:4px;">${bandEmoji} ${bandLevel}</div>
+      <div style="font-size:20px;font-weight:700;color:#6C63FF;margin-top:4px;">${bandLevel}</div>
       <div style="font-size:12px;color:#888;margin-top:6px;max-width:300px;margin-left:auto;margin-right:auto;">${bandMeaning}</div>
     </div>
 

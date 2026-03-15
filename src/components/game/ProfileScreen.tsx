@@ -76,17 +76,16 @@ const ProfileScreen = () => {
     }
   }, [state.isMuted, speak, step]);
 
-  // Reset OTP state if phone number changes
-  useEffect(() => {
-    if (otpStep !== 'idle') {
-      setOtpStep('idle');
-      setOtp('');
-      setOtpError('');
-      setResendTimer(0);
-      if (timerRef.current) clearInterval(timerRef.current);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phone, selectedCountry]);
+  // OTP reset disabled for preview testing
+  // useEffect(() => {
+  //   if (otpStep !== 'idle') {
+  //     setOtpStep('idle');
+  //     setOtp('');
+  //     setOtpError('');
+  //     setResendTimer(0);
+  //     if (timerRef.current) clearInterval(timerRef.current);
+  //   }
+  // }, [phone, selectedCountry]);
 
   const ageNum = parseInt(age, 10);
   const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;

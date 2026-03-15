@@ -41,6 +41,7 @@ type Action =
   | { type: 'SET_MUTE'; value: boolean }
   | { type: 'SET_CAMPAIGN'; campaignId: string | null }
   | { type: 'SET_CAMPAIGN_CODE'; code: string | null }
+  | { type: 'RETAKE' }
   | { type: 'RESET' };
 
 const initialProfile: PlayerProfile = {
@@ -79,6 +80,13 @@ function reducer(state: GameState, action: Action): GameState {
     case 'SET_MUTE': return { ...state, isMuted: action.value };
     case 'SET_CAMPAIGN': return { ...state, campaignId: action.campaignId };
     case 'SET_CAMPAIGN_CODE': return { ...state, campaignCode: action.code };
+    case 'RETAKE': return {
+      ...state,
+      currentQuestion: 0,
+      answers: {},
+      reflectionAnswer: '',
+      step: 'quiz',
+    };
     case 'RESET': return { ...initialState, campaignId: state.campaignId, campaignCode: state.campaignCode };
     default: return state;
   }

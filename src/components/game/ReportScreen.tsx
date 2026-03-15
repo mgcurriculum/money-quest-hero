@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useQuestions, type QuestionItem } from '@/hooks/useQuestions';
+import { useNarration } from '@/hooks/useNarration';
 import { dimensions, dimensionIcons, fqBands, MAX_SCORE, MAX_SCORE_PER_QUESTION, getProfileLabel } from '@/data/questions';
 import {
   extractQuestionsAndAnswers,
@@ -59,7 +60,9 @@ function computeDimensionScores(questions: QuestionItem[], answers: { [idx: numb
 const ReportScreen = () => {
   const { state, dispatch } = useGame();
   const { questions } = useQuestions(state.profile.profileCode);
+  const { speak, stop, isPlaying, isLoading: narrationLoading } = useNarration(state.isMuted);
   const hasSaved = useRef(false);
+  const hasNarrated = useRef(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [emailSending, setEmailSending] = useState(false);
@@ -77,6 +80,16 @@ const ReportScreen = () => {
 
   const questionsAndAnswers = extractQuestionsAndAnswers(questions, state.answers);
   const tips = getFinancialTips(dimScores);
+
+  useEffect(() => {
+    if (!hasNarrated.current && !state.isMuted) {
+      hasNarrated.current = true;
+      const timer = setTimeout(() => {
+        speak("Here's your FQ Test report! Your overall score shows how financially aware you are. Check out the radar chart to see how you performed across six key dimensions like Earning, Spending, Saving, and more. You can download your report, share it with friends, or even take the test again to improve your score!");
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [state.isMuted, speak]);
 
   useEffect(() => {
     if (hasSaved.current || questions.length === 0) return;
@@ -294,7 +307,7 @@ const ReportScreen = () => {
         <SessionHistory phone={state.profile.phone} currentSessionScore={totalScore} />
 
         <div className="pb-8 print:hidden">
-          <button onClick={() => dispatch({ type: 'RESET' })} className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
+          <button onClick={() => { stop(); dispatch({ type: 'RETAKE' }); }} className="w-full py-4 rounded-2xl font-display font-semibold gold-gradient text-white game-shadow hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
             Take Test Again <RefreshCw size={16} />
           </button>
         </div>

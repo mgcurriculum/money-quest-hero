@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Save, RotateCcw, Eye, EyeOff, Key } from 'lucide-react';
 import TTSUsageCard from '@/components/admin/TTSUsageCard';
 import TTSCacheCard from '@/components/admin/TTSCacheCard';
+import TTSPreGenerateCard from '@/components/admin/TTSPreGenerateCard';
 
 const Settings = () => {
   const [bands, setBands] = useState([...defaultBands]);

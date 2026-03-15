@@ -63,6 +63,12 @@ const ProfileScreen = () => {
   const timerRef = useRef<ReturnType<typeof setInterval>>();
 
   useEffect(() => {
+    if (!state.phoneVerified) {
+      dispatch({ type: 'SET_PHONE_VERIFIED', verified: true });
+    }
+  }, []);
+
+  useEffect(() => {
     if (!state.isMuted && hasNarrated.current !== step) {
       hasNarrated.current = step;
       const timer = setTimeout(() => speak(NARRATION_TEXTS[step]), 500);

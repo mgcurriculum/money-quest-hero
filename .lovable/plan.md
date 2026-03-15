@@ -1,33 +1,46 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Plan: Proper PDF Report for Download & Email
 
-### Changes
+### Problem
+Both the download and email report are basic HTML views with poor alignment. Need a professionally designed, well-structured PDF for download, and the same quality HTML for email.
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+### Approach
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+**1. Redesign `generateReportHTML()` in `src/utils/generateReportPDF.ts`**
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+Overhaul the HTML template used for PDF generation with:
+- Proper A4-optimized layout with consistent spacing
+- Clean header with gradient background, logo, player name, profile label
+- Score section with large score display, band level, and meaning
+- Dimension breakdown as a properly aligned table with progress bars
+- Q&A section grouped by dimension with clean card-style layout
+- Financial tips section with styled cards
+- Reflection answer section
+- Footer with branding
+- Better page-break handling between sections for multi-page PDFs
+- All inline styles optimized for html2pdf.js rendering (no CSS classes)
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+**2. Update `downloadReportAsFile()` in `src/utils/generateReportPDF.ts`**
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+Fine-tune html2pdf.js settings:
+- Better margins for A4 readability
+- Improved page break configuration
+- Higher quality rendering
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+**3. Update `send-report-email` edge function**
 
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+Rebuild the email HTML body to match the same professional design as the PDF report. Use the same structure: header → score → dimensions table → Q&A → tips → footer. The edge function already receives all the data needed (`dimensionScores`, `questionsAndAnswers`, `tips`). Align the field names between frontend and edge function (currently mismatched: frontend sends `label`/`icon`/`score` but email template reads `d.label`/`d.icon`/`d.score`).
 
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+Also pass `maxScore` and `profileLabel` from frontend to get proper display.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `src/utils/generateReportPDF.ts` | Redesign HTML template + tune pdf settings |
+| `src/components/game/ReportScreen.tsx` | Pass `profileLabel` to email invoke |
+| `supabase/functions/send-report-email/index.ts` | Rebuild email HTML to match PDF design |
+
+No database changes needed.
 

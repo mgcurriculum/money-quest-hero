@@ -114,9 +114,11 @@ export function useNarration(externalMuted?: boolean) {
 
       try {
         await audio.play();
+        setAutoplayBlocked(false);
       } catch (playErr: any) {
         if (playErr.name === 'NotAllowedError') {
           console.warn('[TTS] Autoplay blocked by browser. User interaction required.');
+          setAutoplayBlocked(true);
         } else {
           console.error('[TTS] Play error:', playErr);
         }

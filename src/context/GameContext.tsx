@@ -104,3 +104,7 @@ export const useGame = () => {
   if (!ctx) throw new Error('useGame must be used within GameProvider');
   return ctx;
 };
+
+export const useGameSafe = () => {
+  return useContext(GameContext);
+};

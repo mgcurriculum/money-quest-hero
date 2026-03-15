@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
-import { useGame } from '@/context/GameContext';
+import { useGameSafe } from '@/context/GameContext';
 import { TOTAL_QUESTIONS } from '@/data/questions';
 
 const GlobalProgressBar = () => {
-  const { state } = useGame();
+  const ctx = useGameSafe();
+  if (!ctx) return null;
+  const { state } = ctx;
 
   const getProgress = (): number => {
     switch (state.step) {

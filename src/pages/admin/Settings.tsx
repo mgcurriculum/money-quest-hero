@@ -71,6 +71,21 @@ const Settings = () => {
     finally { setSavingBands(false); }
   };
 
+  const saveApiKey = async () => {
+    if (!elevenLabsKey.trim()) { toast.error('Please enter an API key'); return; }
+    setSavingKey(true);
+    try {
+      await upsert('elevenlabs_api_key', { key: elevenLabsKey.trim() });
+      toast.success('ElevenLabs API key saved');
+    } catch { toast.error('Failed to save API key'); }
+    finally { setSavingKey(false); }
+  };
+
+  const maskKey = (key: string) => {
+    if (key.length <= 8) return '••••••••';
+    return key.slice(0, 4) + '••••••••' + key.slice(-4);
+  };
+
   if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (

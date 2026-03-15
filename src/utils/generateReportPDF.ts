@@ -100,6 +100,7 @@ export function generateReportHTML(params: {
   logoUrl?: string;
   playerName: string;
   profileLabel: string;
+  playerAge?: number;
   totalScore: number;
   maxScore: number;
   bandLevel: string;
@@ -111,7 +112,7 @@ export function generateReportHTML(params: {
   reflectionAnswer?: string;
 }): string {
   const {
-    logoUrl, playerName, profileLabel, totalScore, maxScore,
+    logoUrl, playerName, profileLabel, playerAge, totalScore, maxScore,
     bandLevel, bandEmoji, bandMeaning, dimensionScores, questionsAndAnswers, tips, reflectionAnswer,
   } = params;
 
@@ -226,7 +227,7 @@ export function generateReportHTML(params: {
       <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
       ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:90px;height:auto;margin:0 auto 16px;display:block;opacity:0.95;" />` : ''}
       <h1 style="margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-0.5px;">FQ Test Report</h1>
-      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;word-wrap:break-word;overflow-wrap:break-word;">${playerName} | ${profileLabel}</p>
+      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;word-wrap:break-word;overflow-wrap:break-word;">${playerName}${playerAge ? ` | Age: ${playerAge}` : ''} | ${profileLabel}</p>
     </div>
 
     <!-- Score Card -->

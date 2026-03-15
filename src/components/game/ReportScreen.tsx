@@ -138,6 +138,7 @@ const ReportScreen = () => {
       logoUrl: window.location.origin + finquoLogo,
       playerName: state.profile.name,
       profileLabel: getProfileLabel(state.profile.profileCode),
+      playerAge: state.profile.age,
       totalScore,
       maxScore: MAX_SCORE,
       bandLevel: band.level,

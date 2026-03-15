@@ -73,12 +73,27 @@ function padQNo(n: number | undefined): string {
   return `Q${n.toString().padStart(2, '0')}`;
 }
 
+const SHORT_TO_FULL: Record<string, string> = {
+  'Earning': 'Earning Mindset',
+  'Spending': 'Spending Behaviour',
+  'Saving': 'Saving Behaviour',
+  'Borrowing': 'Debt Awareness',
+  'Investing': 'Investment Awareness',
+  'Protecting': 'Financial Safety',
+};
+
 function normalizeDimension(dim: string): string {
-  const lower = dim.toLowerCase().trim();
+  const trimmed = dim.trim();
+  // Check short-name map first
+  for (const [short, full] of Object.entries(SHORT_TO_FULL)) {
+    if (trimmed.toLowerCase() === short.toLowerCase()) return full;
+  }
+  // Then check canonical full names
+  const lower = trimmed.toLowerCase();
   for (const canonical of DIMENSION_ORDER) {
     if (canonical.toLowerCase() === lower) return canonical;
   }
-  return dim;
+  return trimmed;
 }
 
 export function generateReportHTML(params: {

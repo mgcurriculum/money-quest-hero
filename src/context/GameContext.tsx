@@ -85,7 +85,7 @@ function reducer(state: GameState, action: Action): GameState {
       currentQuestion: 0,
       answers: {},
       reflectionAnswer: '',
-      step: 'quiz',
+      step: 'profile',
     };
     case 'RESET': return { ...initialState, campaignId: state.campaignId, campaignCode: state.campaignCode };
     default: return state;

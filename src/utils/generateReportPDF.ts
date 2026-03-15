@@ -1,6 +1,9 @@
 import type { QuestionItem } from '@/hooks/useQuestions';
 import { dimensions, dimensionIcons, MAX_SCORE_PER_QUESTION } from '@/data/questions';
 
+// Canonical dimension order for sorting
+const DIMENSION_ORDER = [...dimensions];
+
 export interface QAEntry {
   questionNo: number;
   dimension: string;
@@ -40,16 +43,16 @@ export function getFinancialTips(dimScores: DimensionScore[]): string[] {
   const tips: string[] = [];
   dimScores.forEach(ds => {
     if (ds.percentage < 50) {
-      tips.push(`${ds.icon} ${ds.dimension}: Needs improvement — focus on building better habits here.`);
+      tips.push(`${ds.dimension}: Needs improvement - focus on building better habits here.`);
     } else if (ds.percentage < 75) {
-      tips.push(`${ds.icon} ${ds.dimension}: Good progress — keep strengthening this area.`);
+      tips.push(`${ds.dimension}: Good progress - keep strengthening this area.`);
     } else {
-      tips.push(`${ds.icon} ${ds.dimension}: Strong performance — you're doing great here!`);
+      tips.push(`${ds.dimension}: Strong performance - you're doing great here!`);
     }
   });
-  tips.push('📝 Create a monthly budget and review it every week to stay on track.');
-  tips.push('🏦 Open a dedicated savings account and automate a fixed monthly transfer.');
-  tips.push('🛡️ Never share OTPs, PINs, or passwords — even with people claiming to be from your bank.');
+  tips.push('Create a monthly budget and review it every week to stay on track.');
+  tips.push('Open a dedicated savings account and automate a fixed monthly transfer.');
+  tips.push('Never share OTPs, PINs, or passwords - even with people claiming to be from your bank.');
   return tips;
 }
 
@@ -63,6 +66,19 @@ function getScoreBg(percentage: number): string {
   if (percentage >= 75) return '#e8f5e9';
   if (percentage >= 50) return '#fff3e0';
   return '#ffebee';
+}
+
+function padQNo(n: number | undefined): string {
+  if (n === undefined || n === null) return 'Q--';
+  return `Q${n.toString().padStart(2, '0')}`;
+}
+
+function normalizeDimension(dim: string): string {
+  const lower = dim.toLowerCase().trim();
+  for (const canonical of DIMENSION_ORDER) {
+    if (canonical.toLowerCase() === lower) return canonical;
+  }
+  return dim;
 }
 
 export function generateReportHTML(params: {
@@ -88,51 +104,82 @@ export function generateReportHTML(params: {
 
   const dimensionRows = dimensionScores.map(ds => `
     <tr>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:13px;color:#333;white-space:nowrap;vertical-align:middle;">
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:13px;color:#333;white-space:nowrap;vertical-align:middle;width:35%;">
         <span style="font-size:16px;margin-right:6px;">${ds.icon}</span>${ds.dimension}
       </td>
-      <td style="padding:12px 8px;border-bottom:1px solid #eee;width:45%;vertical-align:middle;">
+      <td style="padding:12px 8px;border-bottom:1px solid #eee;width:40%;vertical-align:middle;">
         <div style="background:#f0f0f0;border-radius:10px;height:14px;overflow:hidden;position:relative;">
-          <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${ds.percentage}%;min-width:${ds.percentage > 0 ? '8px' : '0'};transition:width 0.3s;"></div>
+          <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${ds.percentage}%;min-width:${ds.percentage > 0 ? '8px' : '0'};"></div>
         </div>
       </td>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:right;vertical-align:middle;white-space:nowrap;">
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:right;vertical-align:middle;white-space:nowrap;width:25%;">
         <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};padding:3px 10px;border-radius:12px;font-size:12px;">${ds.percentage}%</span>
       </td>
     </tr>
   `).join('');
 
-  // Group Q&A by dimension
+  // Normalize, group, and sort Q&A by canonical dimension order, then by questionNo
+  const normalizedQA = questionsAndAnswers.map(qa => ({
+    ...qa,
+    dimension: normalizeDimension(qa.dimension || 'General'),
+  }));
+
   const qaByDim: Record<string, QAEntry[]> = {};
-  questionsAndAnswers.forEach(qa => {
-    const key = qa.dimension || 'General';
+  // Initialize in canonical order
+  for (const dim of DIMENSION_ORDER) {
+    qaByDim[dim] = [];
+  }
+  normalizedQA.forEach(qa => {
+    const key = qa.dimension;
     if (!qaByDim[key]) qaByDim[key] = [];
     qaByDim[key].push(qa);
   });
+  // Sort questions within each dimension by questionNo
+  for (const key of Object.keys(qaByDim)) {
+    qaByDim[key].sort((a, b) => (a.questionNo || 0) - (b.questionNo || 0));
+  }
+  // Remove empty dimensions
+  for (const key of Object.keys(qaByDim)) {
+    if (qaByDim[key].length === 0) delete qaByDim[key];
+  }
 
   const qaHTML = Object.entries(qaByDim).map(([dim, qas]) => `
-    <div style="margin-bottom:20px;">
+    <div class="qa-section" style="margin-bottom:20px;">
       <div style="font-size:13px;font-weight:700;color:#2D1B69;padding:10px 16px;background:linear-gradient(135deg,#f0ebff,#e8e0f0);border-radius:10px;margin-bottom:10px;letter-spacing:0.3px;">
         ${dim}
       </div>
       ${qas.map(qa => {
         const scoreColor = getScoreColor((qa.score / MAX_SCORE_PER_QUESTION) * 100);
+        const scoreBg = getScoreBg((qa.score / MAX_SCORE_PER_QUESTION) * 100);
         return `
-        <div style="padding:12px 16px;border-left:4px solid #6C63FF;margin-bottom:8px;background:#fafbfc;border-radius:0 10px 10px 0;">
-          <p style="font-size:12px;color:#555;margin:0 0 8px;line-height:1.5;">
-            <span style="font-weight:700;color:#333;">Q${qa.questionNo}.</span> ${qa.question}
-          </p>
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <p style="font-size:12px;font-weight:600;color:#2D1B69;margin:0;flex:1;">✓ ${qa.selectedOption}</p>
-            <span style="font-size:11px;font-weight:700;color:${scoreColor};background:${getScoreBg((qa.score / MAX_SCORE_PER_QUESTION) * 100)};padding:2px 8px;border-radius:8px;white-space:nowrap;margin-left:8px;">${qa.score}/${MAX_SCORE_PER_QUESTION}</span>
-          </div>
+        <div class="qa-card" style="padding:12px 16px;border-left:4px solid #6C63FF;margin-bottom:8px;background:#fafbfc;border-radius:0 10px 10px 0;">
+          <table style="width:100%;border-collapse:collapse;">
+            <tr>
+              <td style="vertical-align:top;width:40px;padding-right:8px;">
+                <span style="display:inline-block;width:36px;height:22px;line-height:22px;text-align:center;font-size:11px;font-weight:700;color:#4f46e5;background:#ede9fe;border-radius:6px;">${padQNo(qa.questionNo)}</span>
+              </td>
+              <td style="vertical-align:top;">
+                <p style="font-size:12px;color:#555;margin:0 0 8px;line-height:1.5;">${qa.question}</p>
+                <table style="width:100%;border-collapse:collapse;">
+                  <tr>
+                    <td style="vertical-align:middle;font-size:12px;font-weight:600;color:#2D1B69;padding:0;">Ans: ${qa.selectedOption}</td>
+                    <td style="vertical-align:middle;text-align:right;white-space:nowrap;padding:0;width:60px;">
+                      <span style="font-size:11px;font-weight:700;color:${scoreColor};background:${scoreBg};padding:2px 8px;border-radius:8px;">${qa.score}/${MAX_SCORE_PER_QUESTION}</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
         </div>`;
       }).join('')}
     </div>
   `).join('');
 
-  const tipsHTML = tips.map(t => `
-    <div style="padding:12px 16px;background:#f8f6ff;border-radius:10px;margin-bottom:8px;font-size:12px;color:#333;line-height:1.6;border-left:4px solid #6C63FF;">${t}</div>
+  const tipsHTML = tips.map((t, i) => `
+    <div class="tip-card" style="padding:12px 16px;background:#f8f6ff;border-radius:10px;margin-bottom:8px;font-size:12px;color:#333;line-height:1.6;border-left:4px solid #6C63FF;">
+      <span style="font-weight:700;color:#4f46e5;margin-right:4px;">${i + 1}.</span> ${t}
+    </div>
   `).join('');
 
   return `<!DOCTYPE html>
@@ -143,10 +190,12 @@ export function generateReportHTML(params: {
   <style>
     @media print {
       body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      .page-break { page-break-before: always; }
     }
     * { box-sizing: border-box; }
     body { margin:0; padding:0; background:#fff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color:#333; line-height:1.5; }
+    .qa-card, .tip-card { page-break-inside: avoid; }
+    .qa-section { page-break-inside: auto; }
+    .section-break { page-break-before: always; }
   </style>
 </head>
 <body>
@@ -158,7 +207,7 @@ export function generateReportHTML(params: {
       <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
       ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:90px;height:auto;margin:0 auto 16px;display:block;opacity:0.95;" />` : ''}
       <h1 style="margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-0.5px;">FQ Test Report</h1>
-      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;">${playerName} • ${profileLabel}</p>
+      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;">${playerName} | ${profileLabel}</p>
     </div>
 
     <!-- Score Card -->
@@ -178,22 +227,20 @@ export function generateReportHTML(params: {
     <!-- Dimension Breakdown -->
     <div style="background:#fff;border-radius:20px;padding:20px;margin-bottom:24px;border:2px solid #f0ebff;box-shadow:0 4px 24px rgba(45,27,105,0.06);">
       <h2 style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;text-align:center;margin:0 0 16px;font-weight:600;">Dimension Breakdown</h2>
-      <table style="width:100%;border-collapse:collapse;">${dimensionRows}</table>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">${dimensionRows}</table>
     </div>
 
     <!-- Your Answers -->
-    <div class="page-break" style="margin-bottom:24px;">
+    <div style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #6C63FF;">
-        <span style="font-size:18px;">📝</span>
         <h2 style="font-size:16px;color:#2D1B69;margin:0;font-weight:700;">Your Answers</h2>
       </div>
       ${qaHTML}
     </div>
 
     <!-- Financial Tips -->
-    <div class="page-break" style="margin-bottom:24px;">
+    <div style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #6C63FF;">
-        <span style="font-size:18px;">🎯</span>
         <h2 style="font-size:16px;color:#2D1B69;margin:0;font-weight:700;">Financial Tips</h2>
       </div>
       ${tipsHTML}
@@ -202,7 +249,7 @@ export function generateReportHTML(params: {
     <!-- Reflection -->
     ${reflectionAnswer ? `
     <div style="margin-bottom:24px;padding:20px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border-radius:16px;border:1px solid #d0e0f0;">
-      <p style="font-size:11px;color:#888;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">💭 Your Reflection</p>
+      <p style="font-size:11px;color:#888;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">YOUR REFLECTION</p>
       <p style="font-size:14px;color:#333;margin:0;line-height:1.6;">${reflectionAnswer}</p>
     </div>` : ''}
 
@@ -236,7 +283,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
 
   const pdfFilename = filename.replace(/\.html$/i, '.pdf');
 
-  await new Promise(r => setTimeout(r, 400));
+  await new Promise(r => setTimeout(r, 500));
 
   try {
     await html2pdf()
@@ -246,7 +293,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 600 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'div'] },
+        pagebreak: { mode: ['css'], avoid: ['.qa-card', '.tip-card'] },
       })
       .from(source)
       .save();

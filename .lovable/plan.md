@@ -1,54 +1,33 @@
 
 
-## Plan: Fix Welcome Screen Narration Not Playing
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
-### Root Cause Analysis
+### Changes
 
-Two likely issues preventing narration:
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-1. **`sessionStorage` quota guard**: If TTS previously hit a quota error, `tts_quota_exceeded` is set to `'1'` in `sessionStorage` and silently blocks all future `speak()` calls — even across page reloads (sessionStorage persists per tab). There's no way to clear it except closing the tab.
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-2. **Browser autoplay policy**: On mobile and in iframes (like the Lovable preview), browsers block `audio.play()` without a prior user gesture. The TTS fetch may succeed but `audio.play()` throws a `NotAllowedError` that gets caught silently (logged as "Narration error:" which only shows if you search for it).
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-### Fix
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
 
-**File: `src/hooks/useNarration.ts`**
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
 
-1. **Clear stale quota guard on page load** — only persist the quota block for 10 minutes instead of forever, so a temporary ElevenLabs quota issue doesn't permanently disable narration:
-   ```typescript
-   useEffect(() => {
-     const stored = sessionStorage.getItem('tts_quota_exceeded');
-     if (stored) {
-       const ts = parseInt(stored, 10);
-       // Clear if older than 10 minutes
-       if (Date.now() - ts > 10 * 60 * 1000) {
-         sessionStorage.removeItem('tts_quota_exceeded');
-       } else {
-         quotaExceededRef.current = true;
-       }
-     }
-   }, []);
-   ```
-   And when setting it: `sessionStorage.setItem('tts_quota_exceeded', Date.now().toString())`
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
 
-2. **Handle autoplay policy gracefully** — catch `NotAllowedError` from `audio.play()` and set a flag so the user knows they need to tap unmute/interact first. Don't swallow the error silently:
-   ```typescript
-   try {
-     await audio.play();
-   } catch (playErr: any) {
-     if (playErr.name === 'NotAllowedError') {
-       console.warn('Autoplay blocked by browser. User interaction required.');
-     }
-     setIsPlaying(false);
-   }
-   ```
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
 
-3. **Add debug logging** — add `console.log` calls at the entry of `speak()` to trace why it might return early (muted, quota, env vars missing), making future debugging faster.
-
-### Summary of Changes
-
-Single file edit: `src/hooks/useNarration.ts`
-- Time-limited quota guard (10 min TTL instead of permanent)
-- Explicit autoplay error handling
-- Debug logging for silent early returns
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

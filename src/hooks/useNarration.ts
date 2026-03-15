@@ -10,7 +10,6 @@ export function useNarration(externalMuted?: boolean) {
   const abortRef = useRef<AbortController | null>(null);
   const quotaExceededRef = useRef(false);
 
-  // Use external muted state if provided
   const isMuted = externalMuted ?? false;
 
   const stop = useCallback(() => {
@@ -28,23 +27,36 @@ export function useNarration(externalMuted?: boolean) {
     setIsLoading(false);
   }, []);
 
-  // Stop playback when muted externally
   useEffect(() => {
     if (isMuted) {
       stop();
     }
   }, [isMuted, stop]);
 
+  // Time-limited quota guard (10 min TTL)
   useEffect(() => {
-    quotaExceededRef.current = sessionStorage.getItem('tts_quota_exceeded') === '1';
+    const stored = sessionStorage.getItem('tts_quota_exceeded');
+    if (stored) {
+      const ts = parseInt(stored, 10);
+      if (isNaN(ts) || Date.now() - ts > 10 * 60 * 1000) {
+        sessionStorage.removeItem('tts_quota_exceeded');
+        quotaExceededRef.current = false;
+        console.log('[TTS] Cleared expired quota guard');
+      } else {
+        quotaExceededRef.current = true;
+        console.log('[TTS] Quota guard active, expires in', Math.round((10 * 60 * 1000 - (Date.now() - ts)) / 1000), 's');
+      }
+    }
   }, []);
 
   const speak = useCallback(async (text: string) => {
-    if (isMuted || quotaExceededRef.current) return;
+    console.log('[TTS] speak() called, muted:', isMuted, 'quota:', quotaExceededRef.current);
+    if (isMuted) { console.log('[TTS] Skipped: muted'); return; }
+    if (quotaExceededRef.current) { console.log('[TTS] Skipped: quota exceeded'); return; }
     stop();
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-      console.warn('Supabase not configured for TTS');
+      console.warn('[TTS] Supabase not configured');
       return;
     }
 
@@ -69,10 +81,11 @@ export function useNarration(externalMuted?: boolean) {
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.warn('[TTS] API error:', response.status, errorText);
         if (errorText.includes('quota_exceeded')) {
           quotaExceededRef.current = true;
-          sessionStorage.setItem('tts_quota_exceeded', '1');
-          console.warn('TTS quota exceeded. Narration disabled for this session.');
+          sessionStorage.setItem('tts_quota_exceeded', Date.now().toString());
+          console.warn('[TTS] Quota exceeded — narration disabled for 10 min');
         }
         setIsLoading(false);
         return;
@@ -97,17 +110,26 @@ export function useNarration(externalMuted?: boolean) {
 
       setIsLoading(false);
       setIsPlaying(true);
-      await audio.play();
+
+      try {
+        await audio.play();
+      } catch (playErr: any) {
+        if (playErr.name === 'NotAllowedError') {
+          console.warn('[TTS] Autoplay blocked by browser. User interaction required.');
+        } else {
+          console.error('[TTS] Play error:', playErr);
+        }
+        setIsPlaying(false);
+      }
     } catch (err: any) {
       if (err.name !== 'AbortError') {
-        console.error('Narration error:', err);
+        console.error('[TTS] Narration error:', err);
       }
       setIsLoading(false);
       setIsPlaying(false);
     }
   }, [stop, isMuted]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => stop();
   }, [stop]);

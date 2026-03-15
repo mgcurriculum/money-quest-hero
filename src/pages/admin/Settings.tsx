@@ -151,6 +151,9 @@ const Settings = () => {
         </CardContent>
       </Card>
 
+      {/* TTS Usage */}
+      <TTSUsageCard />
+
       {/* Score Bands */}
       <Card>
         <CardHeader className="pb-3">

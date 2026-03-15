@@ -1,33 +1,31 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Plan: Add OTP Authentication to User Dashboard
 
-### Changes
+Currently the `/profile` page shows session history after a simple phone number lookup with no verification. This needs to be secured with OTP verification before displaying any data.
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+### Changes in `src/pages/UserDashboard.tsx`
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+**Add OTP verification step between phone entry and data display:**
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+1. Add new state: `otpStep` (`'phone' | 'otp' | 'verified'`), `otp`, `otpError`, `sending`, `verifying`, `resendTimer`
+2. Change the "Find My Profile" button to "Send OTP" — calls `send-otp` edge function instead of querying sessions directly
+3. After OTP sent, show a 6-digit OTP input with resend/change number options (reuse the same UI pattern from `PhoneVerificationScreen`)
+4. On successful OTP verification via `verify-otp` edge function, set `otpStep = 'verified'` and then fetch sessions
+5. Only render profile/history/charts when `otpStep === 'verified'`
+6. Logout button resets `otpStep` back to `'phone'`
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+**Flow:**
+```text
+Enter phone → Send OTP → Enter 6-digit code → Verify → Fetch & show sessions
+```
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
+| What | Detail |
+|------|--------|
+| Phone input | Same country picker + phone field, button changes to "Send OTP" |
+| OTP input | 6-digit field with resend timer (30s) and "Change number" link |
+| On verify success | Fetch sessions from DB and display dashboard |
+| Logout | Reset all state including `otpStep` back to `'phone'` |
 
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
-
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
-
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+Single file change: `src/pages/UserDashboard.tsx`
 

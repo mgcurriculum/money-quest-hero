@@ -6,6 +6,7 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 export function useNarration(externalMuted?: boolean) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const quotaExceededRef = useRef(false);
@@ -113,9 +114,11 @@ export function useNarration(externalMuted?: boolean) {
 
       try {
         await audio.play();
+        setAutoplayBlocked(false);
       } catch (playErr: any) {
         if (playErr.name === 'NotAllowedError') {
           console.warn('[TTS] Autoplay blocked by browser. User interaction required.');
+          setAutoplayBlocked(true);
         } else {
           console.error('[TTS] Play error:', playErr);
         }
@@ -134,5 +137,5 @@ export function useNarration(externalMuted?: boolean) {
     return () => stop();
   }, [stop]);
 
-  return { isMuted, isPlaying, isLoading, speak, stop };
+  return { isMuted, isPlaying, isLoading, autoplayBlocked, speak, stop };
 }

@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { fqBands, MAX_SCORE, getProfileLabel, dimensions, dimensionIcons } from '@/data/questions';
 import { generateReportHTML, downloadReportAsFile, getFinancialTips } from '@/utils/generateReportPDF';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Download, User, Phone, TrendingUp, History, ArrowLeft, Search } from 'lucide-react';
+import { Download, User, Phone, TrendingUp, History, ArrowLeft, Search, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import CountryCodePicker, { COUNTRIES, Country } from '@/components/game/CountryCodePicker';
@@ -118,7 +118,17 @@ const UserDashboard = () => {
             <ArrowLeft size={20} />
           </button>
           <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto" />
-          <div className="w-5" />
+          {searched && sessions.length > 0 ? (
+            <button
+              onClick={() => { setSessions([]); setSearched(false); setPhone(''); navigate('/'); }}
+              className="text-game-muted hover:text-red-400 transition-colors"
+              title="Logout"
+            >
+              <LogOut size={20} />
+            </button>
+          ) : (
+            <div className="w-5" />
+          )}
         </div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">

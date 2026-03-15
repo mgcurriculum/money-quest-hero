@@ -41,6 +41,7 @@ type Action =
   | { type: 'SET_MUTE'; value: boolean }
   | { type: 'SET_CAMPAIGN'; campaignId: string | null }
   | { type: 'SET_CAMPAIGN_CODE'; code: string | null }
+  | { type: 'RETAKE' }
   | { type: 'RESET' };
 
 const initialProfile: PlayerProfile = {

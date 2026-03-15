@@ -290,7 +290,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
 
   const parsed = new DOMParser().parseFromString(html, 'text/html');
   const source = document.createElement('div');
-  source.style.width = '790px';
+  source.style.width = '768px';
   source.style.background = '#ffffff';
   source.innerHTML = parsed.body.innerHTML;
 

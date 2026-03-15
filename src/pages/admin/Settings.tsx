@@ -153,6 +153,7 @@ const Settings = () => {
       </Card>
 
       {/* TTS Usage */}
+      <TTSCacheCard />
       <TTSUsageCard />
 
       {/* Score Bands */}

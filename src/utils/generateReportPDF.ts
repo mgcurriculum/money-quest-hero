@@ -100,6 +100,7 @@ export function generateReportHTML(params: {
   logoUrl?: string;
   playerName: string;
   profileLabel: string;
+  playerAge?: number;
   totalScore: number;
   maxScore: number;
   bandLevel: string;
@@ -111,7 +112,7 @@ export function generateReportHTML(params: {
   reflectionAnswer?: string;
 }): string {
   const {
-    logoUrl, playerName, profileLabel, totalScore, maxScore,
+    logoUrl, playerName, profileLabel, playerAge, totalScore, maxScore,
     bandLevel, bandEmoji, bandMeaning, dimensionScores, questionsAndAnswers, tips, reflectionAnswer,
   } = params;
 

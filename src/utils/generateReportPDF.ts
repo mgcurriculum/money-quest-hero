@@ -315,10 +315,10 @@ export async function downloadReportAsFile(html: string, filename: string) {
   try {
     await html2pdf()
       .set({
-        margin: [4, 6, 4, 6],
+        margin: [4, 8, 4, 8],
         filename: pdfFilename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 768 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 720 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'], avoid: ['.qa-card', '.tip-card'] },
       })

@@ -1,11 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Download, Loader2 } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Download, Loader2, CalendarIcon } from 'lucide-react';
+import { format, startOfDay, startOfWeek, startOfMonth, startOfYear } from 'date-fns';
+import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
+import { dimensions, TOTAL_QUESTIONS } from '@/data/questions';
+import { getEnrichedAnswers } from '@/utils/dashboardAnalytics';
 import DashboardOverview from '@/components/admin/DashboardOverview';
 import QuestionInsights from '@/components/admin/QuestionInsights';
 import FinancialExpertView from '@/components/admin/FinancialExpertView';
@@ -13,16 +18,24 @@ import SessionDetailModal from '@/components/admin/SessionDetailModal';
 
 type Session = Tables<'game_sessions'>;
 
+type DatePreset = 'all' | 'today' | 'this_week' | 'this_month' | 'this_year' | 'custom';
+
 const Dashboard = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [ageFilter, setAgeFilter] = useState('all');
   const [bandFilter, setBandFilter] = useState('all');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [campaignFilter, setCampaignFilter] = useState('all');
+  const [datePreset, setDatePreset] = useState<DatePreset>('all');
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [campaigns, setCampaigns] = useState<{ id: string; name: string }[]>([]);
 
-  useEffect(() => { fetchSessions(); }, []);
+  useEffect(() => {
+    fetchSessions();
+    fetchCampaigns();
+  }, []);
 
   const fetchSessions = async () => {
     setLoading(true);
@@ -31,24 +44,82 @@ const Dashboard = () => {
     setLoading(false);
   };
 
+  const fetchCampaigns = async () => {
+    const { data } = await supabase.from('campaigns').select('id, name');
+    setCampaigns(data || []);
+  };
+
+  // Compute effective date range from preset
+  const effectiveDateRange = useMemo(() => {
+    const now = new Date();
+    switch (datePreset) {
+      case 'today': return { from: startOfDay(now), to: now };
+      case 'this_week': return { from: startOfWeek(now, { weekStartsOn: 1 }), to: now };
+      case 'this_month': return { from: startOfMonth(now), to: now };
+      case 'this_year': return { from: startOfYear(now), to: now };
+      case 'custom': return { from: dateFrom, to: dateTo };
+      default: return { from: undefined, to: undefined };
+    }
+  }, [datePreset, dateFrom, dateTo]);
+
   const filtered = useMemo(() => {
     return sessions.filter(s => {
       if (ageFilter !== 'all' && s.player_age !== ageFilter) return false;
       if (bandFilter !== 'all' && s.band_level !== bandFilter) return false;
-      if (dateFrom && new Date(s.created_at) < new Date(dateFrom)) return false;
-      if (dateTo && new Date(s.created_at) > new Date(dateTo + 'T23:59:59')) return false;
+      if (campaignFilter !== 'all' && s.campaign_id !== campaignFilter) return false;
+      const created = new Date(s.created_at);
+      if (effectiveDateRange.from && created < effectiveDateRange.from) return false;
+      if (effectiveDateRange.to && created > new Date(effectiveDateRange.to.getTime() + 86400000 - 1)) return false;
       return true;
     });
-  }, [sessions, ageFilter, bandFilter, dateFrom, dateTo]);
+  }, [sessions, ageFilter, bandFilter, campaignFilter, effectiveDateRange]);
 
   const exportCSV = () => {
-    const headers = ['Name', 'Age', 'Gender', 'Phone', 'State', 'District', 'Status', 'Income Type', 'FQ Score', 'Band', 'Primary Archetype', 'Secondary Archetype', 'Reflection', 'Date'];
-    const rows = filtered.map(s => [
-      s.player_name, s.player_age, s.player_gender, s.player_phone, s.player_state, s.player_district,
-      s.player_status, s.player_income_type, s.fq_score, s.band_level, s.primary_archetype,
-      s.secondary_archetype, s.reflection_answer, new Date(s.created_at).toLocaleString(),
-    ]);
-    const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${v ?? ''}"`).join(','))].join('\n');
+    // Build dynamic question headers
+    const qHeaders: string[] = [];
+    for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+      qHeaders.push(`Q${i} Answer`, `Q${i} Score`);
+    }
+    const dimHeaders = dimensions.map(d => `${d} %`);
+
+    const headers = [
+      'Name', 'Age Group', 'Age (Exact)', 'Gender', 'Phone', 'Email',
+      'Country', 'State', 'District', 'Status', 'Income Type', 'Profile Code',
+      'FQ Score', 'Band', 'Primary Archetype', 'Secondary Archetype',
+      ...dimHeaders,
+      ...qHeaders,
+      'Reflection', 'Campaign ID', 'Date',
+    ];
+
+    const rows = filtered.map(s => {
+      const enriched = getEnrichedAnswers(s);
+      const detailed = enriched.detailed || [];
+      const dimScores = enriched.dimensionScores || [];
+
+      // Map dimension scores by name
+      const dimMap: Record<string, number> = {};
+      dimScores.forEach(ds => { dimMap[ds.dimension] = ds.percentage; });
+      const dimValues = dimensions.map(d => dimMap[d] ?? '');
+
+      // Map question answers by question number
+      const qValues: (string | number)[] = [];
+      for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+        const q = detailed.find(d => d.questionNo === i);
+        qValues.push(q?.selectedOption ?? '', q?.score ?? '');
+      }
+
+      return [
+        s.player_name, s.player_age, s.player_age_number ?? '', s.player_gender, s.player_phone, s.player_email,
+        s.player_country, s.player_state, s.player_district, s.player_status, s.player_income_type, s.profile_code,
+        s.fq_score, s.band_level, s.primary_archetype, s.secondary_archetype,
+        ...dimValues,
+        ...qValues,
+        s.reflection_answer, s.campaign_id, new Date(s.created_at).toLocaleString(),
+      ];
+    });
+
+    const escapeCsv = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csv = [headers.map(escapeCsv).join(','), ...rows.map(r => r.map(escapeCsv).join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -71,7 +142,7 @@ const Dashboard = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-display font-bold text-foreground">Dashboard</h1>
         <Button onClick={exportCSV} variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-2" /> Export CSV
+          <Download className="h-4 w-4 mr-2" /> Export CSV ({filtered.length})
         </Button>
       </div>
 
@@ -105,14 +176,66 @@ const Dashboard = () => {
             </SelectContent>
           </Select>
         </div>
+        {campaigns.length > 0 && (
+          <div>
+            <label className="text-xs text-muted-foreground">Campaign</label>
+            <Select value={campaignFilter} onValueChange={setCampaignFilter}>
+              <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Campaigns</SelectItem>
+                {campaigns.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <div>
-          <label className="text-xs text-muted-foreground">From</label>
-          <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-[140px]" />
+          <label className="text-xs text-muted-foreground">Date Range</label>
+          <Select value={datePreset} onValueChange={(v) => setDatePreset(v as DatePreset)}>
+            <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="this_week">This Week</SelectItem>
+              <SelectItem value="this_month">This Month</SelectItem>
+              <SelectItem value="this_year">This Year</SelectItem>
+              <SelectItem value="custom">Custom Range</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div>
-          <label className="text-xs text-muted-foreground">To</label>
-          <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-[140px]" />
-        </div>
+        {datePreset === 'custom' && (
+          <>
+            <div>
+              <label className="text-xs text-muted-foreground">From</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-[140px] justify-start text-left font-normal", !dateFrom && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateFrom ? format(dateFrom, 'PP') : 'Start'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus className="p-3 pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">To</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-[140px] justify-start text-left font-normal", !dateTo && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateTo ? format(dateTo, 'PP') : 'End'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus className="p-3 pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Tabs */}

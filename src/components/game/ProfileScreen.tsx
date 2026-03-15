@@ -35,19 +35,26 @@ const ProfileScreen = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef<number>(-1);
+  // Derive initial phone digits by stripping country dial code
+  const existingProfile = state.profile;
+  const matchedCountry = COUNTRIES.find(c => c.name === existingProfile.country) || COUNTRIES[0];
+  const initialPhone = existingProfile.phone
+    ? existingProfile.phone.replace(matchedCountry.dial, '')
+    : '';
+
   const [step, setStep] = useState(0);
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
-  const [phone, setPhone] = useState('');
+  const [name, setName] = useState(existingProfile.name || '');
+  const [age, setAge] = useState(existingProfile.age > 0 ? String(existingProfile.age) : '');
+  const [gender, setGender] = useState(existingProfile.gender || '');
+  const [phone, setPhone] = useState(initialPhone);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(matchedCountry);
   const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
   const [campaignCodeError, setCampaignCodeError] = useState('');
   const [validatingCode, setValidatingCode] = useState(false);
 
-  // OTP inline state
-  const [otpStep, setOtpStep] = useState<'idle' | 'sent' | 'verified'>('idle');
+  // OTP inline state — auto-verified on retake
+  const [otpStep, setOtpStep] = useState<'idle' | 'sent' | 'verified'>(state.phoneVerified ? 'verified' : 'idle');
   const [otp, setOtp] = useState('');
   const [otpSending, setOtpSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);

@@ -294,6 +294,33 @@ export type Database = {
         }
         Relationships: []
       }
+      tts_usage_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          status: string
+          text_length: number
+          voice_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status?: string
+          text_length?: number
+          voice_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status?: string
+          text_length?: number
+          voice_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

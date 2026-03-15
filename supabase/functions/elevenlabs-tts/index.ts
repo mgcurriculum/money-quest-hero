@@ -6,12 +6,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function getApiKey(): Promise<string | null> {
+function getAdminClient() {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (supabaseUrl && serviceRoleKey) {
+    return createClient(supabaseUrl, serviceRoleKey);
+  }
+  return null;
+}
+
+async function getApiKey(admin: ReturnType<typeof createClient> | null): Promise<string | null> {
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    if (supabaseUrl && serviceRoleKey) {
-      const admin = createClient(supabaseUrl, serviceRoleKey);
+    if (admin) {
       const { data } = await admin
         .from('admin_settings')
         .select('value')
@@ -26,16 +32,35 @@ async function getApiKey(): Promise<string | null> {
   return Deno.env.get('ELEVENLABS_API_KEY') || null;
 }
 
+async function logUsage(admin: ReturnType<typeof createClient> | null, textLength: number, voiceId: string | null, status: string, errorMessage?: string) {
+  if (!admin) return;
+  try {
+    await admin.from('tts_usage_logs').insert({
+      text_length: textLength,
+      voice_id: voiceId || null,
+      status,
+      error_message: errorMessage || null,
+    });
+  } catch (e) {
+    console.warn('Failed to log TTS usage:', e.message);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const admin = getAdminClient();
+
   try {
     const { text, voiceId } = await req.json();
-    const ELEVENLABS_API_KEY = await getApiKey();
+    const ELEVENLABS_API_KEY = await getApiKey(admin);
+    const usedVoiceId = voiceId || 'Ih3XRGwQe2qczi6DzW48';
+    const textLength = (text || '').length;
 
     if (!ELEVENLABS_API_KEY) {
+      await logUsage(admin, textLength, usedVoiceId, 'error', 'API key not configured');
       throw new Error('ELEVENLABS_API_KEY is not configured');
     }
 
@@ -44,7 +69,7 @@ serve(async (req) => {
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       response = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId || 'Ih3XRGwQe2qczi6DzW48'}?output_format=mp3_22050_32`,
+        `https://api.elevenlabs.io/v1/text-to-speech/${usedVoiceId}?output_format=mp3_22050_32`,
         {
           method: 'POST',
           headers: {
@@ -82,12 +107,14 @@ serve(async (req) => {
       const detailMessage = parsed?.detail?.message || errorText;
 
       if (detailStatus === 'quota_exceeded') {
+        await logUsage(admin, textLength, usedVoiceId, 'quota_exceeded', detailMessage);
         return new Response(
           JSON.stringify({ error: 'quota_exceeded', message: detailMessage }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
+      await logUsage(admin, textLength, usedVoiceId, 'error', `[${response.status}] ${detailMessage}`);
       return new Response(
         JSON.stringify({ error: `ElevenLabs API error [${response.status}]`, message: detailMessage }),
         { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -95,11 +122,15 @@ serve(async (req) => {
     }
 
     if (!response || !response.ok) {
+      await logUsage(admin, textLength, usedVoiceId, 'error', 'Failed after retries');
       return new Response(
         JSON.stringify({ error: 'TTS request failed after retries' }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Success
+    await logUsage(admin, textLength, usedVoiceId, 'success');
 
     const audioBuffer = await response.arrayBuffer();
 

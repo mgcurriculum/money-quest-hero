@@ -1,43 +1,33 @@
 
 
-## Plan: Log ElevenLabs TTS Consumption in Admin Dashboard
-
-### What
-Track every TTS API call (text length, character count, success/failure, timestamp) in a new `tts_usage_logs` table and display a usage summary in the Admin Settings page.
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
 ### Changes
 
-#### 1. New database table: `tts_usage_logs`
-```sql
-CREATE TABLE public.tts_usage_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_at timestamptz NOT NULL DEFAULT now(),
-  text_length integer NOT NULL DEFAULT 0,
-  voice_id text,
-  status text NOT NULL DEFAULT 'success',
-  error_message text
-);
-ALTER TABLE public.tts_usage_logs ENABLE ROW LEVEL SECURITY;
--- Only admins can read logs
-CREATE POLICY "Admins can read tts logs" ON public.tts_usage_logs FOR SELECT USING (has_role(auth.uid(), 'admin'));
--- Edge function inserts via service role (bypasses RLS)
-```
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-#### 2. Edge Function (`supabase/functions/elevenlabs-tts/index.ts`)
-After each TTS call (success or failure), insert a row into `tts_usage_logs` with:
-- `text_length`: character count of the input text
-- `voice_id`: the voice used
-- `status`: 'success', 'error', or 'quota_exceeded'
-- `error_message`: error detail if failed
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-Uses the existing service-role admin client already created in `getApiKey()`.
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-#### 3. Admin Settings page (`src/pages/admin/Settings.tsx`)
-Add an "ElevenLabs Usage" card below the API Keys card showing:
-- **Today's characters used** (sum of text_length for today)
-- **This month's characters used** (sum for current month)
-- **Total requests** (count all-time)
-- **Recent log table** (last 20 entries with timestamp, characters, status)
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
 
-Data fetched from `tts_usage_logs` table on page load.
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
+
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

@@ -1,25 +1,33 @@
 
 
-## Fix: Dimension Breakdown Table Misalignment in PDF
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
-### Problem
-The dimension table uses `table-layout: fixed` but the `width` percentages are set as inline styles on `<td>` elements. With `table-layout: fixed`, column widths are determined by the **first row** only, and percentage widths on `<td>` can behave inconsistently across renderers (especially html2canvas). The combination of `white-space: nowrap` on the dimension name column and long dimension names like "Investment Awareness" can also cause the first column to overflow its declared width.
+### Changes
 
-### Fix
-1. **Use `<colgroup>` with `<col>` elements** to explicitly define column widths — this is the reliable way to control columns with `table-layout: fixed`
-2. **Remove `width` from `<td>` styles** (let `<colgroup>` handle it)
-3. **Remove `white-space: nowrap`** from the dimension name column so long names wrap gracefully instead of pushing the layout
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-### Change in `src/utils/generateReportPDF.ts`
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-**Dimension table** (~line 232 in the full HTML output): Add `<colgroup>` before the rows:
-```html
-<colgroup>
-  <col style="width:40%;" />
-  <col style="width:38%;" />
-  <col style="width:22%;" />
-</colgroup>
-```
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-**Dimension row template** (lines 120-134): Remove `width` and `white-space:nowrap` from `<td>` inline styles so columns are governed solely by `<colgroup>`.
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
+
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
+
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
+
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

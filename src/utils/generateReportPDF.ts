@@ -119,15 +119,15 @@ export function generateReportHTML(params: {
 
   const dimensionRows = dimensionScores.map(ds => `
     <tr>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:13px;color:#333;white-space:nowrap;vertical-align:middle;width:35%;">
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:13px;color:#333;vertical-align:middle;">
         <span style="font-size:16px;margin-right:6px;">${ds.icon}</span>${ds.dimension}
       </td>
-      <td style="padding:12px 8px;border-bottom:1px solid #eee;width:40%;vertical-align:middle;">
+      <td style="padding:12px 8px;border-bottom:1px solid #eee;vertical-align:middle;">
         <div style="background:#f0f0f0;border-radius:10px;height:14px;overflow:hidden;position:relative;">
           <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${ds.percentage}%;min-width:${ds.percentage > 0 ? '8px' : '0'};"></div>
         </div>
       </td>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:right;vertical-align:middle;white-space:nowrap;width:25%;">
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:right;vertical-align:middle;white-space:nowrap;">
         <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};padding:3px 10px;border-radius:12px;font-size:12px;">${ds.percentage}%</span>
       </td>
     </tr>
@@ -242,7 +242,14 @@ export function generateReportHTML(params: {
     <!-- Dimension Breakdown -->
     <div style="background:#fff;border-radius:20px;padding:20px;margin-bottom:24px;border:2px solid #f0ebff;box-shadow:0 4px 24px rgba(45,27,105,0.06);">
       <h2 style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;text-align:center;margin:0 0 16px;font-weight:600;">Dimension Breakdown</h2>
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">${dimensionRows}</table>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <colgroup>
+          <col style="width:40%;" />
+          <col style="width:38%;" />
+          <col style="width:22%;" />
+        </colgroup>
+        ${dimensionRows}
+      </table>
     </div>
 
     <!-- Your Answers -->

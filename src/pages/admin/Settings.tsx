@@ -153,7 +153,8 @@ const Settings = () => {
         </CardContent>
       </Card>
 
-      {/* TTS Usage */}
+      {/* TTS Pre-Generate & Cache */}
+      <TTSPreGenerateCard />
       <TTSCacheCard />
       <TTSUsageCard />
 

@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { fqBands as defaultBands, MAX_SCORE } from '@/data/questions';
 import { toast } from 'sonner';
 import { Save, RotateCcw, Eye, EyeOff, Key } from 'lucide-react';
+import TTSUsageCard from '@/components/admin/TTSUsageCard';
 
 const Settings = () => {
   const [bands, setBands] = useState([...defaultBands]);

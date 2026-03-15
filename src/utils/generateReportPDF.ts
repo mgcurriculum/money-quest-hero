@@ -215,7 +215,7 @@ export function generateReportHTML(params: {
   </style>
 </head>
 <body>
-  <div style="max-width:580px;margin:0 auto;padding:32px 24px;">
+  <div style="max-width:100%;margin:0 auto;padding:24px 16px;">
 
     <!-- Header -->
     <div style="text-align:center;padding:32px 16px;background:linear-gradient(135deg,#2D1B69 0%,#1a103f 50%,#0f0a2e 100%);border-radius:20px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;width:100%;box-sizing:border-box;">
@@ -290,7 +290,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
 
   const parsed = new DOMParser().parseFromString(html, 'text/html');
   const source = document.createElement('div');
-  source.style.width = '600px';
+  source.style.width = '700px';
   source.style.background = '#ffffff';
   source.innerHTML = parsed.body.innerHTML;
 
@@ -310,12 +310,12 @@ export async function downloadReportAsFile(html: string, filename: string) {
   try {
     await html2pdf()
       .set({
-        margin: [8, 4, 8, 4],
+        margin: [6, 3, 6, 3],
         filename: pdfFilename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 600 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 700 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css'], avoid: ['.qa-card', '.tip-card'] },
+        pagebreak: { mode: ['css', 'legacy'], avoid: ['.qa-card', '.tip-card'] },
       })
       .from(source)
       .save();

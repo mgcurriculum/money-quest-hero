@@ -1,28 +1,33 @@
 
 
-## Plan: Disable OTP in Preview
+## Plan: Update DOCUMENTATION.md to Match Current Code
 
-Simple change — auto-set OTP as verified so you can skip phone verification during testing.
+### Changes
 
-### File: `src/components/game/ProfileScreen.tsx`
+**Section 1 - Overview**
+- Rename "Money Quest" to "Finance Quest" throughout
 
-Change the initial `otpStep` state (line 57) to always start as `'verified'`:
+**Section 2 - Game Flow**
+- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
 
-```typescript
-const [otpStep, setOtpStep] = useState<'idle' | 'sent' | 'verified'>('verified');
-```
+**Section 3 - Player Profile Fields**
+- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
 
-Also auto-dispatch phone verified on mount so the rest of the flow recognizes it:
+**Section 4 - Level 0 Questions**
+- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
+- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
+- Update question count from 11 to 7
+- Renumber remaining questions 1-7
 
-```typescript
-useEffect(() => {
-  if (!state.phoneVerified) {
-    dispatch({ type: 'SET_PHONE_VERIFIED', verified: true });
-  }
-}, []);
-```
+**Section 5 - Scoring Criteria**
+- Update Level 0: minScore = 7, maxScore = 35
 
-The Send OTP button and OTP input won't render since `otpStep` starts as `'verified'`. The green "Verified" badge will show instead.
+**Section 9 - Reflection Options**
+- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
 
-No other files need changes.
+**Section 10 - State Shape**
+- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
+
+### Files to Change
+- `DOCUMENTATION.md` — single file update
 

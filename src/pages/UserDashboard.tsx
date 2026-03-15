@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { fqBands, MAX_SCORE, getProfileLabel, dimensions, dimensionIcons } from '@/data/questions';
 import { generateReportHTML, downloadReportAsFile, getFinancialTips } from '@/utils/generateReportPDF';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Download, User, Phone, TrendingUp, History, ArrowLeft, Search, LogOut } from 'lucide-react';
+import { Download, User, Phone, TrendingUp, History, ArrowLeft, LogOut, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import CountryCodePicker, { COUNTRIES, Country } from '@/components/game/CountryCodePicker';
@@ -26,29 +26,133 @@ interface SessionData {
   reflection_answer: string | null;
 }
 
+type OtpStep = 'phone' | 'otp' | 'verified';
+
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
   const [downloading, setDownloading] = useState<string | null>(null);
 
-  const handleSearch = async () => {
-    const fullPhone = selectedCountry.dial + phone.replace(/[^\d]/g, '');
-    if (phone.replace(/[^\d]/g, '').length < 10) return;
-    setLoading(true);
-    setSearched(true);
+  // OTP state
+  const [otpStep, setOtpStep] = useState<OtpStep>('phone');
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval>>();
 
+  const fullPhone = selectedCountry.dial + phone.replace(/[^\d]/g, '');
+
+  const startResendTimer = () => {
+    setResendTimer(30);
+    timerRef.current = setInterval(() => {
+      setResendTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleSendOtp = async () => {
+    if (phone.replace(/[^\d]/g, '').length < 10) return;
+    setOtpError('');
+    setSending(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
+        body: { phone: fullPhone },
+      });
+      if (fnError || data?.error) {
+        throw new Error(data?.error || fnError?.message || 'Failed to send OTP');
+      }
+      setOtpStep('otp');
+      startResendTimer();
+    } catch (err: any) {
+      setOtpError(err.message || 'Failed to send OTP');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otp.length !== 6) return;
+    setOtpError('');
+    setVerifying(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('verify-otp', {
+        body: { phone: fullPhone, otp },
+      });
+
+      if (fnError) {
+        let errMsg = 'Verification failed. Please try again.';
+        const maybeContext = (fnError as any)?.context;
+        if (maybeContext instanceof Response) {
+          const body = await maybeContext.json().catch(() => null);
+          errMsg = body?.error || errMsg;
+        }
+        setOtpError(errMsg);
+        return;
+      }
+
+      if (data?.verified) {
+        setOtpStep('verified');
+        // Now fetch sessions
+        await fetchSessions();
+        return;
+      }
+
+      setOtpError(data?.error || 'Incorrect OTP. Please try again.');
+    } catch (err: any) {
+      setOtpError(err.message || 'Verification failed');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendTimer > 0) return;
+    setOtp('');
+    setOtpError('');
+    setSending(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
+        body: { phone: fullPhone },
+      });
+      if (fnError || data?.error) throw new Error(data?.error || 'Failed to resend');
+      startResendTimer();
+    } catch (err: any) {
+      setOtpError(err.message);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const fetchSessions = async () => {
+    setLoading(true);
     const { data } = await supabase
       .from('game_sessions')
       .select('id, player_name, player_age, player_age_number, player_gender, player_phone, player_country, profile_code, fq_score, band_level, created_at, answers, reflection_answer')
       .eq('player_phone', fullPhone)
       .order('created_at', { ascending: false });
-
     setSessions((data as SessionData[]) || []);
     setLoading(false);
+  };
+
+  const handleLogout = () => {
+    setSessions([]);
+    setOtpStep('phone');
+    setOtp('');
+    setOtpError('');
+    setPhone('');
+    setResendTimer(0);
+    if (timerRef.current) clearInterval(timerRef.current);
+    navigate('/');
   };
 
   const latestSession = sessions[0];
@@ -118,9 +222,9 @@ const UserDashboard = () => {
             <ArrowLeft size={20} />
           </button>
           <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto" />
-          {searched && sessions.length > 0 ? (
+          {otpStep === 'verified' && sessions.length > 0 ? (
             <button
-              onClick={() => { setSessions([]); setSearched(false); setPhone(''); navigate('/'); }}
+              onClick={handleLogout}
               className="text-game-muted hover:text-red-400 transition-colors"
               title="Logout"
             >
@@ -133,35 +237,104 @@ const UserDashboard = () => {
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">
           <h1 className="text-2xl font-display font-bold text-game-text">My <span className="gold-text">Profile</span></h1>
-          <p className="text-game-muted font-body text-sm mt-1">View your test history and scores</p>
+          <p className="text-game-muted font-body text-sm mt-1">
+            {otpStep === 'verified' ? 'Your test history and scores' : 'Verify your phone to view your profile'}
+          </p>
         </motion.div>
 
-        {/* Phone Lookup */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-2xl p-5 mb-6">
-          <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-2 block">
-            <Phone size={12} className="inline mr-1" /> Enter your registered phone number
-          </label>
-          <div className="flex gap-2 mb-3">
-            <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
-            <input
-              type="tel"
-              value={phone}
-              onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
-              placeholder="9876543210"
-              className="flex-1 bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            />
+        {/* Phone + OTP Flow */}
+        {otpStep !== 'verified' && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-2xl p-5 mb-6">
+            {otpStep === 'phone' && (
+              <>
+                <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-2 block">
+                  <Phone size={12} className="inline mr-1" /> Enter your registered phone number
+                </label>
+                <div className="flex gap-2 mb-3">
+                  <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
+                    placeholder="9876543210"
+                    className="flex-1 bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+                    onKeyDown={e => e.key === 'Enter' && handleSendOtp()}
+                  />
+                </div>
+                <Button
+                  onClick={handleSendOtp}
+                  disabled={phone.replace(/[^\d]/g, '').length < 10 || sending}
+                  className="w-full gold-gradient text-white font-display font-semibold rounded-xl py-3 hover:scale-105 active:scale-95 transition-transform"
+                >
+                  {sending ? 'Sending OTP...' : <><ShieldCheck size={16} className="mr-2" /> Send OTP</>}
+                </Button>
+              </>
+            )}
+
+            {otpStep === 'otp' && (
+              <>
+                <div className="text-center mb-4">
+                  <div className="w-12 h-12 rounded-full bg-game-gold/20 flex items-center justify-center mx-auto mb-3">
+                    <ShieldCheck size={24} className="text-game-gold" />
+                  </div>
+                  <p className="text-game-text font-body text-sm">
+                    We sent a 6-digit code to
+                  </p>
+                  <p className="text-game-gold font-display font-semibold text-sm">{fullPhone}</p>
+                </div>
+                <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">
+                  Enter OTP
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otp}
+                  onChange={e => { setOtp(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
+                  placeholder="• • • • • •"
+                  className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-2xl tracking-[0.5em] text-center font-mono mb-3"
+                />
+                <div className="flex justify-between items-center mb-4">
+                  <button
+                    onClick={handleResend}
+                    disabled={resendTimer > 0 || sending}
+                    className={`text-xs font-body ${resendTimer > 0 ? 'text-game-muted' : 'text-game-gold hover:underline'}`}
+                  >
+                    {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
+                  </button>
+                  <button
+                    onClick={() => { setOtpStep('phone'); setOtp(''); setOtpError(''); }}
+                    className="text-xs font-body text-game-muted hover:text-game-text"
+                  >
+                    Change number
+                  </button>
+                </div>
+                <Button
+                  onClick={handleVerifyOtp}
+                  disabled={otp.length !== 6 || verifying}
+                  className="w-full gold-gradient text-white font-display font-semibold rounded-xl py-3 hover:scale-105 active:scale-95 transition-transform"
+                >
+                  {verifying ? 'Verifying...' : 'Verify & View Profile →'}
+                </Button>
+              </>
+            )}
+
+            {otpError && (
+              <p className="text-destructive text-xs text-center mt-3">{otpError}</p>
+            )}
+          </motion.div>
+        )}
+
+        {/* Loading */}
+        {otpStep === 'verified' && loading && (
+          <div className="text-center py-12">
+            <span className="animate-spin inline-block w-8 h-8 border-3 border-game-gold border-t-transparent rounded-full" />
+            <p className="text-game-muted font-body text-sm mt-3">Loading your profile...</p>
           </div>
-          <Button
-            onClick={handleSearch}
-            disabled={phone.replace(/[^\d]/g, '').length < 10 || loading}
-            className="w-full gold-gradient text-white font-display font-semibold rounded-xl py-3 hover:scale-105 active:scale-95 transition-transform"
-          >
-            {loading ? 'Searching...' : <><Search size={16} className="mr-2" /> Find My Profile</>}
-          </Button>
-        </motion.div>
+        )}
 
-        {searched && !loading && sessions.length === 0 && (
+        {/* No records */}
+        {otpStep === 'verified' && !loading && sessions.length === 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card rounded-2xl p-6 text-center">
             <p className="text-game-muted font-body text-sm">No records found for this phone number.</p>
             <Button onClick={() => navigate('/')} variant="outline" className="mt-4 border-game-gold/30 text-game-gold bg-transparent font-display">
@@ -170,7 +343,8 @@ const UserDashboard = () => {
           </motion.div>
         )}
 
-        {profile && (
+        {/* Profile & History (only when verified) */}
+        {otpStep === 'verified' && profile && (
           <>
             {/* Profile Card */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card rounded-2xl p-5 mb-5">

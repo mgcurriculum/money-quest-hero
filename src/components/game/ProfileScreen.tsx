@@ -73,16 +73,15 @@ const ProfileScreen = () => {
     }
   }, [state.isMuted, speak, step]);
 
-  // OTP reset disabled for preview testing
-  // useEffect(() => {
-  //   if (otpStep !== 'idle') {
-  //     setOtpStep('idle');
-  //     setOtp('');
-  //     setOtpError('');
-  //     setResendTimer(0);
-  //     if (timerRef.current) clearInterval(timerRef.current);
-  //   }
-  // }, [phone, selectedCountry]);
+  useEffect(() => {
+    if (otpStep !== 'idle' && otpStep !== 'verified') {
+      setOtpStep('idle');
+      setOtp('');
+      setOtpError('');
+      setResendTimer(0);
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+  }, [phone, selectedCountry]);
 
   const ageNum = parseInt(age, 10);
   const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;

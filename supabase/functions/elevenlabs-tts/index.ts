@@ -46,6 +46,36 @@ async function logUsage(admin: ReturnType<typeof createClient> | null, textLengt
   }
 }
 
+async function hashText(text: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function getCachedAudio(admin: ReturnType<typeof createClient>, hash: string): Promise<ArrayBuffer | null> {
+  try {
+    const { data, error } = await admin.storage.from('tts-cache').download(`${hash}.mp3`);
+    if (error || !data) return null;
+    return await data.arrayBuffer();
+  } catch {
+    return null;
+  }
+}
+
+async function setCachedAudio(admin: ReturnType<typeof createClient>, hash: string, audioBuffer: ArrayBuffer): Promise<void> {
+  try {
+    const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+    await admin.storage.from('tts-cache').upload(`${hash}.mp3`, blob, {
+      contentType: 'audio/mpeg',
+      upsert: true,
+    });
+  } catch (e) {
+    console.warn('Failed to cache audio:', e.message);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -55,9 +85,22 @@ serve(async (req) => {
 
   try {
     const { text, voiceId } = await req.json();
-    const ELEVENLABS_API_KEY = await getApiKey(admin);
     const usedVoiceId = voiceId || 'Ih3XRGwQe2qczi6DzW48';
     const textLength = (text || '').length;
+
+    // Check cache first
+    if (admin && text) {
+      const hash = await hashText(text + '::' + usedVoiceId);
+      const cached = await getCachedAudio(admin, hash);
+      if (cached) {
+        await logUsage(admin, textLength, usedVoiceId, 'cached');
+        return new Response(cached, {
+          headers: { ...corsHeaders, 'Content-Type': 'audio/mpeg' },
+        });
+      }
+    }
+
+    const ELEVENLABS_API_KEY = await getApiKey(admin);
 
     if (!ELEVENLABS_API_KEY) {
       await logUsage(admin, textLength, usedVoiceId, 'error', 'API key not configured');
@@ -129,10 +172,14 @@ serve(async (req) => {
       );
     }
 
-    // Success
+    // Success - cache the audio
     await logUsage(admin, textLength, usedVoiceId, 'success');
-
     const audioBuffer = await response.arrayBuffer();
+
+    if (admin && text) {
+      const hash = await hashText(text + '::' + usedVoiceId);
+      await setCachedAudio(admin, hash, audioBuffer);
+    }
 
     return new Response(audioBuffer, {
       headers: { ...corsHeaders, 'Content-Type': 'audio/mpeg' },

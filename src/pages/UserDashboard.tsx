@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { fqBands, MAX_SCORE, getProfileLabel, dimensions, dimensionIcons } from '@/data/questions';
 import { generateReportHTML, downloadReportAsFile, getFinancialTips } from '@/utils/generateReportPDF';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Download, User, Phone, TrendingUp, History, ArrowLeft, Search } from 'lucide-react';
+import { Download, User, Phone, TrendingUp, History, ArrowLeft, Search, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import CountryCodePicker, { COUNTRIES, Country } from '@/components/game/CountryCodePicker';

@@ -54,7 +54,7 @@ const ProfileScreen = () => {
   const [validatingCode, setValidatingCode] = useState(false);
 
   // OTP inline state — auto-verified on retake
-  const [otpStep, setOtpStep] = useState<'idle' | 'sent' | 'verified'>(state.phoneVerified ? 'verified' : 'idle');
+  const [otpStep, setOtpStep] = useState<'idle' | 'sent' | 'verified'>('verified');
   const [otp, setOtp] = useState('');
   const [otpSending, setOtpSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);

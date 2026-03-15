@@ -231,7 +231,7 @@ export function generateReportHTML(params: {
       <div style="font-size:52px;font-weight:800;color:#2D1B69;line-height:1;">
         ${totalScore}<span style="font-size:18px;color:#aaa;font-weight:400;">/${maxScore}</span>
       </div>
-      <div style="margin:12px auto;width:80%;max-width:320px;height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;">
+      <div style="margin:16px auto 0;width:80%;max-width:320px;height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;">
         <div style="height:100%;width:${scorePercent}%;background:linear-gradient(90deg,#6C63FF,#4FC3F7);border-radius:8px;"></div>
       </div>
       <div style="font-size:12px;color:#999;margin-top:8px;">You are</div>

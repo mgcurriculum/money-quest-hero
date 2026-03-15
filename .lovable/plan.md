@@ -1,33 +1,45 @@
 
 
-## Plan: Update DOCUMENTATION.md to Match Current Code
+## Plan: Cache TTS Audio in Storage to Eliminate Redundant API Calls
+
+### Problem
+Every user session calls ElevenLabs API for the same static narration texts (welcome, consent, profile, reflection, question prompts). This wastes API quota and adds latency.
+
+### Solution
+Store generated audio files in a storage bucket. The edge function checks for a cached file before calling ElevenLabs. On cache miss, it generates audio, stores it, and returns it. On cache hit, it serves the stored file directly — zero API calls, instant playback.
+
+### Static Texts to Cache (identified from codebase)
+- **WelcomeScreen**: 1 fixed text
+- **ConsentScreen**: 1 fixed text
+- **ProfileScreen**: 2 fixed texts (step 0, step 1)
+- **QuestionPlay**: 18 texts ("Question 1. Read through and pick...")
+- **ReflectionScreen**: 2 fixed texts (step 0, step 1)
+
+**Total: ~24 unique texts** — after first playthrough, all future users get instant cached audio.
 
 ### Changes
 
-**Section 1 - Overview**
-- Rename "Money Quest" to "Finance Quest" throughout
+#### 1. Create Storage Bucket (`tts-cache`)
+- Migration to create a public `tts-cache` bucket
+- RLS: public read access, service role writes (edge function only)
 
-**Section 2 - Game Flow**
-- Update Level Play description: "Level 0: 7 reality-check questions; Levels 1–6: 3 scenario-based questions each (25 total questions)"
+#### 2. Update Edge Function (`supabase/functions/elevenlabs-tts/index.ts`)
+- Hash the input text (SHA-256) to create a deterministic filename
+- Check if `tts-cache/{hash}.mp3` exists in storage
+- **Cache hit**: Return the stored file directly (no ElevenLabs call)
+- **Cache miss**: Call ElevenLabs, upload result to storage, return audio
+- Log usage with a new `cached` status to distinguish cached vs fresh calls
 
-**Section 3 - Player Profile Fields**
-- Add note that `status` and `incomeType` are collected via UI selection (moved from Level 0)
+#### 3. Update Client (`src/hooks/useNarration.ts`)
+- No changes needed — the edge function handles caching transparently
+- Client already fetches from the same endpoint and plays the blob
 
-**Section 4 - Level 0 Questions**
-- Remove Questions 1-2 (Current Stage of Life, Income Source) — these are now collected in Profile screen step 2
-- Remove Questions 10-11 (Financial Knowledge Growth, Money Journey Commitment) — these are now in the Reflection screen
-- Update question count from 11 to 7
-- Renumber remaining questions 1-7
+#### 4. Admin Cache Management (optional, in Settings)
+- Add a "Clear TTS Cache" button in Admin Settings to purge the bucket
+- Show cache hit/miss stats from `tts_usage_logs`
 
-**Section 5 - Scoring Criteria**
-- Update Level 0: minScore = 7, maxScore = 35
-
-**Section 9 - Reflection Options**
-- Add the "Financial Mindset" step (interest level question with 5 options) before the reflection goal selection
-
-**Section 10 - State Shape**
-- Fix comment: `currentQuestion: 0–6 (Level 0) or 0–2 (Levels 1–6)`
-
-### Files to Change
-- `DOCUMENTATION.md` — single file update
+### Benefits
+- **API savings**: ~24 texts cached; after first user, zero ElevenLabs calls for narration
+- **Speed**: Cached audio serves from storage (~50ms) vs ElevenLabs API (~1-3s)
+- **No client changes**: Fully transparent to the frontend
 

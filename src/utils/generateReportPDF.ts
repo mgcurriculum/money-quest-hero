@@ -119,15 +119,15 @@ export function generateReportHTML(params: {
 
   const dimensionRows = dimensionScores.map(ds => `
     <tr>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:13px;color:#333;white-space:nowrap;vertical-align:middle;width:35%;">
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:13px;color:#333;vertical-align:middle;">
         <span style="font-size:16px;margin-right:6px;">${ds.icon}</span>${ds.dimension}
       </td>
-      <td style="padding:12px 8px;border-bottom:1px solid #eee;width:40%;vertical-align:middle;">
+      <td style="padding:12px 8px;border-bottom:1px solid #eee;vertical-align:middle;">
         <div style="background:#f0f0f0;border-radius:10px;height:14px;overflow:hidden;position:relative;">
           <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${ds.percentage}%;min-width:${ds.percentage > 0 ? '8px' : '0'};"></div>
         </div>
       </td>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:right;vertical-align:middle;white-space:nowrap;width:25%;">
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:right;vertical-align:middle;white-space:nowrap;">
         <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};padding:3px 10px;border-radius:12px;font-size:12px;">${ds.percentage}%</span>
       </td>
     </tr>

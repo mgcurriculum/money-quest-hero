@@ -60,7 +60,9 @@ function computeDimensionScores(questions: QuestionItem[], answers: { [idx: numb
 const ReportScreen = () => {
   const { state, dispatch } = useGame();
   const { questions } = useQuestions(state.profile.profileCode);
+  const { speak, stop, isPlaying, isLoading: narrationLoading } = useNarration(state.isMuted);
   const hasSaved = useRef(false);
+  const hasNarrated = useRef(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [emailSending, setEmailSending] = useState(false);

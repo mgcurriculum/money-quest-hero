@@ -210,6 +210,7 @@ export function generateReportHTML(params: {
     body { margin:0; padding:0; background:#fff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color:#333; line-height:1.5; }
     .qa-card, .tip-card { page-break-inside: avoid; }
     .qa-section { page-break-inside: auto; }
+    .section-title { page-break-after: avoid; }
     .section-break { page-break-before: always; }
   </style>
 </head>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '@/context/GameContext';
 import { useQuestions, type QuestionItem } from '@/hooks/useQuestions';
+import { useNarration } from '@/hooks/useNarration';
 import { dimensions, dimensionIcons, fqBands, MAX_SCORE, MAX_SCORE_PER_QUESTION, getProfileLabel } from '@/data/questions';
 import {
   extractQuestionsAndAnswers,

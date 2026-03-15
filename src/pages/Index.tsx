@@ -3,7 +3,7 @@ import { GameProvider } from '@/context/GameContext';
 import WelcomeScreen from '@/components/game/WelcomeScreen';
 import ConsentScreen from '@/components/game/ConsentScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
-import PhoneVerificationScreen from '@/components/game/PhoneVerificationScreen';
+
 import QuestionPlay from '@/components/game/QuestionPlay';
 import ReflectionScreen from '@/components/game/ReflectionScreen';
 import ReportScreen from '@/components/game/ReportScreen';

@@ -54,7 +54,9 @@ const ProfileScreen = () => {
   const [validatingCode, setValidatingCode] = useState(false);
 
   // OTP inline state — auto-verified on retake
-  const [otpStep, setOtpStep] = useState<'idle' | 'sent' | 'verified'>('verified');
+  const [otpStep, setOtpStep] = useState<'idle' | 'sent' | 'verified'>(
+    state.phoneVerified ? 'verified' : 'idle'
+  );
   const [otp, setOtp] = useState('');
   const [otpSending, setOtpSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);
@@ -62,11 +64,6 @@ const ProfileScreen = () => {
   const [resendTimer, setResendTimer] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
 
-  useEffect(() => {
-    if (!state.phoneVerified) {
-      dispatch({ type: 'SET_PHONE_VERIFIED', verified: true });
-    }
-  }, []);
 
   useEffect(() => {
     if (!state.isMuted && hasNarrated.current !== step) {
@@ -76,16 +73,15 @@ const ProfileScreen = () => {
     }
   }, [state.isMuted, speak, step]);
 
-  // OTP reset disabled for preview testing
-  // useEffect(() => {
-  //   if (otpStep !== 'idle') {
-  //     setOtpStep('idle');
-  //     setOtp('');
-  //     setOtpError('');
-  //     setResendTimer(0);
-  //     if (timerRef.current) clearInterval(timerRef.current);
-  //   }
-  // }, [phone, selectedCountry]);
+  useEffect(() => {
+    if (otpStep !== 'idle' && otpStep !== 'verified') {
+      setOtpStep('idle');
+      setOtp('');
+      setOtpError('');
+      setResendTimer(0);
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+  }, [phone, selectedCountry]);
 
   const ageNum = parseInt(age, 10);
   const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;

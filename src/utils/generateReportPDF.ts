@@ -290,7 +290,7 @@ export async function downloadReportAsFile(html: string, filename: string) {
 
   const parsed = new DOMParser().parseFromString(html, 'text/html');
   const source = document.createElement('div');
-  source.style.width = '700px';
+  source.style.width = '794px';
   source.style.background = '#ffffff';
   source.innerHTML = parsed.body.innerHTML;
 
@@ -310,10 +310,10 @@ export async function downloadReportAsFile(html: string, filename: string) {
   try {
     await html2pdf()
       .set({
-        margin: [6, 3, 6, 3],
+        margin: [4, 2, 4, 2],
         filename: pdfFilename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 700 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 794 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'], avoid: ['.qa-card', '.tip-card'] },
       })

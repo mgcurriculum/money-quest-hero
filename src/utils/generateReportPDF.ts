@@ -192,9 +192,10 @@ export function generateReportHTML(params: {
   `).join('');
 
   const tipsHTML = tips.map((t, i) => {
-    const pageBreak = i === 5 ? '<div class="section-break"></div>' : '';
-    return `${pageBreak}
-    <div class="tip-card" style="padding:12px 16px;background:#f8f6ff;border-radius:10px;margin-bottom:8px;font-size:12px;color:#333;line-height:1.6;border-left:4px solid #6C63FF;page-break-inside:avoid;break-inside:avoid;">
+    const forceNextPage = i === 5;
+    const extra = forceNextPage ? 'page-break-before:always;break-before:page;' : '';
+    return `
+    <div class="tip-card" style="padding:12px 16px;background:#f8f6ff;border-radius:10px;margin-bottom:8px;font-size:12px;color:#333;line-height:1.6;border-left:4px solid #6C63FF;page-break-inside:avoid;break-inside:avoid;${extra}">
       <span style="font-weight:700;color:#4f46e5;margin-right:4px;">${i + 1}.</span> ${t}
     </div>`;
   }).join('');

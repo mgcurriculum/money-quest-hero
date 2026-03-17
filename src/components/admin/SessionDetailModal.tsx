@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import type { Tables } from '@/integrations/supabase/types';
 import { getDetailedAnswers, getDimensionScores } from '@/utils/dashboardAnalytics';
+import { MAX_SCORE_PER_QUESTION } from '@/data/questions';
 import { MAX_SCORE } from '@/data/questions';
 
 type Session = Tables<'game_sessions'>;
@@ -76,7 +77,7 @@ const SessionDetailModal = ({ session, open, onClose }: Props) => {
                     </TableCell>
                     <TableCell className="text-xs">{d.selectedOption}</TableCell>
                     <TableCell className={`text-right text-xs font-semibold ${d.score <= 20 ? 'text-destructive' : d.score >= 40 ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {d.score}/50
+                      {d.score}/{MAX_SCORE_PER_QUESTION}
                     </TableCell>
                   </TableRow>
                 ))}

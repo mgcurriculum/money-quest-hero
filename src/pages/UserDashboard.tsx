@@ -194,6 +194,7 @@ const UserDashboard = () => {
         logoUrl: window.location.origin + finquoLogo,
         playerName: session.player_name,
         profileLabel: getProfileLabel(session.profile_code || ''),
+        playerAge: session.player_age_number || undefined,
         totalScore: session.fq_score || 0,
         maxScore: MAX_SCORE,
         bandLevel: band.level,

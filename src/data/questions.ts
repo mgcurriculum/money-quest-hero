@@ -109,13 +109,13 @@ export const dimensions = [
 
 export const dimensionIcons = ['💼', '💳', '💰', '🧾', '📈', '🛡️'];
 
-// FQ Score bands (0-810, max 18×45)
+// FQ Score bands (0-900, max 18×50)
 export const fqBands = [
-  { min: 0, max: 163, level: 'Beginner', meaning: 'Limited awareness — your journey starts here!', emoji: '🌱' },
-  { min: 163, max: 325, level: 'Explorer', meaning: 'Basic awareness — keep exploring!', emoji: '🧭' },
-  { min: 325, max: 487, level: 'Developing', meaning: 'Improving habits — you\'re on the right track!', emoji: '📚' },
-  { min: 487, max: 649, level: 'Smart', meaning: 'Good control — strong financial instincts!', emoji: '🧠' },
-  { min: 649, max: 811, level: 'Master', meaning: 'Highly optimized behaviour — you\'re a legend!', emoji: '👑' },
+  { min: 0, max: 181, level: 'Beginner', meaning: 'Limited awareness — your journey starts here!', emoji: '🌱' },
+  { min: 181, max: 361, level: 'Explorer', meaning: 'Basic awareness — keep exploring!', emoji: '🧭' },
+  { min: 361, max: 541, level: 'Developing', meaning: 'Improving habits — you\'re on the right track!', emoji: '📚' },
+  { min: 541, max: 721, level: 'Smart', meaning: 'Good control — strong financial instincts!', emoji: '🧠' },
+  { min: 721, max: 901, level: 'Master', meaning: 'Highly optimized behaviour — you\'re a legend!', emoji: '👑' },
 ];
 
 export const TOTAL_QUESTIONS = 18;

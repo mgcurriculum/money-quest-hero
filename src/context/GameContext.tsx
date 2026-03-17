@@ -36,6 +36,7 @@ type Action =
   | { type: 'SET_PHONE_VERIFIED'; verified: boolean }
   | { type: 'ANSWER_QUESTION'; question: number; score: number }
   | { type: 'NEXT_QUESTION' }
+  | { type: 'PREV_QUESTION' }
   | { type: 'SET_REFLECTION'; answer: string }
   | { type: 'SET_LANGUAGE'; lang: 'en' | 'ml' }
   | { type: 'SET_MUTE'; value: boolean }

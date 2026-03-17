@@ -48,7 +48,7 @@ const ProfileScreen = () => {
   const [age, setAge] = useState(existingProfile.age > 0 ? String(existingProfile.age) : '');
   const [gender, setGender] = useState(existingProfile.gender || '');
   const [phone, setPhone] = useState(initialPhone);
-  const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState(isRetake ? (getAgeGroup(existingProfile.age) || '') : '');
   const [selectedCountry, setSelectedCountry] = useState<Country>(matchedCountry);
   const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
   const [campaignCodeError, setCampaignCodeError] = useState('');

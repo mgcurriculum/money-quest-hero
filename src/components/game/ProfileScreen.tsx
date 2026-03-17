@@ -244,42 +244,52 @@ const ProfileScreen = () => {
 
         {step === 0 && (
           <div className="glass-card rounded-2xl p-6 space-y-4">
-            <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Name <span className="text-game-gold">*</span></label>
-              <input
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Enter your name"
-                className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
-              />
-            </div>
-            <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Age <span className="text-game-gold">*</span></label>
-              <input
-                type="number"
-                value={age}
-                onChange={e => setAge(e.target.value)}
-                placeholder="e.g. 25"
-                min={18}
-                max={120}
-                className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
-              />
-              {age && !isValidAge && <p className="text-red-400 text-xs mt-1">Please enter a valid age (18+)</p>}
-            </div>
-            <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Gender (optional)</label>
-              <select
-                value={gender}
-                onChange={e => setGender(e.target.value)}
-                className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
-              >
-                <option value="">Select</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+            {!isRetake && (
+              <>
+                <div>
+                  <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Name <span className="text-game-gold">*</span></label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    placeholder="Enter your name"
+                    className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Your Age <span className="text-game-gold">*</span></label>
+                  <input
+                    type="number"
+                    value={age}
+                    onChange={e => setAge(e.target.value)}
+                    placeholder="e.g. 25"
+                    min={18}
+                    max={120}
+                    className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+                  />
+                  {age && !isValidAge && <p className="text-red-400 text-xs mt-1">Please enter a valid age (18+)</p>}
+                </div>
+                <div>
+                  <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Gender (optional)</label>
+                  <select
+                    value={gender}
+                    onChange={e => setGender(e.target.value)}
+                    className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+                  >
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </>
+            )}
+            {isRetake && (
+              <div className="text-center py-2">
+                <p className="text-game-text font-body text-sm">Welcome back, <span className="text-game-gold font-semibold">{name}</span>!</p>
+                <p className="text-game-muted text-xs mt-1">Please verify your phone number to continue.</p>
+              </div>
+            )}
 
             {/* Phone + inline OTP */}
             <div>

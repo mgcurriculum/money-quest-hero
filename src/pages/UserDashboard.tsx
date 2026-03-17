@@ -453,7 +453,7 @@ const UserDashboard = () => {
 
             {/* Take Test Again */}
             <Button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/', { state: { retake: true, profile: { name: profile!.name, age: profile!.age, gender: profile!.gender, phone: fullPhone, country: profile!.country } } })}
               className="w-full py-6 text-base gold-gradient text-white font-display font-semibold rounded-2xl hover:scale-105 active:scale-95 transition-transform mb-8"
             >
               Take Test Again

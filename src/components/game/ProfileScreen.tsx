@@ -23,7 +23,7 @@ const ROLE_ICONS: Record<string, React.ReactNode> = {
   RET: <Palmtree size={18} />,
 };
 
-function getAgeGroup(age: number): string | null {
+export function getAgeGroup(age: number): string | null {
   if (age >= 18 && age <= 25) return '18-25';
   if (age >= 26 && age <= 39) return '26-39';
   if (age >= 40 && age <= 59) return '40-59';

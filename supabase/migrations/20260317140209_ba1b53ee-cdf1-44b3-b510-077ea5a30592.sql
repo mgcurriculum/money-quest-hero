@@ -1,0 +1,1 @@
+ALTER TABLE public.questions ALTER COLUMN score_5 SET DEFAULT 45;

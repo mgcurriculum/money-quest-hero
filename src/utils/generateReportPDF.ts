@@ -128,8 +128,8 @@ export function generateReportHTML(params: {
           <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${ds.percentage}%;min-width:${ds.percentage > 0 ? '8px' : '0'};"></div>
         </div>
       </td>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:right;vertical-align:middle;white-space:nowrap;">
-        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};padding:3px 10px;border-radius:12px;font-size:12px;">${ds.percentage}%</span>
+      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:center;vertical-align:middle;white-space:nowrap;">
+        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};padding:3px 10px;border-radius:12px;font-size:12px;display:inline-block;min-width:48px;text-align:center;">${ds.percentage}%</span>
       </td>
     </tr>
   `).join('');
@@ -256,13 +256,6 @@ export function generateReportHTML(params: {
       </table>
     </div>
 
-    <!-- Your Answers -->
-    <div style="margin-bottom:24px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #6C63FF;">
-        <h2 style="font-size:16px;color:#2D1B69;margin:0;font-weight:700;">Your Answers</h2>
-      </div>
-      ${qaHTML}
-    </div>
 
     <!-- Financial Tips -->
     <div class="section-break"></div>

@@ -42,6 +42,7 @@ const ProfileScreen = () => {
     ? existingProfile.phone.replace(matchedCountry.dial, '')
     : '';
 
+  const isRetake = existingProfile.name.trim().length > 0 && existingProfile.age > 0;
   const [step, setStep] = useState(0);
   const [name, setName] = useState(existingProfile.name || '');
   const [age, setAge] = useState(existingProfile.age > 0 ? String(existingProfile.age) : '');

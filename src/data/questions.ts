@@ -119,8 +119,8 @@ export const fqBands = [
 ];
 
 export const TOTAL_QUESTIONS = 18;
-export const MAX_SCORE = 810; // 18 × 45
-export const MAX_SCORE_PER_QUESTION = 45;
+export const MAX_SCORE_PER_QUESTION = 50;
+export const MAX_SCORE = TOTAL_QUESTIONS * MAX_SCORE_PER_QUESTION; // 18 × 50 = 900
 
 export const reflectionOptions = [
   '💼 Earn more actively',

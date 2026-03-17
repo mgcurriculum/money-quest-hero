@@ -36,6 +36,7 @@ type Action =
   | { type: 'SET_PHONE_VERIFIED'; verified: boolean }
   | { type: 'ANSWER_QUESTION'; question: number; score: number }
   | { type: 'NEXT_QUESTION' }
+  | { type: 'PREV_QUESTION' }
   | { type: 'SET_REFLECTION'; answer: string }
   | { type: 'SET_LANGUAGE'; lang: 'en' | 'ml' }
   | { type: 'SET_MUTE'; value: boolean }
@@ -75,6 +76,7 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...state, answers: { ...state.answers, [action.question]: action.score } };
     }
     case 'NEXT_QUESTION': return { ...state, currentQuestion: state.currentQuestion + 1 };
+    case 'PREV_QUESTION': return { ...state, currentQuestion: Math.max(0, state.currentQuestion - 1) };
     case 'SET_REFLECTION': return { ...state, reflectionAnswer: action.answer };
     case 'SET_LANGUAGE': return { ...state, language: action.lang };
     case 'SET_MUTE': return { ...state, isMuted: action.value };

@@ -63,12 +63,10 @@ const QuestionPlay = () => {
   const handleBack = () => {
     stop();
     if (state.currentQuestion > 0) {
-      // Go to previous question
-      dispatch({ type: 'NEXT_QUESTION' }); // We need a PREV action
-      // Since there's no PREV action, we'll use SET_STEP workaround
-      // Actually let's just go back to profile if on first question
+      dispatch({ type: 'PREV_QUESTION' });
+    } else {
+      dispatch({ type: 'SET_STEP', step: 'profile' });
     }
-    dispatch({ type: 'SET_STEP', step: 'phone-verify' });
   };
 
   if (loading) {
@@ -104,15 +102,14 @@ const QuestionPlay = () => {
       <div className="max-w-md mx-auto relative z-10">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            {state.currentQuestion === 0 && (
-              <button
-                onClick={handleBack}
-                className="p-2 text-game-muted hover:text-game-text transition-colors"
-                title="Go back"
-              >
-                <ArrowLeft size={18} />
-              </button>
-            )}
+            <button
+              onClick={handleBack}
+              disabled={showFeedback}
+              className="p-2 text-game-muted hover:text-game-text transition-colors disabled:opacity-50"
+              title="Go back"
+            >
+              <ArrowLeft size={18} />
+            </button>
             <MuteButton isPlaying={isPlaying} isLoading={narrationLoading} className="p-2" />
           </div>
           <img src={finquoLogo} alt="FinQuo Versity" className="h-6 w-auto" />

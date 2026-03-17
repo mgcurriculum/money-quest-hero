@@ -43,12 +43,12 @@ const ProfileScreen = () => {
     : '';
 
   const isRetake = existingProfile.name.trim().length > 0 && existingProfile.age > 0;
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(isRetake ? 1 : 0);
   const [name, setName] = useState(existingProfile.name || '');
   const [age, setAge] = useState(existingProfile.age > 0 ? String(existingProfile.age) : '');
   const [gender, setGender] = useState(existingProfile.gender || '');
   const [phone, setPhone] = useState(initialPhone);
-  const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState(isRetake ? (getAgeGroup(existingProfile.age) || '') : '');
   const [selectedCountry, setSelectedCountry] = useState<Country>(matchedCountry);
   const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
   const [campaignCodeError, setCampaignCodeError] = useState('');

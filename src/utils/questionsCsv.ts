@@ -148,7 +148,7 @@ export function parseCsvToQuestions(csv: string, defaultProfileCode?: string): Q
       score_2: parseInt(get(cols, 'score_2')) || 20,
       score_3: parseInt(get(cols, 'score_3')) || 30,
       score_4: parseInt(get(cols, 'score_4')) || 40,
-      score_5: parseInt(get(cols, 'score_5')) || 50,
+      score_5: parseInt(get(cols, 'score_5')) || 45,
       is_active: get(cols, 'is_active').toLowerCase() !== 'false',
     });
   }

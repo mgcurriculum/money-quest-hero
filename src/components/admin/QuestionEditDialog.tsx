@@ -67,7 +67,7 @@ const QuestionEditDialog = ({
                 }} placeholder={`Option ${idx + 1}`} className="flex-1" />
                 <Input type="number" value={formScores[idx]} onChange={e => {
                   const next = [...formScores]; next[idx] = Number(e.target.value); setFormScores(next);
-                }} className="w-20" min={0} max={50} step={10} />
+                }} className="w-20" min={0} max={45} step={5} />
                 <span className="text-xs text-muted-foreground">pts</span>
               </div>
             ))}

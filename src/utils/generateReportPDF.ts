@@ -253,8 +253,8 @@ export function generateReportHTML(params: {
 
     <!-- Financial Tips -->
     <div style="margin-bottom:24px;">
-    <div style="margin-bottom:24px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #6C63FF;">
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:3px solid #6C63FF;">
         <h2 style="font-size:16px;color:#2D1B69;margin:0;font-weight:700;">Financial Tips</h2>
       </div>
       ${tipsHTML}

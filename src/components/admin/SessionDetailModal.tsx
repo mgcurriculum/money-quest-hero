@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import type { Tables } from '@/integrations/supabase/types';
 import { getDetailedAnswers, getDimensionScores } from '@/utils/dashboardAnalytics';
+import { MAX_SCORE_PER_QUESTION } from '@/data/questions';
 import { MAX_SCORE } from '@/data/questions';
 
 type Session = Tables<'game_sessions'>;

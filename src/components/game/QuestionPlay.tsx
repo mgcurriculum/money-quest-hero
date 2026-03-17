@@ -63,12 +63,10 @@ const QuestionPlay = () => {
   const handleBack = () => {
     stop();
     if (state.currentQuestion > 0) {
-      // Go to previous question
-      dispatch({ type: 'NEXT_QUESTION' }); // We need a PREV action
-      // Since there's no PREV action, we'll use SET_STEP workaround
-      // Actually let's just go back to profile if on first question
+      dispatch({ type: 'PREV_QUESTION' });
+    } else {
+      dispatch({ type: 'SET_STEP', step: 'profile' });
     }
-    dispatch({ type: 'SET_STEP', step: 'phone-verify' });
   };
 
   if (loading) {

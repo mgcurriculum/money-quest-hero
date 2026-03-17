@@ -52,7 +52,7 @@ function computeDimensionScores(questions: QuestionItem[], answers: { [idx: numb
       icon: dimensionIcons[i],
       score: d.total,
       maxScore,
-      percentage: Math.round((d.total / maxScore) * 100),
+      percentage: Math.min(100, Math.round((d.total / maxScore) * 100)),
     };
   });
 }

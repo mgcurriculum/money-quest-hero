@@ -128,8 +128,8 @@ export function generateReportHTML(params: {
           <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${ds.percentage}%;min-width:${ds.percentage > 0 ? '8px' : '0'};"></div>
         </div>
       </td>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;text-align:center;vertical-align:middle;white-space:nowrap;">
-        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};padding:0 10px;border-radius:999px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:24px;line-height:1;text-align:center;">${ds.percentage}%</span>
+      <td style="padding:12px 8px;border-bottom:1px solid #eee;font-size:12px;font-weight:700;text-align:center;vertical-align:middle;width:60px;">
+        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};padding:3px 8px;border-radius:10px;font-size:12px;line-height:20px;white-space:nowrap;">${ds.percentage}%</span>
       </td>
     </tr>
   `).join('');

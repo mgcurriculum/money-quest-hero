@@ -35,7 +35,7 @@ const SessionHistory = ({ phone, currentSessionScore }: Props) => {
     const fetchHistory = async () => {
       const { data } = await supabase
         .from('game_sessions')
-        .select('id, player_name, fq_score, band_level, profile_code, created_at, answers, reflection_answer, player_age, player_gender')
+        .select('id, player_name, fq_score, band_level, profile_code, created_at, answers, reflection_answer, player_age, player_age_number, player_gender')
         .eq('player_phone', phone)
         .order('created_at', { ascending: false });
 

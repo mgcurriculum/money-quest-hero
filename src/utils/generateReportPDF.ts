@@ -262,7 +262,7 @@ export function generateReportHTML(params: {
 
     <!-- Reflection -->
     ${reflectionAnswer ? `
-    <div style="margin-bottom:24px;padding:20px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border-radius:16px;border:1px solid #d0e0f0;">
+    <div style="margin-bottom:16px;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border-radius:16px;border:1px solid #d0e0f0;">
       <p style="font-size:11px;color:#888;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">YOUR REFLECTION</p>
       <p style="font-size:14px;color:#333;margin:0;line-height:1.6;">${reflectionAnswer}</p>
     </div>` : ''}

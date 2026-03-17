@@ -105,7 +105,7 @@ const Settings = () => {
             FQ Score = Σ <span className="text-primary">option_scores</span> → <strong>0–{MAX_SCORE}</strong>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Each of the 18 questions has 5 options scored 10-50 by admin. Total score is the sum of all selected option scores. Maximum possible score is {MAX_SCORE} (18 × 50).
+            Each of the 18 questions has 5 options scored 10-45 by admin. Total score is the sum of all selected option scores. Maximum possible score is {MAX_SCORE} (18 × 45).
           </p>
         </CardContent>
       </Card>

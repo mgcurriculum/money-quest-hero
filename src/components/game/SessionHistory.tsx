@@ -16,6 +16,7 @@ interface HistorySession {
   answers: any;
   reflection_answer: string | null;
   player_age: string | null;
+  player_age_number: number | null;
   player_gender: string | null;
 }
 

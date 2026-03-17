@@ -76,6 +76,7 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...state, answers: { ...state.answers, [action.question]: action.score } };
     }
     case 'NEXT_QUESTION': return { ...state, currentQuestion: state.currentQuestion + 1 };
+    case 'PREV_QUESTION': return { ...state, currentQuestion: Math.max(0, state.currentQuestion - 1) };
     case 'SET_REFLECTION': return { ...state, reflectionAnswer: action.answer };
     case 'SET_LANGUAGE': return { ...state, language: action.lang };
     case 'SET_MUTE': return { ...state, isMuted: action.value };

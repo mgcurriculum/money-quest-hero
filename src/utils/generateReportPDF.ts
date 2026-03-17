@@ -248,9 +248,9 @@ export function generateReportHTML(params: {
       <h2 style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;text-align:center;margin:0 0 16px;font-weight:600;">Dimension Breakdown</h2>
       <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
         <colgroup>
-          <col style="width:35%;" />
-          <col style="width:40%;" />
-          <col style="width:25%;" />
+          <col style="width:36%;" />
+          <col />
+          <col style="width:108px;" />
         </colgroup>
         ${dimensionRows}
       </table>

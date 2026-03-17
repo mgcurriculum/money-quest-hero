@@ -126,7 +126,7 @@ export function generateReportHTML(params: {
       </div>
       <div style="padding:0 4px;">
         <div style="background:#f0f0f0;border-radius:10px;height:14px;overflow:hidden;position:relative;">
-          <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${ds.percentage}%;min-width:${ds.percentage > 0 ? '8px' : '0'};"></div>
+          <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${Math.min(ds.percentage, 100)}%;min-width:${ds.percentage > 0 ? '8px' : '0'};"></div>
         </div>
       </div>
       <div style="width:108px;display:flex;align-items:center;justify-content:center;">

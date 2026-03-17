@@ -193,7 +193,7 @@ export function generateReportHTML(params: {
   `).join('');
 
   const tipsHTML = tips.map((t, i) => {
-    const forceNextPage = i === 5;
+    const forceNextPage = i === 3;
     const extra = forceNextPage ? 'page-break-before:always;break-before:page;' : '';
     return `
     <div class="tip-card" style="padding:12px 16px;background:#f8f6ff;border-radius:10px;margin-bottom:8px;font-size:12px;color:#333;line-height:1.6;border-left:4px solid #6C63FF;page-break-inside:avoid;break-inside:avoid;${extra}">
@@ -248,9 +248,9 @@ export function generateReportHTML(params: {
       <h2 style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1.5px;text-align:center;margin:0 0 16px;font-weight:600;">Dimension Breakdown</h2>
       <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
         <colgroup>
+          <col style="width:35%;" />
           <col style="width:40%;" />
-          <col style="width:38%;" />
-          <col style="width:22%;" />
+          <col style="width:25%;" />
         </colgroup>
         ${dimensionRows}
       </table>
@@ -258,7 +258,7 @@ export function generateReportHTML(params: {
 
 
     <!-- Financial Tips -->
-    <div class="section-break"></div>
+    <div style="margin-bottom:24px;">
     <div style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #6C63FF;">
         <h2 style="font-size:16px;color:#2D1B69;margin:0;font-weight:700;">Financial Tips</h2>

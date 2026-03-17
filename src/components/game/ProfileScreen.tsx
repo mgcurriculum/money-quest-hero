@@ -88,7 +88,7 @@ const ProfileScreen = () => {
   const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;
   const phoneDigits = phone.replace(/[^\d]/g, '');
   const isPhoneValid = phoneDigits.length >= 10;
-  const canProceedStep0 = name.trim().length > 0 && isValidAge && otpStep === 'verified';
+  const canProceedStep0 = (isRetake || name.trim().length > 0) && isValidAge && otpStep === 'verified';
 
   const fullPhone = selectedCountry.dial + phone;
 

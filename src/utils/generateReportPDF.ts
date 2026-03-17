@@ -130,7 +130,7 @@ export function generateReportHTML(params: {
         </div>
       </div>
       <div style="width:108px;display:flex;align-items:center;justify-content:center;">
-        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};display:flex;align-items:center;justify-content:center;height:34px;min-width:86px;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700;line-height:1;white-space:nowrap;box-sizing:border-box;">${ds.percentage}%</span>
+        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};display:flex;align-items:center;justify-content:center;height:34px;min-width:86px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:700;line-height:34px;white-space:nowrap;box-sizing:border-box;">${ds.percentage}%</span>
       </div>
     </div>
   `).join('');
@@ -194,10 +194,8 @@ export function generateReportHTML(params: {
   `).join('');
 
   const tipsHTML = tips.map((t, i) => {
-    const forceNextPage = i === 3;
-    const extra = forceNextPage ? 'page-break-before:always;break-before:page;' : '';
     return `
-    <div class="tip-card" style="padding:12px 16px;background:#f8f6ff;border-radius:10px;margin-bottom:8px;font-size:12px;color:#333;line-height:1.6;border-left:4px solid #6C63FF;page-break-inside:avoid;break-inside:avoid;${extra}">
+    <div class="tip-card" style="padding:10px 14px;background:#f8f6ff;border-radius:10px;margin-bottom:6px;font-size:12px;color:#333;line-height:1.5;border-left:4px solid #6C63FF;page-break-inside:avoid;break-inside:avoid;">
       <span style="font-weight:700;color:#4f46e5;margin-right:4px;">${i + 1}.</span> ${t}
     </div>`;
   }).join('');
@@ -255,8 +253,8 @@ export function generateReportHTML(params: {
 
     <!-- Financial Tips -->
     <div style="margin-bottom:24px;">
-    <div style="margin-bottom:24px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #6C63FF;">
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:3px solid #6C63FF;">
         <h2 style="font-size:16px;color:#2D1B69;margin:0;font-weight:700;">Financial Tips</h2>
       </div>
       ${tipsHTML}
@@ -264,7 +262,7 @@ export function generateReportHTML(params: {
 
     <!-- Reflection -->
     ${reflectionAnswer ? `
-    <div style="margin-bottom:24px;padding:20px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border-radius:16px;border:1px solid #d0e0f0;">
+    <div style="margin-bottom:16px;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border-radius:16px;border:1px solid #d0e0f0;">
       <p style="font-size:11px;color:#888;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">YOUR REFLECTION</p>
       <p style="font-size:14px;color:#333;margin:0;line-height:1.6;">${reflectionAnswer}</p>
     </div>` : ''}

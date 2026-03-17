@@ -76,7 +76,7 @@ const SessionDetailModal = ({ session, open, onClose }: Props) => {
                     </TableCell>
                     <TableCell className="text-xs">{d.selectedOption}</TableCell>
                     <TableCell className={`text-right text-xs font-semibold ${d.score <= 20 ? 'text-destructive' : d.score >= 40 ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {d.score}/50
+                      {d.score}/{MAX_SCORE_PER_QUESTION}
                     </TableCell>
                   </TableRow>
                 ))}

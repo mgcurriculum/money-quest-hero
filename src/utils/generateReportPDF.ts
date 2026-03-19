@@ -1,5 +1,5 @@
-import type { QuestionItem } from '@/hooks/useQuestions';
-import { dimensions, dimensionIcons, MAX_SCORE_PER_QUESTION } from '@/data/questions';
+import type { QuestionItem } from "@/hooks/useQuestions";
+import { dimensions, dimensionIcons, MAX_SCORE_PER_QUESTION } from "@/data/questions";
 
 // Canonical dimension order for sorting
 const DIMENSION_ORDER = [...dimensions];
@@ -21,13 +21,10 @@ export interface DimensionScore {
   percentage: number;
 }
 
-export function extractQuestionsAndAnswers(
-  questions: QuestionItem[],
-  answers: { [idx: number]: number }
-): QAEntry[] {
+export function extractQuestionsAndAnswers(questions: QuestionItem[], answers: { [idx: number]: number }): QAEntry[] {
   return questions.map((q, idx) => {
     const score = answers[idx] || 0;
-    const selectedOpt = q.options.find(o => o.score === score);
+    const selectedOpt = q.options.find((o) => o.score === score);
     return {
       questionNo: q.questionNo,
       dimension: q.dimension,
@@ -41,7 +38,7 @@ export function extractQuestionsAndAnswers(
 
 export function getFinancialTips(dimScores: DimensionScore[]): string[] {
   const tips: string[] = [];
-  dimScores.forEach(ds => {
+  dimScores.forEach((ds) => {
     if (ds.percentage < 50) {
       tips.push(`${ds.dimension}: Needs improvement - focus on building better habits here.`);
     } else if (ds.percentage < 75) {
@@ -50,36 +47,36 @@ export function getFinancialTips(dimScores: DimensionScore[]): string[] {
       tips.push(`${ds.dimension}: Strong performance - you're doing great here!`);
     }
   });
-  tips.push('Create a monthly budget and review it every week to stay on track.');
-  tips.push('Open a dedicated savings account and automate a fixed monthly transfer.');
-  tips.push('Never share OTPs, PINs, or passwords - even with people claiming to be from your bank.');
+  tips.push("Create a monthly budget and review it every week to stay on track.");
+  tips.push("Open a dedicated savings account and automate a fixed monthly transfer.");
+  tips.push("Never share OTPs, PINs, or passwords - even with people claiming to be from your bank.");
   return tips;
 }
 
 function getScoreColor(percentage: number): string {
-  if (percentage >= 75) return '#2e7d32';
-  if (percentage >= 50) return '#f57c00';
-  return '#c62828';
+  if (percentage >= 75) return "#2e7d32";
+  if (percentage >= 50) return "#f57c00";
+  return "#c62828";
 }
 
 function getScoreBg(percentage: number): string {
-  if (percentage >= 75) return '#e8f5e9';
-  if (percentage >= 50) return '#fff3e0';
-  return '#ffebee';
+  if (percentage >= 75) return "#e8f5e9";
+  if (percentage >= 50) return "#fff3e0";
+  return "#ffebee";
 }
 
 function padQNo(n: number | undefined): string {
-  if (n === undefined || n === null) return 'Q--';
-  return `Q${n.toString().padStart(2, '0')}`;
+  if (n === undefined || n === null) return "Q--";
+  return `Q${n.toString().padStart(2, "0")}`;
 }
 
 const SHORT_TO_FULL: Record<string, string> = {
-  'Earning': 'Earning Mindset',
-  'Spending': 'Spending Behaviour',
-  'Saving': 'Saving Behaviour',
-  'Borrowing': 'Debt Awareness',
-  'Investing': 'Investment Awareness',
-  'Protecting': 'Financial Safety',
+  Earning: "Earning Mindset",
+  Spending: "Spending Behaviour",
+  Saving: "Saving Behaviour",
+  Borrowing: "Debt Awareness",
+  Investing: "Investment Awareness",
+  Protecting: "Financial Safety",
 };
 
 function normalizeDimension(dim: string): string {
@@ -111,14 +108,13 @@ export function generateReportHTML(params: {
   tips: string[];
   reflectionAnswer?: string;
 }): string {
-  const {
-    logoUrl, playerName, profileLabel, playerAge, totalScore, maxScore,
-    bandLevel, bandEmoji, bandMeaning, dimensionScores, questionsAndAnswers, tips, reflectionAnswer,
-  } = params;
+  const { logoUrl, playerName, profileLabel, playerAge, totalScore, maxScore, bandLevel, bandEmoji, bandMeaning, dimensionScores, questionsAndAnswers, tips, reflectionAnswer } = params;
 
   const scorePercent = Math.round((totalScore / maxScore) * 100);
 
-  const dimensionRows = dimensionScores.map(ds => `
+  const dimensionRows = dimensionScores
+    .map(
+      (ds) => `
     <div style="display:grid;grid-template-columns:minmax(180px,36%) minmax(0,1fr) 108px;column-gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #eee;">
       <div style="padding:0 16px;font-size:13px;color:#333;display:flex;align-items:center;min-width:0;">
         <span style="font-size:16px;margin-right:6px;flex-shrink:0;">${ds.icon}</span>
@@ -126,19 +122,21 @@ export function generateReportHTML(params: {
       </div>
       <div style="padding:0 4px;">
         <div style="background:#f0f0f0;border-radius:10px;height:14px;overflow:hidden;position:relative;">
-          <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${Math.min(ds.percentage, 100)}%;min-width:${ds.percentage > 0 ? '8px' : '0'};"></div>
+          <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6C63FF,#4FC3F7);width:${Math.min(ds.percentage, 100)}%;min-width:${ds.percentage > 0 ? "8px" : "0"};"></div>
         </div>
       </div>
       <div style="width:108px;display:flex;align-items:center;justify-content:center;">
-        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};display:flex;align-items:center;justify-content:center;height:34px;min-width:86px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:700;line-height:34px;white-space:nowrap;box-sizing:border-box;">${ds.percentage}%</span>
+        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};display:flex;align-items:center;justify-content:center;height:34px;min-width:86px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;box-sizing:border-box;">${ds.percentage}%</span>
       </div>
     </div>
-  `).join('');
+  `,
+    )
+    .join("");
 
   // Normalize, group, and sort Q&A by canonical dimension order, then by questionNo
-  const normalizedQA = questionsAndAnswers.map(qa => ({
+  const normalizedQA = questionsAndAnswers.map((qa) => ({
     ...qa,
-    dimension: normalizeDimension(qa.dimension || 'General'),
+    dimension: normalizeDimension(qa.dimension || "General"),
   }));
 
   const qaByDim: Record<string, QAEntry[]> = {};
@@ -146,7 +144,7 @@ export function generateReportHTML(params: {
   for (const dim of DIMENSION_ORDER) {
     qaByDim[dim] = [];
   }
-  normalizedQA.forEach(qa => {
+  normalizedQA.forEach((qa) => {
     const key = qa.dimension;
     if (!qaByDim[key]) qaByDim[key] = [];
     qaByDim[key].push(qa);
@@ -160,15 +158,18 @@ export function generateReportHTML(params: {
     if (qaByDim[key].length === 0) delete qaByDim[key];
   }
 
-  const qaHTML = Object.entries(qaByDim).map(([dim, qas]) => `
+  const qaHTML = Object.entries(qaByDim)
+    .map(
+      ([dim, qas]) => `
     <div class="qa-section" style="margin-bottom:20px;">
       <div class="section-title" style="font-size:13px;font-weight:700;color:#2D1B69;padding:10px 16px;background:linear-gradient(135deg,#f0ebff,#e8e0f0);border-radius:10px;margin-bottom:10px;letter-spacing:0.3px;page-break-after:avoid;">
         ${dim}
       </div>
-      ${qas.map(qa => {
-        const scoreColor = getScoreColor((qa.score / MAX_SCORE_PER_QUESTION) * 100);
-        const scoreBg = getScoreBg((qa.score / MAX_SCORE_PER_QUESTION) * 100);
-        return `
+      ${qas
+        .map((qa) => {
+          const scoreColor = getScoreColor((qa.score / MAX_SCORE_PER_QUESTION) * 100);
+          const scoreBg = getScoreBg((qa.score / MAX_SCORE_PER_QUESTION) * 100);
+          return `
         <div class="qa-card" style="padding:12px 16px;border-left:4px solid #6C63FF;margin-bottom:8px;background:#fafbfc;border-radius:0 10px 10px 0;">
           <table style="width:100%;border-collapse:collapse;">
             <tr>
@@ -189,16 +190,21 @@ export function generateReportHTML(params: {
             </tr>
           </table>
         </div>`;
-      }).join('')}
+        })
+        .join("")}
     </div>
-  `).join('');
+  `,
+    )
+    .join("");
 
-  const tipsHTML = tips.map((t, i) => {
-    return `
+  const tipsHTML = tips
+    .map((t, i) => {
+      return `
     <div class="tip-card" style="padding:10px 14px;background:#f8f6ff;border-radius:10px;margin-bottom:6px;font-size:12px;color:#333;line-height:1.5;border-left:4px solid #6C63FF;page-break-inside:avoid;break-inside:avoid;">
       <span style="font-weight:700;color:#4f46e5;margin-right:4px;">${i + 1}.</span> ${t}
     </div>`;
-  }).join('');
+    })
+    .join("");
 
   return `<!DOCTYPE html>
 <html>
@@ -224,9 +230,9 @@ export function generateReportHTML(params: {
     <div style="text-align:center;padding:32px 16px;background:linear-gradient(135deg,#2D1B69 0%,#1a103f 50%,#0f0a2e 100%);border-radius:20px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;width:100%;box-sizing:border-box;">
       <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
       <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,0.03);border-radius:50%;"></div>
-      ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:90px;height:auto;margin:0 auto 16px;display:block;opacity:0.95;" />` : ''}
+      ${logoUrl ? `<img src="${logoUrl}" alt="FinQuo Versity" style="width:90px;height:auto;margin:0 auto 16px;display:block;opacity:0.95;" />` : ""}
       <h1 style="margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-0.5px;">FQ Test Report</h1>
-      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;word-wrap:break-word;overflow-wrap:break-word;">${playerName}${playerAge ? ` | Age: ${playerAge}` : ''} | ${profileLabel}</p>
+      <p style="margin:0;opacity:0.65;font-size:13px;font-weight:400;word-wrap:break-word;overflow-wrap:break-word;">${playerName}${playerAge ? ` | Age: ${playerAge}` : ""} | ${profileLabel}</p>
     </div>
 
     <!-- Score Card -->
@@ -261,11 +267,15 @@ export function generateReportHTML(params: {
     </div>
 
     <!-- Reflection -->
-    ${reflectionAnswer ? `
+    ${
+      reflectionAnswer
+        ? `
     <div style="margin-bottom:16px;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border-radius:16px;border:1px solid #d0e0f0;">
       <p style="font-size:11px;color:#888;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">YOUR REFLECTION</p>
       <p style="font-size:14px;color:#333;margin:0;line-height:1.6;">${reflectionAnswer}</p>
-    </div>` : ''}
+    </div>`
+        : ""
+    }
 
     <!-- Footer -->
     <div style="text-align:center;padding:20px 16px;margin-top:8px;border-top:1px solid #eee;">
@@ -278,36 +288,36 @@ export function generateReportHTML(params: {
 }
 
 export async function downloadReportAsFile(html: string, filename: string) {
-  const html2pdf = (await import('html2pdf.js')).default;
+  const html2pdf = (await import("html2pdf.js")).default;
 
-  const parsed = new DOMParser().parseFromString(html, 'text/html');
-  const source = document.createElement('div');
-  source.style.width = '720px';
-  source.style.background = '#ffffff';
+  const parsed = new DOMParser().parseFromString(html, "text/html");
+  const source = document.createElement("div");
+  source.style.width = "720px";
+  source.style.background = "#ffffff";
   source.innerHTML = parsed.body.innerHTML;
 
-  const container = document.createElement('div');
-  container.style.position = 'fixed';
-  container.style.top = '0';
-  container.style.left = '0';
-  container.style.zIndex = '-9999';
-  container.style.pointerEvents = 'none';
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.top = "0";
+  container.style.left = "0";
+  container.style.zIndex = "-9999";
+  container.style.pointerEvents = "none";
   container.appendChild(source);
   document.body.appendChild(container);
 
-  const pdfFilename = filename.replace(/\.html$/i, '.pdf');
+  const pdfFilename = filename.replace(/\.html$/i, ".pdf");
 
-  await new Promise(r => setTimeout(r, 500));
+  await new Promise((r) => setTimeout(r, 500));
 
   try {
     await html2pdf()
       .set({
         margin: [4, 8, 4, 8],
         filename: pdfFilename,
-        image: { type: 'jpeg', quality: 0.98 },
+        image: { type: "jpeg", quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 720 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'], avoid: ['.qa-card', '.tip-card'] },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"], avoid: [".qa-card", ".tip-card"] },
       })
       .from(source)
       .save();
@@ -318,5 +328,5 @@ export async function downloadReportAsFile(html: string, filename: string) {
 
 // Legacy export for backward compat
 export function openPrintableReport(html: string) {
-  downloadReportAsFile(html, 'FQ-Test-Report.pdf');
+  downloadReportAsFile(html, "FQ-Test-Report.pdf");
 }

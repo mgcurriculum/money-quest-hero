@@ -5,6 +5,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { supabase } from '@/integrations/supabase/client';
 import { AGE_GROUPS, buildProfileCode } from '@/data/questions';
 import { User, Briefcase, GraduationCap, Home, Rocket, Laptop, Palmtree, CheckCircle2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import MuteButton from './MuteButton';
 import CountryCodePicker, { COUNTRIES, Country } from './CountryCodePicker';
 import finquoLogo from '@/assets/finquo-logo-white.png';

@@ -184,7 +184,7 @@ const PhoneVerificationScreen = () => {
   };
 
   return (
-    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
+    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12 relative">
       <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -206,7 +206,7 @@ const PhoneVerificationScreen = () => {
           </p>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 space-y-4">
+        <div className="glass-card rounded-2xl p-4 sm:p-6 space-y-4">
           {/* Phone input */}
           <div>
             <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">

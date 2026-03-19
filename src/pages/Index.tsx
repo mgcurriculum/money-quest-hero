@@ -4,6 +4,7 @@ import { useGame, useGameSafe } from '@/context/GameContext';
 import { GameProvider } from '@/context/GameContext';
 import WelcomeScreen from '@/components/game/WelcomeScreen';
 import ConsentScreen from '@/components/game/ConsentScreen';
+import PhoneVerificationScreen from '@/components/game/PhoneVerificationScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
 
 import QuestionPlay from '@/components/game/QuestionPlay';

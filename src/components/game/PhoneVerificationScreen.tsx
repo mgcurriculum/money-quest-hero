@@ -184,7 +184,7 @@ const PhoneVerificationScreen = () => {
   };
 
   return (
-    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
+    <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12 relative">
       <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}

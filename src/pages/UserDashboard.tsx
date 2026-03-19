@@ -295,7 +295,7 @@ const UserDashboard = () => {
                   value={otp}
                   onChange={e => { setOtp(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
                   placeholder="• • • • • •"
-                  className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-2xl tracking-[0.5em] text-center font-mono mb-3"
+                  className="w-full bg-game-surface text-game-text rounded-xl px-3 sm:px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-xl sm:text-2xl tracking-[0.3em] sm:tracking-[0.5em] text-center font-mono mb-3"
                 />
                 <div className="flex justify-between items-center mb-4">
                   <button

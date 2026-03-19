@@ -47,8 +47,8 @@ const GameFlow = () => {
   switch (state.step) {
     case 'welcome': return <WelcomeScreen />;
     case 'consent': return <ConsentScreen />;
+    case 'phone-verify': return <PhoneVerificationScreen />;
     case 'profile': return <ProfileScreen />;
-    
     case 'quiz': return <QuestionPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface Country {
   code: string;
@@ -57,16 +58,34 @@ interface CountryCodePickerProps {
 const CountryCodePicker = ({ selectedCountry, onSelect }: CountryCodePickerProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    setMounted(true);
+    const mql = window.matchMedia('(max-width: 767px)');
+    const handleViewportChange = () => setIsMobile(mql.matches);
+    handleViewportChange();
+    mql.addEventListener('change', handleViewportChange);
+    return () => mql.removeEventListener('change', handleViewportChange);
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setSearch('');
+      const target = e.target as Node;
+      if (
+        (dropdownRef.current && dropdownRef.current.contains(target)) ||
+        (panelRef.current && panelRef.current.contains(target))
+      ) {
+        return;
       }
+      setOpen(false);
+      setSearch('');
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -77,12 +96,82 @@ const CountryCodePicker = ({ selectedCountry, onSelect }: CountryCodePickerProps
     }
   }, [open]);
 
+  const searchText = search.toLowerCase().trim();
   const filtered = COUNTRIES.filter(
-    c =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.dial.includes(search) ||
-      c.code.toLowerCase().includes(search.toLowerCase())
+    c => c.name.toLowerCase().includes(searchText) || c.dial.includes(searchText) || c.code.toLowerCase().includes(searchText)
   );
+
+  const renderDropdownPanel = () => {
+    const panelContent = (
+      <>
+        <div className="p-2 border-b border-game-card">
+          <input
+            ref={searchRef}
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search country..."
+            className="w-full bg-game-card text-game-text rounded-lg px-3 py-2 text-xs font-body border-none focus:outline-none focus:ring-1 focus:ring-game-gold"
+          />
+        </div>
+        <div className="overflow-y-auto flex-1">
+          {filtered.map(country => (
+            <button
+              key={country.code}
+              type="button"
+              onClick={() => {
+                onSelect(country);
+                setOpen(false);
+                setSearch('');
+              }}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-body text-left transition-colors hover:bg-game-card ${
+                selectedCountry.code === country.code ? 'bg-game-card text-game-gold' : 'text-game-text'
+              }`}
+            >
+              <span className="text-base">{country.flag}</span>
+              <span className="flex-1 truncate">{country.name}</span>
+              <span className="text-game-muted">{country.dial}</span>
+            </button>
+          ))}
+          {filtered.length === 0 && (
+            <p className="text-game-muted text-xs text-center py-3">No results</p>
+          )}
+        </div>
+      </>
+    );
+
+    if (isMobile && mounted) {
+      return createPortal(
+        <div className="fixed inset-0 z-[9999]">
+          <button
+            type="button"
+            aria-label="Close country picker"
+            onClick={() => {
+              setOpen(false);
+              setSearch('');
+            }}
+            className="absolute inset-0 bg-game-bg/70"
+          />
+          <div
+            ref={panelRef}
+            className="absolute inset-x-3 top-[max(4rem,env(safe-area-inset-top))] bottom-[max(1rem,env(safe-area-inset-bottom))] bg-game-surface border border-game-card rounded-2xl shadow-xl max-h-[80vh] overflow-hidden flex flex-col"
+          >
+            {panelContent}
+          </div>
+        </div>,
+        document.body
+      );
+    }
+
+    return (
+      <div
+        ref={panelRef}
+        className="absolute top-full left-0 mt-1 w-64 max-w-64 bg-game-surface border border-game-card rounded-xl shadow-xl z-[9999] max-h-60 overflow-hidden flex flex-col"
+      >
+        {panelContent}
+      </div>
+    );
+  };
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -96,43 +185,7 @@ const CountryCodePicker = ({ selectedCountry, onSelect }: CountryCodePickerProps
         <span className="text-[10px] text-game-muted">▼</span>
       </button>
 
-      {open && (
-        <div className="fixed inset-x-3 top-[max(4rem,env(safe-area-inset-top))] bottom-[max(1rem,env(safe-area-inset-bottom))] md:absolute md:inset-auto md:top-full md:left-0 md:mt-1 md:w-64 md:max-w-64 md:bottom-auto bg-game-surface border border-game-card rounded-xl shadow-xl z-[9999] max-h-[70vh] md:max-h-60 overflow-hidden flex flex-col">
-          <div className="p-2 border-b border-game-card">
-            <input
-              ref={searchRef}
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search country..."
-              className="w-full bg-game-card text-game-text rounded-lg px-3 py-2 text-xs font-body border-none focus:outline-none focus:ring-1 focus:ring-game-gold"
-            />
-          </div>
-          <div className="overflow-y-auto flex-1">
-            {filtered.map(country => (
-              <button
-                key={country.code}
-                type="button"
-                onClick={() => {
-                  onSelect(country);
-                  setOpen(false);
-                  setSearch('');
-                }}
-                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-body text-left transition-colors hover:bg-game-card ${
-                  selectedCountry.code === country.code ? 'bg-game-card text-game-gold' : 'text-game-text'
-                }`}
-              >
-                <span className="text-base">{country.flag}</span>
-                <span className="flex-1 truncate">{country.name}</span>
-                <span className="text-game-muted">{country.dial}</span>
-              </button>
-            ))}
-            {filtered.length === 0 && (
-              <p className="text-game-muted text-xs text-center py-3">No results</p>
-            )}
-          </div>
-        </div>
-      )}
+      {open && renderDropdownPanel()}
     </div>
   );
 };

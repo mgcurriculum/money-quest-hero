@@ -60,7 +60,7 @@ const ConsentScreen = () => {
 
         <button
           disabled={!canProceed}
-          onClick={() => { stop(); dispatch({ type: 'SET_CONSENT', value: true }); dispatch({ type: 'SET_STEP', step: 'profile' }); }}
+          onClick={() => { stop(); dispatch({ type: 'SET_CONSENT', value: true }); dispatch({ type: 'SET_STEP', step: 'phone-verify' }); }}
           className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${canProceed ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95' : 'bg-game-card text-game-muted cursor-not-allowed'}`}
         >
           Continue →

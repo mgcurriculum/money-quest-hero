@@ -4,6 +4,7 @@ import { useGame, useGameSafe } from '@/context/GameContext';
 import { GameProvider } from '@/context/GameContext';
 import WelcomeScreen from '@/components/game/WelcomeScreen';
 import ConsentScreen from '@/components/game/ConsentScreen';
+import PhoneVerificationScreen from '@/components/game/PhoneVerificationScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
 
 import QuestionPlay from '@/components/game/QuestionPlay';
@@ -47,8 +48,8 @@ const GameFlow = () => {
   switch (state.step) {
     case 'welcome': return <WelcomeScreen />;
     case 'consent': return <ConsentScreen />;
+    case 'phone-verify': return <PhoneVerificationScreen />;
     case 'profile': return <ProfileScreen />;
-    
     case 'quiz': return <QuestionPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;

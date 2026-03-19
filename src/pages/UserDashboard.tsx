@@ -215,8 +215,8 @@ const UserDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen game-gradient px-4 py-8">
-      <div className="max-w-lg mx-auto">
+    <div className="min-h-screen game-gradient px-3 sm:px-4 py-6 sm:py-8">
+      <div className="max-w-lg mx-auto w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => navigate('/')} className="text-game-muted hover:text-game-text transition-colors">

@@ -97,7 +97,7 @@ const CountryCodePicker = ({ selectedCountry, onSelect }: CountryCodePickerProps
       </button>
 
       {open && (
-        <div className="fixed inset-x-4 top-1/4 bottom-4 sm:absolute sm:inset-auto sm:top-full sm:left-0 sm:mt-1 sm:w-64 sm:max-w-64 sm:bottom-auto bg-game-surface border border-game-card rounded-xl shadow-xl z-[9999] sm:max-h-60 overflow-hidden flex flex-col">
+        <div className="fixed inset-x-3 top-[max(4rem,env(safe-area-inset-top))] bottom-[max(1rem,env(safe-area-inset-bottom))] md:absolute md:inset-auto md:top-full md:left-0 md:mt-1 md:w-64 md:max-w-64 md:bottom-auto bg-game-surface border border-game-card rounded-xl shadow-xl z-[9999] max-h-[70vh] md:max-h-60 overflow-hidden flex flex-col">
           <div className="p-2 border-b border-game-card">
             <input
               ref={searchRef}

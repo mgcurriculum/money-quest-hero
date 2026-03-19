@@ -5,6 +5,7 @@ import { useNarration } from '@/hooks/useNarration';
 import { supabase } from '@/integrations/supabase/client';
 import { AGE_GROUPS, buildProfileCode } from '@/data/questions';
 import { User, Briefcase, GraduationCap, Home, Rocket, Laptop, Palmtree, CheckCircle2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import MuteButton from './MuteButton';
 import CountryCodePicker, { COUNTRIES, Country } from './CountryCodePicker';
 import finquoLogo from '@/assets/finquo-logo-white.png';
@@ -110,6 +111,23 @@ const ProfileScreen = () => {
     setOtpError('');
     setOtpSending(true);
     try {
+      // Check if phone number is already registered
+      const { data: existingSessions } = await supabase
+        .from('game_sessions')
+        .select('id')
+        .eq('player_phone', fullPhone)
+        .limit(1);
+
+      if (existingSessions && existingSessions.length > 0) {
+        toast({
+          title: "Number already registered",
+          description: "This number is already registered. You can retake the test by visiting the 'My Profile & History' page.",
+          variant: "destructive",
+        });
+        setOtpSending(false);
+        return;
+      }
+
       const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
         body: { phone: fullPhone },
       });

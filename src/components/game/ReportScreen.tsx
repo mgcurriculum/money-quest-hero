@@ -201,7 +201,10 @@ const ReportScreen = () => {
     if (platform === 'whatsapp') {
       window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
     } else if (platform === 'facebook') {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(fbText)}`, '_blank');
+      navigator.clipboard.writeText(fbText).then(() => {
+        alert('Your detailed score has been copied to clipboard! 📋\nPaste it in your Facebook post.');
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}`, '_blank');
+      });
     } else if (platform === 'instagram') {
       const instaText = `🏆 My FQ Test Results\n\n👤 Name: ${state.profile.name}\n🎂 Age: ${state.profile.age}\n⚧ Gender: ${state.profile.gender}\n💼 ${state.profile.roleLabel || state.profile.role}\n📍 ${[state.profile.district, state.profile.state, state.profile.country].filter(Boolean).join(', ')}\n🎯 Profile: ${profileLabel}\n\n📊 Score: ${totalScore}/${MAX_SCORE} (${scorePercent}%)\n🎖️ ${band.emoji} ${band.level}\n\n${dimScores.map(ds => `${ds.icon} ${ds.dimension}: ${ds.percentage}%`).join('\n')}\n\n${band.meaning}\n\nTake your FQ Test: ${appUrl}\n\n#FQTest #FinQuoVersity #FinancialLiteracy #MoneySmarts`;
       navigator.clipboard.writeText(instaText);

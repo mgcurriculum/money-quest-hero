@@ -110,6 +110,23 @@ const ProfileScreen = () => {
     setOtpError('');
     setOtpSending(true);
     try {
+      // Check if phone number is already registered
+      const { data: existingSessions } = await supabase
+        .from('game_sessions')
+        .select('id')
+        .eq('player_phone', fullPhone)
+        .limit(1);
+
+      if (existingSessions && existingSessions.length > 0) {
+        toast({
+          title: "Number already registered",
+          description: "This number is already registered. You can retake the test by visiting the 'My Profile & History' page.",
+          variant: "destructive",
+        });
+        setOtpSending(false);
+        return;
+      }
+
       const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
         body: { phone: fullPhone },
       });

@@ -245,7 +245,7 @@ const UserDashboard = () => {
 
         {/* Phone + OTP Flow */}
         {otpStep !== 'verified' && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-2xl p-5 mb-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-2xl p-4 sm:p-5 mb-6 overflow-hidden">
             {otpStep === 'phone' && (
               <>
                 <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-2 block">

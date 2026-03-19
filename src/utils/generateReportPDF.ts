@@ -126,7 +126,7 @@ export function generateReportHTML(params: {
         </div>
       </div>
       <div style="width:108px;display:flex;align-items:center;justify-content:center;">
-        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};display:flex;align-items:center;justify-content:center;height:34px;min-width:86px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;box-sizing:border-box;">${ds.percentage}%</span>
+        <span style="color:${getScoreColor(ds.percentage)};background:${getScoreBg(ds.percentage)};display:flex;align-items:center;justify-content:center;height:34px;min-width:86px;border-radius:999px;padding-bottom:12px;font-size:12px;font-weight:700;white-space:nowrap;box-sizing:border-box;">${ds.percentage}%</span>
       </div>
     </div>
   `,

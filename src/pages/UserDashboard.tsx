@@ -215,8 +215,8 @@ const UserDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen game-gradient px-4 py-8">
-      <div className="max-w-lg mx-auto">
+    <div className="min-h-screen game-gradient px-3 sm:px-4 py-6 sm:py-8">
+      <div className="max-w-lg mx-auto w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => navigate('/')} className="text-game-muted hover:text-game-text transition-colors">
@@ -245,20 +245,22 @@ const UserDashboard = () => {
 
         {/* Phone + OTP Flow */}
         {otpStep !== 'verified' && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-2xl p-5 mb-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-2xl p-4 sm:p-5 mb-6 overflow-hidden">
             {otpStep === 'phone' && (
               <>
                 <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-2 block">
                   <Phone size={12} className="inline mr-1" /> Enter your registered phone number
                 </label>
                 <div className="flex gap-2 mb-3">
-                  <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
+                  <div className="flex-shrink-0">
+                    <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
+                  </div>
                   <input
                     type="tel"
                     value={phone}
                     onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
                     placeholder="9876543210"
-                    className="flex-1 bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+                    className="flex-1 min-w-0 bg-game-surface text-game-text rounded-xl px-3 sm:px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-sm sm:text-base"
                     onKeyDown={e => e.key === 'Enter' && handleSendOtp()}
                   />
                 </div>
@@ -293,7 +295,7 @@ const UserDashboard = () => {
                   value={otp}
                   onChange={e => { setOtp(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
                   placeholder="• • • • • •"
-                  className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-2xl tracking-[0.5em] text-center font-mono mb-3"
+                  className="w-full bg-game-surface text-game-text rounded-xl px-3 sm:px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-xl sm:text-2xl tracking-[0.3em] sm:tracking-[0.5em] text-center font-mono mb-3"
                 />
                 <div className="flex justify-between items-center mb-4">
                   <button

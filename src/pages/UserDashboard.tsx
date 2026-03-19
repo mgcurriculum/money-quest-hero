@@ -252,13 +252,15 @@ const UserDashboard = () => {
                   <Phone size={12} className="inline mr-1" /> Enter your registered phone number
                 </label>
                 <div className="flex gap-2 mb-3">
-                  <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
+                  <div className="flex-shrink-0">
+                    <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
+                  </div>
                   <input
                     type="tel"
                     value={phone}
                     onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
                     placeholder="9876543210"
-                    className="flex-1 bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors"
+                    className="flex-1 min-w-0 bg-game-surface text-game-text rounded-xl px-3 sm:px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-sm sm:text-base"
                     onKeyDown={e => e.key === 'Enter' && handleSendOtp()}
                   />
                 </div>

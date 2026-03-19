@@ -299,12 +299,12 @@ const ReportScreen = () => {
         </motion.div>
 
         {/* Download & Send Email */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="grid grid-cols-2 gap-3 mb-5 print:hidden">
-          <button onClick={handleDownloadPDF} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <Download size={16} /> Download Report
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5 print:hidden">
+          <button onClick={handleDownloadPDF} className="py-3 px-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <Download size={16} className="flex-shrink-0" /> Download Report
           </button>
-          <button onClick={() => setEmailOpen(true)} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <Mail size={16} /> Send to Email
+          <button onClick={() => setEmailOpen(true)} className="py-3 px-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <Mail size={16} className="flex-shrink-0" /> Send to Email
           </button>
         </motion.div>
 

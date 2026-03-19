@@ -4,10 +4,9 @@ import { useGame, PlayerProfile } from '@/context/GameContext';
 import { useNarration } from '@/hooks/useNarration';
 import { supabase } from '@/integrations/supabase/client';
 import { AGE_GROUPS, buildProfileCode } from '@/data/questions';
-import { User, Briefcase, GraduationCap, Home, Rocket, Laptop, Palmtree, CheckCircle2 } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Home, Rocket, Laptop, Palmtree } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import MuteButton from './MuteButton';
-import CountryCodePicker, { COUNTRIES, Country } from './CountryCodePicker';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 
 const NARRATION_TEXTS = [
@@ -36,36 +35,17 @@ const ProfileScreen = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading, speak, stop } = useNarration(state.isMuted);
   const hasNarrated = useRef<number>(-1);
-  // Derive initial phone digits by stripping country dial code
   const existingProfile = state.profile;
-  const matchedCountry = COUNTRIES.find(c => c.name === existingProfile.country) || COUNTRIES[0];
-  const initialPhone = existingProfile.phone
-    ? existingProfile.phone.replace(matchedCountry.dial, '')
-    : '';
 
   const isRetake = existingProfile.name.trim().length > 0 && existingProfile.age > 0;
   const [step, setStep] = useState(isRetake ? 1 : 0);
   const [name, setName] = useState(existingProfile.name || '');
   const [age, setAge] = useState(existingProfile.age > 0 ? String(existingProfile.age) : '');
   const [gender, setGender] = useState(existingProfile.gender || '');
-  const [phone, setPhone] = useState(initialPhone);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState(isRetake ? (getAgeGroup(existingProfile.age) || '') : '');
-  const [selectedCountry, setSelectedCountry] = useState<Country>(matchedCountry);
   const [campaignCode, setCampaignCode] = useState(state.campaignCode || '');
   const [campaignCodeError, setCampaignCodeError] = useState('');
   const [validatingCode, setValidatingCode] = useState(false);
-
-  // OTP inline state — auto-verified on retake
-  const [otpStep, setOtpStep] = useState<'idle' | 'sent' | 'verified'>(
-    state.phoneVerified ? 'verified' : 'idle'
-  );
-  const [otp, setOtp] = useState('');
-  const [otpSending, setOtpSending] = useState(false);
-  const [otpVerifying, setOtpVerifying] = useState(false);
-  const [otpError, setOtpError] = useState('');
-  const [resendTimer, setResendTimer] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
-
 
   useEffect(() => {
     if (!state.isMuted && hasNarrated.current !== step) {
@@ -75,114 +55,9 @@ const ProfileScreen = () => {
     }
   }, [state.isMuted, speak, step]);
 
-  useEffect(() => {
-    if (otpStep !== 'idle' && otpStep !== 'verified') {
-      setOtpStep('idle');
-      setOtp('');
-      setOtpError('');
-      setResendTimer(0);
-      if (timerRef.current) clearInterval(timerRef.current);
-    }
-  }, [phone, selectedCountry]);
-
   const ageNum = parseInt(age, 10);
   const isValidAge = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 120;
-  const phoneDigits = phone.replace(/[^\d]/g, '');
-  const isPhoneValid = phoneDigits.length >= 10;
-  const canProceedStep0 = (isRetake || name.trim().length > 0) && isValidAge && otpStep === 'verified';
-
-  const fullPhone = selectedCountry.dial + phone;
-
-  const startResendTimer = () => {
-    setResendTimer(30);
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setResendTimer(prev => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const handleSendOTP = async () => {
-    setOtpError('');
-    setOtpSending(true);
-    try {
-      // Check if phone number is already registered
-      const { data: existingSessions } = await supabase
-        .from('game_sessions')
-        .select('id')
-        .eq('player_phone', fullPhone)
-        .limit(1);
-
-      if (existingSessions && existingSessions.length > 0) {
-        toast({
-          title: "Number already registered",
-          description: "This number is already registered. You can retake the test by visiting the 'My Profile & History' page.",
-          variant: "destructive",
-        });
-        setOtpSending(false);
-        return;
-      }
-
-      const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
-        body: { phone: fullPhone },
-      });
-      if (fnError || data?.error) {
-        throw new Error(data?.error || fnError?.message || 'Failed to send OTP');
-      }
-      setOtpStep('sent');
-      startResendTimer();
-    } catch (err: any) {
-      setOtpError(err.message || 'Failed to send OTP');
-    } finally {
-      setOtpSending(false);
-    }
-  };
-
-  const handleVerifyOTP = async () => {
-    setOtpError('');
-    if (otp.length !== 6) {
-      setOtpError('Please enter the 6-digit OTP');
-      return;
-    }
-    setOtpVerifying(true);
-    try {
-      const { data, error: fnError } = await supabase.functions.invoke('verify-otp', {
-        body: { phone: fullPhone, otp },
-      });
-      if (fnError) {
-        let errMsg = 'Verification failed. Please try again.';
-        const maybeContext = (fnError as any)?.context;
-        if (maybeContext instanceof Response) {
-          const body = await maybeContext.json().catch(() => null);
-          errMsg = body?.error || errMsg;
-        }
-        setOtpError(errMsg);
-        return;
-      }
-      if (data?.verified) {
-        setOtpStep('verified');
-        dispatch({ type: 'SET_PHONE_VERIFIED', verified: true });
-        return;
-      }
-      setOtpError(data?.error || 'Incorrect OTP. Please try again.');
-    } catch (err: any) {
-      setOtpError(err.message || 'Verification failed');
-    } finally {
-      setOtpVerifying(false);
-    }
-  };
-
-  const handleResend = async () => {
-    if (resendTimer > 0) return;
-    setOtp('');
-    setOtpError('');
-    await handleSendOTP();
-  };
+  const canProceedStep0 = (isRetake || name.trim().length > 0) && isValidAge;
 
   const handleStep0Next = async () => {
     stop();
@@ -220,8 +95,8 @@ const ProfileScreen = () => {
       age: ageNum,
       ageGroup: selectedAgeGroup,
       gender,
-      phone: fullPhone,
-      country: selectedCountry.name,
+      phone: existingProfile.phone,
+      country: existingProfile.country,
       state: '',
       district: '',
       role: roleCode,
@@ -305,85 +180,9 @@ const ProfileScreen = () => {
             {isRetake && (
               <div className="text-center py-2">
                 <p className="text-game-text font-body text-sm">Welcome back, <span className="text-game-gold font-semibold">{name}</span>!</p>
-                <p className="text-game-muted text-xs mt-1">Please verify your phone number to continue.</p>
+                <p className="text-game-muted text-xs mt-1">Select your role to continue.</p>
               </div>
             )}
-
-            {/* Phone + inline OTP */}
-            <div>
-              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">
-                Phone Number <span className="text-game-gold">*</span>
-                {otpStep === 'verified' && (
-                  <span className="inline-flex items-center gap-1 ml-2 text-green-400 normal-case tracking-normal">
-                    <CheckCircle2 size={14} /> Verified
-                  </span>
-                )}
-              </label>
-              <div className="flex gap-2">
-                <CountryCodePicker selectedCountry={selectedCountry} onSelect={setSelectedCountry} />
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
-                  placeholder="9876543210"
-                  disabled={false}
-                  className="flex-1 min-w-0 bg-game-surface text-game-text rounded-xl px-3 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors disabled:opacity-60"
-                />
-              </div>
-              {isPhoneValid && otpStep === 'idle' && (
-                <button
-                  onClick={handleSendOTP}
-                  disabled={otpSending}
-                  className="w-full mt-2 px-4 py-3 rounded-xl text-sm font-display font-semibold gold-gradient text-white hover:scale-105 active:scale-95 transition-all disabled:opacity-60"
-                >
-                  {otpSending ? 'Sending…' : 'Send OTP'}
-                </button>
-              )}
-
-              {/* OTP input area */}
-              {otpStep === 'sent' && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="mt-3 space-y-2"
-                >
-                  <label className="text-game-muted text-xs font-body uppercase tracking-wider block">Enter OTP</label>
-                  <div className="flex flex-col gap-2">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={6}
-                      value={otp}
-                      onChange={e => { setOtp(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
-                      placeholder="• • • • • •"
-                      className="w-full bg-game-surface text-game-text rounded-xl px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-xl tracking-[0.4em] text-center font-mono"
-                    />
-                    <button
-                      onClick={handleVerifyOTP}
-                      disabled={otp.length !== 6 || otpVerifying}
-                      className={`w-full px-4 py-3 rounded-xl text-sm font-display font-semibold transition-all ${
-                        otp.length === 6
-                          ? 'gold-gradient text-white hover:scale-105 active:scale-95'
-                          : 'bg-game-card text-game-muted cursor-not-allowed'
-                      }`}
-                    >
-                      {otpVerifying ? 'Verifying…' : 'Verify OTP'}
-                    </button>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <button
-                      onClick={handleResend}
-                      disabled={resendTimer > 0 || otpSending}
-                      className={`text-xs font-body ${resendTimer > 0 ? 'text-game-muted' : 'text-game-gold hover:underline'}`}
-                    >
-                      {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-
-              {otpError && <p className="text-red-400 text-xs mt-1">{otpError}</p>}
-            </div>
 
             <div>
               <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">Campaign Code (optional)</label>
@@ -430,7 +229,7 @@ const ProfileScreen = () => {
             </button>
           )}
           <button
-            onClick={() => { stop(); step === 0 ? dispatch({ type: 'SET_STEP', step: 'consent' }) : setStep(step - 1); }}
+            onClick={() => { stop(); step === 0 ? dispatch({ type: 'SET_STEP', step: 'phone-verify' }) : setStep(step - 1); }}
             className="w-full py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"
           >
             ← Back

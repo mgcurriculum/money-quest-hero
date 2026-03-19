@@ -284,14 +284,14 @@ const ReportScreen = () => {
         {/* Social Sharing */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="glass-card rounded-2xl p-4 mb-5 text-center print:hidden">
           <p className="text-game-text font-display font-semibold text-sm mb-3 flex items-center justify-center gap-1.5"><Share2 size={14} /> Share Your Results</p>
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
             {[
               { name: 'whatsapp', icon: <MessageCircle size={14} />, label: 'WhatsApp', color: 'bg-green-600' },
               { name: 'facebook', icon: <Facebook size={14} />, label: 'Facebook', color: 'bg-blue-600' },
               { name: 'instagram', icon: <Instagram size={14} />, label: 'Instagram', color: 'bg-pink-600' },
             ].map(p => (
               <button key={p.name} onClick={() => handleShare(p.name)}
-                className={`${p.color} text-white px-4 py-2 rounded-xl font-body text-xs font-semibold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-transform`}>
+                className={`${p.color} text-white px-3 sm:px-4 py-2 rounded-xl font-body text-xs font-semibold flex items-center gap-1 sm:gap-1.5 hover:scale-105 active:scale-95 transition-transform`}>
                 {p.icon} {p.label}
               </button>
             ))}
@@ -299,12 +299,12 @@ const ReportScreen = () => {
         </motion.div>
 
         {/* Download & Send Email */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="grid grid-cols-2 gap-3 mb-5 print:hidden">
-          <button onClick={handleDownloadPDF} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <Download size={16} /> Download Report
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5 print:hidden">
+          <button onClick={handleDownloadPDF} className="py-3 px-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <Download size={16} className="flex-shrink-0" /> Download Report
           </button>
-          <button onClick={() => setEmailOpen(true)} className="py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <Mail size={16} /> Send to Email
+          <button onClick={() => setEmailOpen(true)} className="py-3 px-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <Mail size={16} className="flex-shrink-0" /> Send to Email
           </button>
         </motion.div>
 

@@ -206,7 +206,7 @@ const PhoneVerificationScreen = () => {
           </p>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 space-y-4">
+        <div className="glass-card rounded-2xl p-4 sm:p-6 space-y-4">
           {/* Phone input */}
           <div>
             <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">

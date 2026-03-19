@@ -36,9 +36,12 @@ const AdminLayout = () => {
     <div className="min-h-screen flex bg-background">
       {/* Sidebar */}
       <aside className="w-64 border-r bg-card flex flex-col">
-        <div className="p-4 border-b">
-          <h2 className="font-display text-lg font-bold text-primary">Finance Quest</h2>
-          <p className="text-xs text-muted-foreground">Admin Panel</p>
+        <div className="p-4 border-b flex items-center gap-2">
+          <img src="/favicon.png" alt="FinQuo Versity" className="w-8 h-8" />
+          <div>
+            <h2 className="font-display text-sm font-bold text-primary">FinQuo Versity</h2>
+            <p className="text-xs text-muted-foreground">Admin Panel</p>
+          </div>
         </div>
         <nav className="flex-1 p-2 space-y-1">
           {navItems.map(item => {

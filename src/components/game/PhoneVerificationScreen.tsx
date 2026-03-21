@@ -15,6 +15,7 @@ const PhoneVerificationScreen = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading } = useNarration(state.isMuted);
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
@@ -27,6 +28,8 @@ const PhoneVerificationScreen = () => {
   const fullPhone = selectedCountry.dial + phone;
   const phoneDigits = phone.replace(/[^\d]/g, '');
   const isPhoneValid = phoneDigits.length >= 10;
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const isFormValid = isPhoneValid && isEmailValid;
 
   // Reset OTP state when phone/country changes
   useEffect(() => {
@@ -59,10 +62,14 @@ const PhoneVerificationScreen = () => {
       setError('Please enter a valid phone number');
       return;
     }
+    if (!isEmailValid) {
+      setError('Please enter a valid email address');
+      return;
+    }
     setSending(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
-        body: { phone: fullPhone },
+        body: { phone: fullPhone, email: email.trim() },
       });
       if (fnError || data?.error) {
         throw new Error(data?.error || fnError?.message || 'Failed to send OTP');
@@ -201,8 +208,8 @@ const PhoneVerificationScreen = () => {
           </h2>
           <p className="text-game-muted text-sm font-body">
             {step === 'phone'
-              ? "Enter your phone number to get started"
-              : `We sent a 6-digit code to ${fullPhone}`}
+              ? "Enter your phone number and email to get started"
+              : "Enter the OTP sent to your mobile number and email. Both OTPs are the same."}
           </p>
         </div>
 
@@ -222,10 +229,23 @@ const PhoneVerificationScreen = () => {
                 disabled={step === 'otp'}
                 className="flex-1 min-w-0 bg-game-surface text-game-text rounded-xl px-3 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors disabled:opacity-60"
               />
+              </div>
             </div>
-          </div>
 
-          {/* OTP input */}
+            {/* Email input */}
+            <div>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">
+                Email Address <span className="text-game-gold">*</span>
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                disabled={step === 'otp'}
+                className="w-full bg-game-surface text-game-text rounded-xl px-3 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors disabled:opacity-60"
+              />
+            </div>
           {step === 'otp' && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -266,10 +286,10 @@ const PhoneVerificationScreen = () => {
         <div className="mt-6 space-y-3">
           {step === 'phone' ? (
             <button
-              disabled={!isPhoneValid || sending}
+              disabled={!isFormValid || sending}
               onClick={handleSendOTP}
               className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${
-                isPhoneValid
+                isFormValid
                   ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95'
                   : 'bg-game-card text-game-muted cursor-not-allowed'
               }`}

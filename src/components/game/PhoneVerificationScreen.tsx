@@ -229,10 +229,23 @@ const PhoneVerificationScreen = () => {
                 disabled={step === 'otp'}
                 className="flex-1 min-w-0 bg-game-surface text-game-text rounded-xl px-3 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors disabled:opacity-60"
               />
+              </div>
             </div>
-          </div>
 
-          {/* OTP input */}
+            {/* Email input */}
+            <div>
+              <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">
+                Email Address <span className="text-game-gold">*</span>
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                disabled={step === 'otp'}
+                className="w-full bg-game-surface text-game-text rounded-xl px-3 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors disabled:opacity-60"
+              />
+            </div>
           {step === 'otp' && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}

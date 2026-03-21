@@ -69,10 +69,11 @@ const UserDashboard = () => {
       setOtpError('Please enter a valid email address');
       return;
     }
+    setOtpError('');
     setSending(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
-        body: { phone: fullPhone },
+        body: { phone: fullPhone, email: trimmedEmail },
       });
       if (fnError || data?.error) {
         throw new Error(data?.error || fnError?.message || 'Failed to send OTP');

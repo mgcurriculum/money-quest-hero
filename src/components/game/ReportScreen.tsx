@@ -195,18 +195,8 @@ const ReportScreen = () => {
 
   const whatsappText = `🏆 *My FQ Test Results*\n\n${profileInfo}\n\n📊 Score: ${totalScore}/${MAX_SCORE} (${scorePercent}%)\n🎖️ Level: ${band.emoji} ${band.level}\n\n📈 *Dimension Scores:*\n${dimScores.map(ds => `${ds.icon} ${ds.dimension}: ${ds.percentage}%`).join('\n')}\n\n💡 ${band.meaning}\n\n🔗 Take your FQ Test now:\n${appUrl}\n\n_Powered by FinQuo Versity_`;
 
-  const fbText = `🏆 I just took the FQ Test by FinQuo Versity!\n\n👤 Name: ${state.profile.name} | Age: ${state.profile.age} | ${state.profile.roleLabel || state.profile.role}\n\n📊 My Score: ${totalScore}/${MAX_SCORE} (${scorePercent}%)\n🎖️ Level: ${band.emoji} ${band.level}\n\n${band.meaning}\n\nDiscover your Financial Quotient — Take the free FQ Test!\n${appUrl}`;
-
-  const handleShare = (platform: string) => {
-    if (platform === 'whatsapp') {
-      window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
-    } else if (platform === 'facebook') {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(fbText)}`, '_blank');
-    } else if (platform === 'instagram') {
-      const instaText = `🏆 My FQ Test Results\n\n👤 Name: ${state.profile.name}\n🎂 Age: ${state.profile.age}\n⚧ Gender: ${state.profile.gender}\n💼 ${state.profile.roleLabel || state.profile.role}\n📍 ${[state.profile.district, state.profile.state, state.profile.country].filter(Boolean).join(', ')}\n🎯 Profile: ${profileLabel}\n\n📊 Score: ${totalScore}/${MAX_SCORE} (${scorePercent}%)\n🎖️ ${band.emoji} ${band.level}\n\n${dimScores.map(ds => `${ds.icon} ${ds.dimension}: ${ds.percentage}%`).join('\n')}\n\n${band.meaning}\n\nTake your FQ Test: ${appUrl}\n\n#FQTest #FinQuoVersity #FinancialLiteracy #MoneySmarts`;
-      navigator.clipboard.writeText(instaText);
-      alert('Detailed score copied to clipboard! Paste it on your Instagram Story 📸');
-    }
+  const handleShare = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
   };
 
   return (
@@ -285,7 +275,7 @@ const ReportScreen = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="glass-card rounded-2xl p-4 mb-5 text-center print:hidden">
           <p className="text-game-text font-display font-semibold text-sm mb-3 flex items-center justify-center gap-1.5"><Share2 size={14} /> Share Your Results</p>
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-            <button onClick={() => handleShare('whatsapp')}
+            <button onClick={handleShare}
               className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-xl font-body text-xs font-semibold flex items-center gap-1 sm:gap-1.5 hover:scale-105 active:scale-95 transition-transform">
               <MessageCircle size={14} /> WhatsApp
             </button>

@@ -30,6 +30,8 @@ type OtpStep = 'phone' | 'otp' | 'verified';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const verifiedPhoneFromState = (location.state as any)?.verifiedPhone as string | undefined;
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);

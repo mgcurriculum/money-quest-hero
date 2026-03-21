@@ -297,9 +297,9 @@ const UserDashboard = () => {
                     <ShieldCheck size={24} className="text-game-gold" />
                   </div>
                   <p className="text-game-text font-body text-sm">
-                    We sent a 6-digit code to
+                    Enter the OTP sent to your mobile number and email. Both OTPs are the same.
                   </p>
-                  <p className="text-game-gold font-display font-semibold text-sm">{fullPhone}</p>
+                  <p className="text-game-gold font-display font-semibold text-sm mt-1">{fullPhone}</p>
                 </div>
                 <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-1 block">
                   Enter OTP

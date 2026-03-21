@@ -6,7 +6,7 @@ import WelcomeScreen from '@/components/game/WelcomeScreen';
 import ConsentScreen from '@/components/game/ConsentScreen';
 import PhoneVerificationScreen from '@/components/game/PhoneVerificationScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
-
+import ExistingUserScreen from '@/components/game/ExistingUserScreen';
 import QuestionPlay from '@/components/game/QuestionPlay';
 import ReflectionScreen from '@/components/game/ReflectionScreen';
 import ReportScreen from '@/components/game/ReportScreen';
@@ -50,6 +50,7 @@ const GameFlow = () => {
     case 'consent': return <ConsentScreen />;
     case 'phone-verify': return <PhoneVerificationScreen />;
     case 'profile': return <ProfileScreen />;
+    case 'existing-user': return <ExistingUserScreen />;
     case 'quiz': return <QuestionPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;

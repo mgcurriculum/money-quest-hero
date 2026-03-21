@@ -15,7 +15,7 @@ export interface PlayerProfile {
 }
 
 export interface GameState {
-  step: 'welcome' | 'consent' | 'profile' | 'phone-verify' | 'quiz' | 'reflection' | 'report';
+  step: 'welcome' | 'consent' | 'profile' | 'phone-verify' | 'existing-user' | 'quiz' | 'reflection' | 'report';
   phoneVerified: boolean;
   profile: PlayerProfile;
   consentGiven: boolean;

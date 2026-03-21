@@ -158,12 +158,7 @@ const PhoneVerificationScreen = () => {
           dispatch({ type: 'SET_CAMPAIGN', campaignId: session.campaign_id });
         }
 
-        toast({
-          title: "Welcome back!",
-          description: `Good to see you again, ${session.player_name}. Starting your test now.`,
-        });
-
-        dispatch({ type: 'START_QUIZ' });
+        dispatch({ type: 'SET_STEP', step: 'existing-user' });
       } else {
         // New user — store phone in profile and go to profile screen
         dispatch({

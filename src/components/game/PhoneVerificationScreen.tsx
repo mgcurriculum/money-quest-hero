@@ -199,7 +199,7 @@ const PhoneVerificationScreen = () => {
             <Smartphone size={24} className="text-game-gold" />
           </div>
           <h2 className="text-3xl font-display font-bold text-game-text mb-2">
-            Verify Your Phone
+            Verify Your Account
           </h2>
           <p className="text-game-muted text-sm font-body">
             {step === 'phone'

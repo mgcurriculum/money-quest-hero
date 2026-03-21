@@ -48,6 +48,41 @@ const UserDashboard = () => {
   const [resendTimer, setResendTimer] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
 
+  // Auto-skip OTP if navigated from existing-user screen with verified phone
+  useEffect(() => {
+    if (verifiedPhoneFromState && otpStep === 'phone') {
+      // Find matching country code
+      const matchedCountry = COUNTRIES.find(c => verifiedPhoneFromState.startsWith(c.dial));
+      if (matchedCountry) {
+        setSelectedCountry(matchedCountry);
+        setPhone(verifiedPhoneFromState.slice(matchedCountry.dial.length));
+      } else {
+        setPhone(verifiedPhoneFromState);
+      }
+      setOtpStep('verified');
+      // Clear location state to prevent re-triggering
+      window.history.replaceState({}, document.title);
+    }
+  }, [verifiedPhoneFromState]);
+
+  // Fetch sessions once verified via route state
+  useEffect(() => {
+    if (otpStep === 'verified' && sessions.length === 0 && verifiedPhoneFromState) {
+      const fetchPhone = verifiedPhoneFromState;
+      const doFetch = async () => {
+        setLoading(true);
+        const { data } = await supabase
+          .from('game_sessions')
+          .select('id, player_name, player_age, player_age_number, player_gender, player_phone, player_country, profile_code, fq_score, band_level, created_at, answers, reflection_answer')
+          .eq('player_phone', fetchPhone)
+          .order('created_at', { ascending: false });
+        setSessions((data as SessionData[]) || []);
+        setLoading(false);
+      };
+      doFetch();
+    }
+  }, [otpStep]);
+
   const fullPhone = selectedCountry.dial + phone.replace(/[^\d]/g, '');
 
   const startResendTimer = () => {

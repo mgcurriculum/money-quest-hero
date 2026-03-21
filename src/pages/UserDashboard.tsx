@@ -362,7 +362,7 @@ const UserDashboard = () => {
                     onClick={() => { setOtpStep('phone'); setOtp(''); setOtpError(''); }}
                     className="text-xs font-body text-game-muted hover:text-game-text"
                   >
-                    Change number
+                    Change Email & Phone Number
                   </button>
                 </div>
                 <Button

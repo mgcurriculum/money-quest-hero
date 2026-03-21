@@ -71,10 +71,10 @@ const ExistingUserScreen = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          onClick={() => dispatch({ type: 'RESET' })}
+          onClick={() => dispatch({ type: 'SET_STEP', step: 'phone-verify' })}
           className="w-full mt-6 py-3 text-game-muted font-body text-sm hover:text-game-text transition-colors"
         >
-          ← Back to Home
+          ← Back
         </motion.button>
       </motion.div>
     </div>

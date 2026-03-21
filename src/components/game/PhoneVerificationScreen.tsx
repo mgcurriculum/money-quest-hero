@@ -208,8 +208,8 @@ const PhoneVerificationScreen = () => {
           </h2>
           <p className="text-game-muted text-sm font-body">
             {step === 'phone'
-              ? "Enter your phone number to get started"
-              : `We sent a 6-digit code to ${fullPhone}`}
+              ? "Enter your phone number and email to get started"
+              : "Enter the OTP sent to your mobile number and email. Both OTPs are the same."}
           </p>
         </div>
 

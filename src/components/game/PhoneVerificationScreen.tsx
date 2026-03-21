@@ -15,6 +15,7 @@ const PhoneVerificationScreen = () => {
   const { state, dispatch } = useGame();
   const { isPlaying, isLoading } = useNarration(state.isMuted);
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
@@ -27,6 +28,8 @@ const PhoneVerificationScreen = () => {
   const fullPhone = selectedCountry.dial + phone;
   const phoneDigits = phone.replace(/[^\d]/g, '');
   const isPhoneValid = phoneDigits.length >= 10;
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const isFormValid = isPhoneValid && isEmailValid;
 
   // Reset OTP state when phone/country changes
   useEffect(() => {

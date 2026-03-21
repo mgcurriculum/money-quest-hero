@@ -31,13 +31,147 @@ function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+async function signAndFetch(
+  method: string,
+  host: string,
+  endpoint: string,
+  service: string,
+  region: string,
+  accessKeyId: string,
+  secretAccessKey: string,
+  requestBody: string,
+  contentType: string,
+): Promise<Response> {
+  const now = new Date();
+  const amzDate = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const dateStamp = amzDate.slice(0, 8);
+
+  const payloadHash = await sha256(requestBody);
+  const canonicalHeaders = `content-type:${contentType}\nhost:${host}\nx-amz-date:${amzDate}\n`;
+  const signedHeaders = 'content-type;host;x-amz-date';
+  const canonicalRequest = `${method}\n/\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+  const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+  const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${credentialScope}\n${await sha256(canonicalRequest)}`;
+  const signingKey = await getSignatureKey(secretAccessKey, dateStamp, region, service);
+  const signature = toHex(await hmac(signingKey, stringToSign));
+  const authHeader = `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+  return fetch(endpoint, {
+    method,
+    headers: {
+      'Content-Type': contentType,
+      'Host': host,
+      'X-Amz-Date': amzDate,
+      'Authorization': authHeader,
+    },
+    body: requestBody,
+  });
+}
+
+async function sendSMS(
+  phone: string,
+  message: string,
+  region: string,
+  accessKeyId: string,
+  secretAccessKey: string,
+): Promise<boolean> {
+  try {
+    const host = `sns.${region}.amazonaws.com`;
+    const endpoint = `https://${host}/`;
+
+    const params = new URLSearchParams();
+    params.append('Action', 'Publish');
+    params.append('PhoneNumber', phone);
+    params.append('Message', message);
+    params.append('MessageAttributes.entry.1.Name', 'AWS.SNS.SMS.SenderID');
+    params.append('MessageAttributes.entry.1.Value.DataType', 'String');
+    params.append('MessageAttributes.entry.1.Value.StringValue', 'FinQuo');
+    params.append('MessageAttributes.entry.2.Name', 'AWS.SNS.SMS.SMSType');
+    params.append('MessageAttributes.entry.2.Value.DataType', 'String');
+    params.append('MessageAttributes.entry.2.Value.StringValue', 'Transactional');
+    params.append('Version', '2010-03-31');
+
+    const response = await signAndFetch(
+      'POST', host, endpoint, 'sns', region,
+      accessKeyId, secretAccessKey,
+      params.toString(), 'application/x-www-form-urlencoded',
+    );
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('SNS send failed:', response.status, errText);
+      return false;
+    }
+    console.log('OTP sent via SMS to:', phone);
+    return true;
+  } catch (err) {
+    console.error('SMS send error:', err);
+    return false;
+  }
+}
+
+async function sendEmail(
+  email: string,
+  otpCode: string,
+  region: string,
+  accessKeyId: string,
+  secretAccessKey: string,
+  fromEmail: string,
+): Promise<boolean> {
+  try {
+    const host = `email.${region}.amazonaws.com`;
+    const endpoint = `https://${host}/`;
+
+    const subject = 'Your FinQuo Versity Verification Code';
+    const bodyHtml = `
+      <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;">
+        <h2 style="color:#1a1a2e;margin-bottom:16px;">FinQuo Versity</h2>
+        <p style="color:#333;font-size:16px;">Your verification code is:</p>
+        <div style="background:#f5f5f5;border-radius:12px;padding:20px;text-align:center;margin:16px 0;">
+          <span style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#d4a843;">${otpCode}</span>
+        </div>
+        <p style="color:#666;font-size:14px;">This code is valid for 5 minutes. Do not share it with anyone.</p>
+      </div>
+    `;
+    const bodyText = `Your FinQuo Versity verification code is: ${otpCode}. Valid for 5 minutes.`;
+
+    const params = new URLSearchParams();
+    params.append('Action', 'SendEmail');
+    params.append('Source', fromEmail);
+    params.append('Destination.ToAddresses.member.1', email);
+    params.append('Message.Subject.Data', subject);
+    params.append('Message.Subject.Charset', 'UTF-8');
+    params.append('Message.Body.Html.Data', bodyHtml);
+    params.append('Message.Body.Html.Charset', 'UTF-8');
+    params.append('Message.Body.Text.Data', bodyText);
+    params.append('Message.Body.Text.Charset', 'UTF-8');
+
+    const response = await signAndFetch(
+      'POST', host, endpoint, 'ses', region,
+      accessKeyId, secretAccessKey,
+      params.toString(), 'application/x-www-form-urlencoded',
+    );
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('SES send failed:', response.status, errText);
+      return false;
+    }
+    console.log('OTP sent via email to:', email);
+    return true;
+  } catch (err) {
+    console.error('Email send error:', err);
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { phone } = await req.json();
+    const { phone, email } = await req.json();
 
     if (!phone || phone.length < 10) {
       return new Response(JSON.stringify({ error: 'Valid phone number is required' }), {
@@ -49,6 +183,7 @@ serve(async (req) => {
     const accessKeyId = Deno.env.get('AWS_ACCESS_KEY_ID');
     const secretAccessKey = Deno.env.get('AWS_SECRET_ACCESS_KEY');
     const region = Deno.env.get('AWS_REGION') || 'ap-south-1';
+    const fromEmail = Deno.env.get('AWS_SES_FROM_EMAIL') || '';
 
     if (!accessKeyId || !secretAccessKey) {
       console.error('AWS credentials not configured');
@@ -73,61 +208,30 @@ serve(async (req) => {
       expires_at: expiresAt.toISOString(),
     });
 
-    // Send SMS via AWS SNS
-    const message = `Your FinQuo Versity verification code is: ${otpCode}. Valid for 5 minutes.`;
-    const host = `sns.${region}.amazonaws.com`;
-    const endpoint = `https://${host}/`;
+    // Send OTP via SMS
+    const smsMessage = `Your FinQuo Versity verification code is: ${otpCode}. Valid for 5 minutes.`;
+    const smsSuccess = await sendSMS(phone, smsMessage, region, accessKeyId, secretAccessKey);
 
-    const now = new Date();
-    const amzDate = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-    const dateStamp = amzDate.slice(0, 8);
-    const service = 'sns';
+    // Send OTP via Email (if email provided)
+    let emailSuccess = false;
+    if (email && email.includes('@') && fromEmail) {
+      emailSuccess = await sendEmail(email, otpCode, region, accessKeyId, secretAccessKey, fromEmail);
+    }
 
-    const params = new URLSearchParams();
-    params.append('Action', 'Publish');
-    params.append('PhoneNumber', phone);
-    params.append('Message', message);
-    params.append('MessageAttributes.entry.1.Name', 'AWS.SNS.SMS.SenderID');
-    params.append('MessageAttributes.entry.1.Value.DataType', 'String');
-    params.append('MessageAttributes.entry.1.Value.StringValue', 'FinQuo');
-    params.append('MessageAttributes.entry.2.Name', 'AWS.SNS.SMS.SMSType');
-    params.append('MessageAttributes.entry.2.Value.DataType', 'String');
-    params.append('MessageAttributes.entry.2.Value.StringValue', 'Transactional');
-    params.append('Version', '2010-03-31');
-
-    const requestBody = params.toString();
-    const payloadHash = await sha256(requestBody);
-    const canonicalHeaders = `content-type:application/x-www-form-urlencoded\nhost:${host}\nx-amz-date:${amzDate}\n`;
-    const signedHeaders = 'content-type;host;x-amz-date';
-    const canonicalRequest = `POST\n/\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
-    const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-    const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${credentialScope}\n${await sha256(canonicalRequest)}`;
-    const signingKey = await getSignatureKey(secretAccessKey, dateStamp, region, service);
-    const signature = toHex(await hmac(signingKey, stringToSign));
-    const authHeader = `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
-
-    const snsResponse = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Host': host,
-        'X-Amz-Date': amzDate,
-        'Authorization': authHeader,
-      },
-      body: requestBody,
-    });
-
-    if (!snsResponse.ok) {
-      const errText = await snsResponse.text();
-      console.error('SNS send failed:', snsResponse.status, errText);
-      return new Response(JSON.stringify({ error: 'Failed to send OTP', details: errText }), {
-        status: 500,
+    // If BOTH fail, return error
+    if (!smsSuccess && !emailSuccess) {
+      return new Response(JSON.stringify({ error: 'Failed to send OTP. Please try again.' }), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log('OTP sent successfully via AWS SNS to:', phone);
-    return new Response(JSON.stringify({ success: true }), {
+    console.log(`OTP sent — SMS: ${smsSuccess}, Email: ${emailSuccess}`);
+    return new Response(JSON.stringify({
+      success: true,
+      smsSent: smsSuccess,
+      emailSent: emailSuccess,
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {

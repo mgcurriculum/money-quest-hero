@@ -31,6 +31,7 @@ type OtpStep = 'phone' | 'otp' | 'verified';
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [loading, setLoading] = useState(false);

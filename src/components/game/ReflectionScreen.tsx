@@ -49,6 +49,12 @@ const ReflectionScreen = () => {
   return (
     <div className="min-h-screen game-gradient flex flex-col items-center justify-center px-6 py-12 relative">
       <MuteButton isPlaying={isPlaying} isLoading={isLoading} className="absolute top-4 right-4 z-20" />
+      <button
+        onClick={() => { stop(); step === 0 ? dispatch({ type: 'SET_STEP', step: 'quiz' }) : setStep(0); }}
+        className="absolute top-4 left-4 z-20 text-game-muted hover:text-game-text font-body text-sm transition-colors"
+      >
+        ← Back
+      </button>
       <motion.div key={step} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full text-center">
         <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto mx-auto mb-4" />
         <p className="gold-text font-display font-bold text-lg mb-2">FQ Test</p>

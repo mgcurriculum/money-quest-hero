@@ -6,7 +6,7 @@ import WelcomeScreen from '@/components/game/WelcomeScreen';
 import ConsentScreen from '@/components/game/ConsentScreen';
 import PhoneVerificationScreen from '@/components/game/PhoneVerificationScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
-
+import ExistingUserScreen from '@/components/game/ExistingUserScreen';
 import QuestionPlay from '@/components/game/QuestionPlay';
 import ReflectionScreen from '@/components/game/ReflectionScreen';
 import ReportScreen from '@/components/game/ReportScreen';

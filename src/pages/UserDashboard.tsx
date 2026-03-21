@@ -62,8 +62,13 @@ const UserDashboard = () => {
   };
 
   const handleSendOtp = async () => {
-    if (phone.replace(/[^\d]/g, '').length < 10) return;
-    setOtpError('');
+    const digits = phone.replace(/[^\d]/g, '');
+    if (digits.length < 10) return;
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setOtpError('Please enter a valid email address');
+      return;
+    }
     setSending(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('send-otp', {

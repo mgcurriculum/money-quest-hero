@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Share2, MessageCircle, Facebook, Instagram, Download, Mail, RefreshCw } from 'lucide-react';
+import { Share2, MessageCircle, Download, Mail, RefreshCw } from 'lucide-react';
 import SessionHistory from './SessionHistory';
 
 // Map short DB dimension names to full display names
@@ -285,16 +285,10 @@ const ReportScreen = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="glass-card rounded-2xl p-4 mb-5 text-center print:hidden">
           <p className="text-game-text font-display font-semibold text-sm mb-3 flex items-center justify-center gap-1.5"><Share2 size={14} /> Share Your Results</p>
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-            {[
-              { name: 'whatsapp', icon: <MessageCircle size={14} />, label: 'WhatsApp', color: 'bg-green-600' },
-              { name: 'facebook', icon: <Facebook size={14} />, label: 'Facebook', color: 'bg-blue-600' },
-              { name: 'instagram', icon: <Instagram size={14} />, label: 'Instagram', color: 'bg-pink-600' },
-            ].map(p => (
-              <button key={p.name} onClick={() => handleShare(p.name)}
-                className={`${p.color} text-white px-3 sm:px-4 py-2 rounded-xl font-body text-xs font-semibold flex items-center gap-1 sm:gap-1.5 hover:scale-105 active:scale-95 transition-transform`}>
-                {p.icon} {p.label}
-              </button>
-            ))}
+            <button onClick={() => handleShare('whatsapp')}
+              className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-xl font-body text-xs font-semibold flex items-center gap-1 sm:gap-1.5 hover:scale-105 active:scale-95 transition-transform">
+              <MessageCircle size={14} /> WhatsApp
+            </button>
           </div>
         </motion.div>
 

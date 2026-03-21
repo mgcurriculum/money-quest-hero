@@ -62,6 +62,10 @@ const PhoneVerificationScreen = () => {
       setError('Please enter a valid phone number');
       return;
     }
+    if (!isEmailValid) {
+      setError('Please enter a valid email address');
+      return;
+    }
     setSending(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('send-otp', {

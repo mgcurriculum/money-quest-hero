@@ -68,6 +68,8 @@ const ReportScreen = () => {
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
+  const isLoading = questions.length === 0;
+
   const totalScore = Object.values(state.answers).reduce((sum, s) => sum + s, 0);
   const band = fqBands.find(b => totalScore >= b.min && totalScore < b.max) || fqBands[0];
   const dimScores = computeDimensionScores(questions, state.answers);
@@ -80,6 +82,17 @@ const ReportScreen = () => {
 
   const questionsAndAnswers = extractQuestionsAndAnswers(questions, state.answers);
   const tips = getFinancialTips(dimScores);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen game-gradient flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-game-gold/30 border-t-game-gold rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-game-muted font-body text-sm">Preparing your report...</p>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (!hasNarrated.current && !state.isMuted) {

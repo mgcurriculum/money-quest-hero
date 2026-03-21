@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { fqBands, MAX_SCORE, getProfileLabel, dimensions, dimensionIcons } from '@/data/questions';
@@ -6,7 +6,7 @@ import { generateReportHTML, downloadReportAsFile, getFinancialTips } from '@/ut
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Download, User, Phone, TrendingUp, History, ArrowLeft, LogOut, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import CountryCodePicker, { COUNTRIES, Country } from '@/components/game/CountryCodePicker';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 

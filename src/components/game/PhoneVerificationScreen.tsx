@@ -286,10 +286,10 @@ const PhoneVerificationScreen = () => {
         <div className="mt-6 space-y-3">
           {step === 'phone' ? (
             <button
-              disabled={!isPhoneValid || sending}
+              disabled={!isFormValid || sending}
               onClick={handleSendOTP}
               className={`w-full py-4 rounded-2xl font-display font-semibold text-lg transition-all ${
-                isPhoneValid
+                isFormValid
                   ? 'gold-gradient text-white game-shadow hover:scale-105 active:scale-95'
                   : 'bg-game-card text-game-muted cursor-not-allowed'
               }`}

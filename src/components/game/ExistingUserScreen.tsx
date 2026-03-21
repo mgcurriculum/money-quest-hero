@@ -9,7 +9,7 @@ const ExistingUserScreen = () => {
   const navigate = useNavigate();
 
   const handleViewProfile = () => {
-    navigate('/profile');
+    navigate('/profile', { state: { verifiedPhone: state.profile.phone } });
   };
 
   const handleRetakeTest = () => {

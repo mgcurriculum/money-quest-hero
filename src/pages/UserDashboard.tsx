@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { fqBands, MAX_SCORE, getProfileLabel, dimensions, dimensionIcons } from '@/data/questions';
@@ -6,7 +6,7 @@ import { generateReportHTML, downloadReportAsFile, getFinancialTips } from '@/ut
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Download, User, Phone, TrendingUp, History, ArrowLeft, LogOut, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import CountryCodePicker, { COUNTRIES, Country } from '@/components/game/CountryCodePicker';
 import finquoLogo from '@/assets/finquo-logo-white.png';
 
@@ -30,6 +30,8 @@ type OtpStep = 'phone' | 'otp' | 'verified';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const verifiedPhoneFromState = (location.state as any)?.verifiedPhone as string | undefined;
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
@@ -45,6 +47,41 @@ const UserDashboard = () => {
   const [verifying, setVerifying] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
+
+  // Auto-skip OTP if navigated from existing-user screen with verified phone
+  useEffect(() => {
+    if (verifiedPhoneFromState && otpStep === 'phone') {
+      // Find matching country code
+      const matchedCountry = COUNTRIES.find(c => verifiedPhoneFromState.startsWith(c.dial));
+      if (matchedCountry) {
+        setSelectedCountry(matchedCountry);
+        setPhone(verifiedPhoneFromState.slice(matchedCountry.dial.length));
+      } else {
+        setPhone(verifiedPhoneFromState);
+      }
+      setOtpStep('verified');
+      // Clear location state to prevent re-triggering
+      window.history.replaceState({}, document.title);
+    }
+  }, [verifiedPhoneFromState]);
+
+  // Fetch sessions once verified via route state
+  useEffect(() => {
+    if (otpStep === 'verified' && sessions.length === 0 && verifiedPhoneFromState) {
+      const fetchPhone = verifiedPhoneFromState;
+      const doFetch = async () => {
+        setLoading(true);
+        const { data } = await supabase
+          .from('game_sessions')
+          .select('id, player_name, player_age, player_age_number, player_gender, player_phone, player_country, profile_code, fq_score, band_level, created_at, answers, reflection_answer')
+          .eq('player_phone', fetchPhone)
+          .order('created_at', { ascending: false });
+        setSessions((data as SessionData[]) || []);
+        setLoading(false);
+      };
+      doFetch();
+    }
+  }, [otpStep]);
 
   const fullPhone = selectedCountry.dial + phone.replace(/[^\d]/g, '');
 

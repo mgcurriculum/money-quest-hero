@@ -204,7 +204,7 @@ const PhoneVerificationScreen = () => {
           <p className="text-game-muted text-sm font-body">
             {step === 'phone'
               ? "Enter your phone number and email to get started"
-              : `Enter the OTP sent to your mobile number (${fullPhone}) and email (${email.trim()}). Both OTPs are the same. Please enter the OTP you received.`}
+              : `Enter the OTP sent to your mobile number (${fullPhone}) and email (${email.trim()}). Please enter the OTP you received.`}
           </p>
         </div>
 

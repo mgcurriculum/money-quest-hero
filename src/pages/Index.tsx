@@ -50,6 +50,7 @@ const GameFlow = () => {
     case 'consent': return <ConsentScreen />;
     case 'phone-verify': return <PhoneVerificationScreen />;
     case 'profile': return <ProfileScreen />;
+    case 'existing-user': return <ExistingUserScreen />;
     case 'quiz': return <QuestionPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;

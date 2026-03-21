@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { GameProvider, useGame } from '@/context/GameContext';
+import { GameProvider, useGame, GameState } from '@/context/GameContext';
 import WelcomeScreen from '@/components/game/WelcomeScreen';
 import ConsentScreen from '@/components/game/ConsentScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
@@ -29,13 +29,52 @@ const CampaignInit = ({ campaign }: { campaign: CampaignData }) => {
   return null;
 };
 
+function getCampaignPreviousStep(currentStep: GameState['step']): GameState['step'] | null {
+  switch (currentStep) {
+    case 'consent': return 'welcome';
+    case 'profile': return 'consent';
+    case 'quiz': return 'profile';
+    case 'reflection': return 'quiz';
+    case 'report': return 'reflection';
+    default: return null;
+  }
+}
+
 const CampaignGameFlow = () => {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
+  const isPopstateRef = useRef(false);
+  const prevStepRef = useRef(state.step);
+
+  // Push browser history when step changes (forward navigation)
+  useEffect(() => {
+    if (isPopstateRef.current) {
+      isPopstateRef.current = false;
+      prevStepRef.current = state.step;
+      return;
+    }
+    if (state.step !== prevStepRef.current && state.step !== 'welcome') {
+      window.history.pushState({ gameStep: state.step }, '');
+    }
+    prevStepRef.current = state.step;
+  }, [state.step]);
+
+  // Handle browser back button
+  useEffect(() => {
+    const handlePopState = () => {
+      isPopstateRef.current = true;
+      const prev = getCampaignPreviousStep(prevStepRef.current);
+      if (prev) {
+        dispatch({ type: 'SET_STEP', step: prev });
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [dispatch]);
+
   switch (state.step) {
     case 'welcome': return <WelcomeScreen />;
     case 'consent': return <ConsentScreen />;
     case 'profile': return <ProfileScreen />;
-    
     case 'quiz': return <QuestionPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;

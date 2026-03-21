@@ -263,7 +263,7 @@ const UserDashboard = () => {
       <div className="max-w-lg mx-auto w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => navigate('/')} className="text-game-muted hover:text-game-text transition-colors">
+          <button onClick={() => navigate(-1)} className="text-game-muted hover:text-game-text transition-colors">
             <ArrowLeft size={20} />
           </button>
           <img src={finquoLogo} alt="FinQuo Versity" className="w-20 h-auto" />

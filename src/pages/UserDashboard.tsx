@@ -268,12 +268,21 @@ const UserDashboard = () => {
                     onChange={e => setPhone(e.target.value.replace(/[^\d]/g, ''))}
                     placeholder="9876543210"
                     className="flex-1 min-w-0 bg-game-surface text-game-text rounded-xl px-3 sm:px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-sm sm:text-base"
-                    onKeyDown={e => e.key === 'Enter' && handleSendOtp()}
                   />
                 </div>
+                <label className="text-game-muted text-xs font-body uppercase tracking-wider mb-2 block">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full bg-game-surface text-game-text rounded-xl px-3 sm:px-4 py-3 font-body border border-game-card focus:border-game-gold focus:outline-none transition-colors text-sm sm:text-base mb-3"
+                />
                 <Button
                   onClick={handleSendOtp}
-                  disabled={phone.replace(/[^\d]/g, '').length < 10 || sending}
+                  disabled={phone.replace(/[^\d]/g, '').length < 10 || !email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || sending}
                   className="w-full gold-gradient text-white font-display font-semibold rounded-xl py-3 hover:scale-105 active:scale-95 transition-transform"
                 >
                   {sending ? 'Sending OTP...' : <><ShieldCheck size={16} className="mr-2" /> Send OTP</>}

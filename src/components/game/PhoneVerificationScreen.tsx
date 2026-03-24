@@ -154,8 +154,21 @@ const PhoneVerificationScreen = () => {
 
         dispatch({ type: 'SET_PROFILE', profile });
 
-        if (session.campaign_id) {
+        // Only set campaign from old session if we're NOT already in a campaign flow
+        if (!state.campaignId && session.campaign_id) {
           dispatch({ type: 'SET_CAMPAIGN', campaignId: session.campaign_id });
+        }
+
+        // If in a campaign flow, link the existing session to this campaign
+        if (state.campaignId) {
+          try {
+            await supabase
+              .from('game_sessions')
+              .update({ campaign_id: state.campaignId } as any)
+              .eq('id', session.id);
+          } catch (err) {
+            console.error('Failed to link session to campaign:', err);
+          }
         }
 
         dispatch({ type: 'SET_STEP', step: 'existing-user' });

@@ -34,7 +34,9 @@ const CampaignInit = ({ campaign }: { campaign: CampaignData }) => {
 function getCampaignPreviousStep(currentStep: GameState['step']): GameState['step'] | null {
   switch (currentStep) {
     case 'consent': return 'welcome';
-    case 'profile': return 'consent';
+    case 'phone-verify': return 'consent';
+    case 'profile': return 'phone-verify';
+    case 'existing-user': return 'phone-verify';
     case 'quiz': return 'profile';
     case 'reflection': return 'quiz';
     case 'report': return 'reflection';

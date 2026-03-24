@@ -11,9 +11,15 @@ type Session = Tables<'game_sessions'>;
 interface Props {
   sessions: Session[];
   onSelectSession: (session: Session) => void;
+  campaigns?: { id: string; name: string }[];
 }
 
-const DashboardOverview = ({ sessions, onSelectSession }: Props) => {
+const DashboardOverview = ({ sessions, onSelectSession, campaigns = [] }: Props) => {
+  const campaignMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    campaigns.forEach(c => { map[c.id] = c.name; });
+    return map;
+  }, [campaigns]);
   const avgScore = sessions.length
     ? Math.round(sessions.reduce((sum, s) => sum + (s.fq_score || 0), 0) / sessions.length)
     : 0;
@@ -78,6 +84,7 @@ const DashboardOverview = ({ sessions, onSelectSession }: Props) => {
                 <TableHead>Profile</TableHead>
                 <TableHead>FQ Score</TableHead>
                 <TableHead>Band</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -89,12 +96,21 @@ const DashboardOverview = ({ sessions, onSelectSession }: Props) => {
                   <TableCell>{(s as any).profile_code || '-'}</TableCell>
                   <TableCell>{s.fq_score}/{MAX_SCORE}</TableCell>
                   <TableCell>{s.band_level}</TableCell>
+                  <TableCell>
+                    {s.campaign_id ? (
+                      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                        Campaign: {campaignMap[s.campaign_id] || 'Unknown'}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Direct</span>
+                    )}
+                  </TableCell>
                   <TableCell>{new Date(s.created_at).toLocaleDateString()}</TableCell>
                 </TableRow>
               ))}
               {sessions.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">No sessions found</TableCell>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">No sessions found</TableCell>
                 </TableRow>
               )}
             </TableBody>

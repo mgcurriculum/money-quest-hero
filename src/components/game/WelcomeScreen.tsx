@@ -87,9 +87,11 @@ const WelcomeScreen = () => {
           <button onClick={handleStart} className="w-full py-4 px-8 rounded-2xl font-display font-semibold text-lg gold-gradient text-game-bg game-shadow pulse-glow transition-transform hover:scale-105 active:scale-95">
             Start My FQ Test 🚀
           </button>
-          <button onClick={() => navigate('/profile')} className="w-full py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform">
-            📋 View My Profile & History
-          </button>
+          {!state.campaignId && (
+            <button onClick={() => navigate('/profile')} className="w-full py-3 rounded-2xl font-display font-semibold text-sm glass-card border border-game-gold/30 text-game-gold hover:scale-105 active:scale-95 transition-transform">
+              📋 View My Profile & History
+            </button>
+          )}
         </motion.div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-8 flex items-center justify-center gap-6 text-game-muted text-sm">

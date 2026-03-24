@@ -11,6 +11,7 @@ type Session = Tables<'game_sessions'>;
 interface Props {
   sessions: Session[];
   onSelectSession: (session: Session) => void;
+  campaigns?: { id: string; name: string }[];
 }
 
 const DashboardOverview = ({ sessions, onSelectSession }: Props) => {

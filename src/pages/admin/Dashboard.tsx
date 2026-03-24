@@ -247,7 +247,7 @@ const Dashboard = () => {
         </TabsList>
 
         <TabsContent value="overview">
-          <DashboardOverview sessions={filtered} onSelectSession={setSelectedSession} />
+          <DashboardOverview sessions={filtered} onSelectSession={setSelectedSession} campaigns={campaigns} />
         </TabsContent>
 
         <TabsContent value="questions">

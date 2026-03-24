@@ -96,6 +96,15 @@ const DashboardOverview = ({ sessions, onSelectSession, campaigns = [] }: Props)
                   <TableCell>{(s as any).profile_code || '-'}</TableCell>
                   <TableCell>{s.fq_score}/{MAX_SCORE}</TableCell>
                   <TableCell>{s.band_level}</TableCell>
+                  <TableCell>
+                    {s.campaign_id ? (
+                      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                        Campaign: {campaignMap[s.campaign_id] || 'Unknown'}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Direct</span>
+                    )}
+                  </TableCell>
                   <TableCell>{new Date(s.created_at).toLocaleDateString()}</TableCell>
                 </TableRow>
               ))}

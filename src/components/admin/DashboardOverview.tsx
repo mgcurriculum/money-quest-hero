@@ -84,6 +84,7 @@ const DashboardOverview = ({ sessions, onSelectSession, campaigns = [] }: Props)
                 <TableHead>Profile</TableHead>
                 <TableHead>FQ Score</TableHead>
                 <TableHead>Band</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>

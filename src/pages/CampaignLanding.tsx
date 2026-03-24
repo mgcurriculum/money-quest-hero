@@ -4,7 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { GameProvider, useGame, GameState } from '@/context/GameContext';
 import WelcomeScreen from '@/components/game/WelcomeScreen';
 import ConsentScreen from '@/components/game/ConsentScreen';
+import PhoneVerificationScreen from '@/components/game/PhoneVerificationScreen';
 import ProfileScreen from '@/components/game/ProfileScreen';
+import ExistingUserScreen from '@/components/game/ExistingUserScreen';
 import QuestionPlay from '@/components/game/QuestionPlay';
 import ReflectionScreen from '@/components/game/ReflectionScreen';
 
@@ -32,7 +34,9 @@ const CampaignInit = ({ campaign }: { campaign: CampaignData }) => {
 function getCampaignPreviousStep(currentStep: GameState['step']): GameState['step'] | null {
   switch (currentStep) {
     case 'consent': return 'welcome';
-    case 'profile': return 'consent';
+    case 'phone-verify': return 'consent';
+    case 'profile': return 'phone-verify';
+    case 'existing-user': return 'phone-verify';
     case 'quiz': return 'profile';
     case 'reflection': return 'quiz';
     case 'report': return 'reflection';
@@ -74,7 +78,9 @@ const CampaignGameFlow = () => {
   switch (state.step) {
     case 'welcome': return <WelcomeScreen />;
     case 'consent': return <ConsentScreen />;
+    case 'phone-verify': return <PhoneVerificationScreen />;
     case 'profile': return <ProfileScreen />;
+    case 'existing-user': return <ExistingUserScreen />;
     case 'quiz': return <QuestionPlay />;
     case 'reflection': return <ReflectionScreen />;
     case 'report': return <ReportScreen />;

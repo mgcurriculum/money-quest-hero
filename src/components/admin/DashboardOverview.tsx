@@ -14,7 +14,12 @@ interface Props {
   campaigns?: { id: string; name: string }[];
 }
 
-const DashboardOverview = ({ sessions, onSelectSession }: Props) => {
+const DashboardOverview = ({ sessions, onSelectSession, campaigns = [] }: Props) => {
+  const campaignMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    campaigns.forEach(c => { map[c.id] = c.name; });
+    return map;
+  }, [campaigns]);
   const avgScore = sessions.length
     ? Math.round(sessions.reduce((sum, s) => sum + (s.fq_score || 0), 0) / sessions.length)
     : 0;
